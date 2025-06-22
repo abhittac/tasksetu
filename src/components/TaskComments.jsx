@@ -220,3 +220,78 @@ export default function TaskComments({ taskId }) {
     </div>
   )
 }
+import { useState } from 'react'
+
+export default function TaskComments({ taskId }) {
+  const [comments, setComments] = useState([
+    {
+      id: 1,
+      user: 'John Doe',
+      avatar: 'JD',
+      text: 'This task is progressing well. Need to complete the database setup first.',
+      timestamp: '2024-01-22 10:30:00',
+      mentions: []
+    },
+    {
+      id: 2,
+      user: 'Jane Smith',
+      avatar: 'JS',
+      text: 'I can help with the frontend once the API is ready.',
+      timestamp: '2024-01-22 09:15:00',
+      mentions: []
+    }
+  ])
+  
+  const [newComment, setNewComment] = useState('')
+
+  const handleSubmitComment = (e) => {
+    e.preventDefault()
+    if (!newComment.trim()) return
+
+    const comment = {
+      id: Date.now(),
+      user: 'Current User',
+      avatar: 'CU',
+      text: newComment,
+      timestamp: new Date().toLocaleString(),
+      mentions: []
+    }
+
+    setComments([...comments, comment])
+    setNewComment('')
+  }
+
+  return (
+    <div className="task-comments">
+      <div className="comments-list">
+        {comments.map(comment => (
+          <div key={comment.id} className="comment-item">
+            <div className="comment-avatar">{comment.avatar}</div>
+            <div className="comment-content">
+              <div className="comment-header">
+                <span className="comment-user">{comment.user}</span>
+                <span className="comment-time">{comment.timestamp}</span>
+              </div>
+              <div className="comment-text">{comment.text}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <form onSubmit={handleSubmitComment} className="comment-form">
+        <textarea
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Add a comment..."
+          className="comment-input"
+          rows="3"
+        />
+        <div className="comment-actions">
+          <button type="submit" className="btn-primary">
+            Add Comment
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}

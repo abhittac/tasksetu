@@ -868,6 +868,74 @@ function SubtaskDetailView({ subtask, onUpdate, onClose, canEdit, currentUser })
             </div>
 
             <div className="form-field">
+              <label>Due Date</label>
+              <input
+                type="date"
+                name="dueDate"
+                value={formData.dueDate}
+                onChange={handleChange}
+                disabled={!canEdit}
+              />
+            </div>
+          </div>
+
+          <div className="form-field full-width">
+            <label>Description</label>
+            <textarea
+              name="description"
+              value={formData.description || ''}
+              onChange={handleChange}
+              disabled={!canEdit}
+              rows="4"
+            />
+          </div>
+        </div>
+
+        <div className="subtask-meta-info">
+          <div className="meta-item">
+            <strong>Created:</strong> {new Date(subtask.createdAt).toLocaleString()}
+          </div>
+          <div className="meta-item">
+            <strong>Created by:</strong> {subtask.createdBy}
+          </div>
+          <div className="meta-item">
+            <strong>Visibility:</strong> {subtask.visibility}
+          </div>
+        </div>
+
+        {canEdit && (
+          <div className="subtask-detail-actions">
+            <button className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button className="btn-primary" onClick={handleSave}>
+              Save Changes
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}</old_str>ed">Completed</option>
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label>Priority</label>
+              <select
+                name="priority"
+                value={formData.priority}
+                onChange={handleChange}
+                disabled={!canEdit}
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+            </div>
+
+            <div className="form-field">
               <label>Assignee</label>
               <select
                 name="assignee"

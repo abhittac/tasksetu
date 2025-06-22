@@ -281,3 +281,83 @@ export default function TaskAttachments({ taskId }) {
     </div>
   )
 }
+import { useState } from 'react'
+
+export default function TaskAttachments({ taskId }) {
+  const [attachments, setAttachments] = useState([
+    {
+      id: 1,
+      name: 'requirements.pdf',
+      size: '2.4 MB',
+      type: 'pdf',
+      uploadedBy: 'John Doe',
+      uploadedAt: '2024-01-22 10:00:00'
+    },
+    {
+      id: 2,
+      name: 'design-mockup.png',
+      size: '1.8 MB',
+      type: 'image',
+      uploadedBy: 'Jane Smith',
+      uploadedAt: '2024-01-22 09:30:00'
+    }
+  ])
+
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files)
+    files.forEach(file => {
+      const attachment = {
+        id: Date.now() + Math.random(),
+        name: file.name,
+        size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+        type: file.type.split('/')[0],
+        uploadedBy: 'Current User',
+        uploadedAt: new Date().toLocaleString()
+      }
+      setAttachments(prev => [...prev, attachment])
+    })
+  }
+
+  const handleDeleteAttachment = (id) => {
+    setAttachments(prev => prev.filter(att => att.id !== id))
+  }
+
+  return (
+    <div className="task-attachments">
+      <div className="attachments-header">
+        <h4>Attachments</h4>
+        <label className="upload-button btn-primary">
+          Upload Files
+          <input
+            type="file"
+            multiple
+            onChange={handleFileUpload}
+            style={{ display: 'none' }}
+          />
+        </label>
+      </div>
+
+      <div className="attachments-list">
+        {attachments.map(attachment => (
+          <div key={attachment.id} className="attachment-item">
+            <div className="attachment-info">
+              <div className="attachment-name">{attachment.name}</div>
+              <div className="attachment-meta">
+                {attachment.size} • Uploaded by {attachment.uploadedBy} • {attachment.uploadedAt}
+              </div>
+            </div>
+            <div className="attachment-actions">
+              <button className="btn-action">Download</button>
+              <button 
+                className="btn-action delete"
+                onClick={() => handleDeleteAttachment(attachment.id)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}

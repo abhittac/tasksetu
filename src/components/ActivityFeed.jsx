@@ -182,3 +182,51 @@ export default function ActivityFeed({ taskId }) {
     </div>
   )
 }
+import { useState } from 'react'
+
+export default function ActivityFeed({ taskId }) {
+  const [activities] = useState([
+    {
+      id: 1,
+      type: 'status_change',
+      user: 'John Doe',
+      action: 'changed status from "To Do" to "In Progress"',
+      timestamp: '2024-01-22 10:30:00',
+      avatar: 'JD'
+    },
+    {
+      id: 2,
+      type: 'comment',
+      user: 'Jane Smith',
+      action: 'added a comment',
+      timestamp: '2024-01-22 09:15:00',
+      avatar: 'JS'
+    },
+    {
+      id: 3,
+      type: 'assignment',
+      user: 'Admin',
+      action: 'assigned task to John Doe',
+      timestamp: '2024-01-22 08:00:00',
+      avatar: 'A'
+    }
+  ])
+
+  return (
+    <div className="activity-feed">
+      <div className="activity-list">
+        {activities.map(activity => (
+          <div key={activity.id} className="activity-item">
+            <div className="activity-avatar">{activity.avatar}</div>
+            <div className="activity-content">
+              <div className="activity-text">
+                <span className="activity-user">{activity.user}</span> {activity.action}
+              </div>
+              <div className="activity-time">{activity.timestamp}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
