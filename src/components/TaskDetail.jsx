@@ -268,7 +268,12 @@ export default function TaskDetail({ taskId, onClose }) {
           )}
 
           {activeTab === 'subtasks' && (
-            <SubtasksPanel subtasks={task.subtasks} onCreateSubtask={handleCreateSubtask} />
+            <SubtasksPanel 
+              subtasks={task.subtasks} 
+              onCreateSubtask={handleCreateSubtask}
+              parentTask={task}
+              currentUser={currentUser}
+            />
           )}
 
           {activeTab === 'comments' && <TaskComments taskId={taskId} />}
@@ -292,53 +297,541 @@ export default function TaskDetail({ taskId, onClose }) {
   )
 }
 
-function SubtasksPanel({ subtasks, onCreateSubtask }) {
+function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
   const [filter, setFilter] = useState('all')
+  const [showInlineAdd, setShowInlineAdd] = useState(false)
+  const [expandedSubtask, setExpandedSubtask] = useState(null)
+  const [subtaskList, setSubtaskList] = useState(subtasks)
 
-  const filteredSubtasks = subtasks.filter(subtask => {
+  const filteredSubtasks = subtaskList.filter(subtask => {
     if (filter === 'all') return true
     return subtask.status === filter
   })
 
+  const handleCreateSubtask = (subtaskData) => {
+    const newSubtask = {
+      id: Date.now(),
+      ...subtaskData,
+      parentTaskId: parentTask.id,
+      createdAt: new Date().toISOString(),
+      createdBy: currentUser.name
+    }
+    setSubtaskList([...subtaskList, newSubtask])
+    setShowInlineAdd(false)
+  }
+
+  const handleUpdateSubtask = (updatedSubtask) => {
+    setSubtaskList(subtaskList.map(st => 
+      st.id === updatedSubtask.id ? updatedSubtask : st
+    ))
+  }
+
+  const handleDeleteSubtask = (subtaskId) => {
+    setSubtaskList(subtaskList.filter(st => st.id !== subtaskId))
+    if (expandedSubtask?.id === subtaskId) {
+      setExpandedSubtask(null)
+    }
+  }
+
+  const canEditSubtask = (subtask) => {
+    return subtask.createdBy === currentUser.name || 
+           subtask.assignee === currentUser.name || 
+           currentUser.role === 'admin'
+  }
+
+  const canDeleteSubtask = (subtask) => {
+    return subtask.createdBy === currentUser.name || currentUser.role === 'admin'
+  }
+
   return (
     <div className="subtasks-panel">
       <div className="subtasks-header">
-        <h3>Subtasks ({subtasks.length})</h3>
+        <h3>Sub-tasks ({subtaskList.length})</h3>
         <div className="subtasks-filters">
           <select value={filter} onChange={(e) => setFilter(e.target.value)}>
             <option value="all">All Status</option>
-            <option value="pending">Pending</option>
+            <option value="to-do">To Do</option>
             <option value="in-progress">In Progress</option>
+            <option value="blocked">Blocked</option>
             <option value="completed">Completed</option>
           </select>
-          <button className="btn-primary" onClick={onCreateSubtask}>
-            + Add Subtask
+          <button 
+            className="btn-primary" 
+            onClick={() => setShowInlineAdd(true)}
+          >
+            + Add Sub-task
           </button>
         </div>
       </div>
 
       <div className="subtasks-list">
+        {showInlineAdd && (
+          <InlineSubtaskAdd
+            parentTask={parentTask}
+            currentUser={currentUser}
+            onSubmit={handleCreateSubtask}
+            onCancel={() => setShowInlineAdd(false)}
+          />
+        )}
+
         {filteredSubtasks.map(subtask => (
           <div key={subtask.id} className="subtask-item">
-            <div className="subtask-info">
-              <span className={`status-indicator ${subtask.status}`}>
-                {subtask.status === 'completed' ? '✅' : 
-                 subtask.status === 'in-progress' ? '🔄' : '⏸️'}
-              </span>
-              <div className="subtask-details">
-                <h4>{subtask.title}</h4>
-                <div className="subtask-meta">
-                  <span>Assignee: {subtask.assignee}</span>
-                  <span>Due: {subtask.dueDate}</span>
-                </div>
-              </div>
-            </div>
-            <div className="subtask-actions">
-              <button className="btn-action">Edit</button>
-              <button className="btn-action">Delete</button>
-            </div>
+            <SubtaskSummary 
+              subtask={subtask}
+              isExpanded={expandedSubtask?.id === subtask.id}
+              onExpand={() => {
+                setExpandedSubtask(expandedSubtask?.id === subtask.id ? null : subtask)
+              }}
+              onUpdate={handleUpdateSubtask}
+              onDelete={handleDeleteSubtask}
+              canEdit={canEditSubtask(subtask)}
+              canDelete={canDeleteSubtask(subtask)}
+              currentUser={currentUser}
+            />
+            
+            {expandedSubtask?.id === subtask.id && (
+              <SubtaskDetailView 
+                subtask={subtask}
+                onUpdate={handleUpdateSubtask}
+                onClose={() => setExpandedSubtask(null)}
+                canEdit={canEditSubtask(subtask)}
+                currentUser={currentUser}
+              />
+            )}
           </div>
         ))}
+
+        {filteredSubtasks.length === 0 && !showInlineAdd && (
+          <div className="empty-subtasks">
+            <p>No sub-tasks found. Create your first sub-task to break down this task into manageable pieces.</p>
+            <button 
+              className="btn-secondary"
+              onClick={() => setShowInlineAdd(true)}
+            >
+              + Add Sub-task
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    assignee: currentUser.name,
+    assigneeId: currentUser.id,
+    priority: 'low',
+    dueDate: parentTask.dueDate,
+    status: 'to-do',
+    visibility: parentTask.visibility || 'private',
+    description: '',
+    attachments: []
+  })
+
+  const priorityDueDays = { low: 30, medium: 14, high: 7, critical: 2 }
+
+  const calculateDueDate = (priority) => {
+    const today = new Date()
+    const daysToAdd = priorityDueDays[priority] || 30
+    const dueDate = new Date(today.getTime() + (daysToAdd * 24 * 60 * 60 * 1000))
+    return dueDate.toISOString().split('T')[0]
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    
+    if (name === 'priority') {
+      setFormData({
+        ...formData,
+        [name]: value,
+        dueDate: calculateDueDate(value)
+      })
+    } else if (name === 'assignee') {
+      // In a real app, you'd lookup assignee ID from name
+      setFormData({
+        ...formData,
+        [name]: value,
+        assigneeId: value === currentUser.name ? currentUser.id : 2 // Mock ID
+      })
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      })
+    }
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (formData.title.trim()) {
+      onSubmit(formData)
+    }
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit(e)
+    } else if (e.key === 'Escape') {
+      onCancel()
+    }
+  }
+
+  return (
+    <div className="inline-subtask-add">
+      <form onSubmit={handleSubmit} className="subtask-form">
+        <div className="subtask-form-header">
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Enter sub-task name (max 60 characters)"
+            maxLength={60}
+            required
+            autoFocus
+            className="subtask-title-input"
+            onKeyDown={handleKeyPress}
+          />
+          <div className="character-count">{formData.title.length}/60</div>
+        </div>
+
+        <div className="subtask-form-fields">
+          <div className="form-row">
+            <div className="form-field">
+              <label>Assigned To*</label>
+              <select
+                name="assignee"
+                value={formData.assignee}
+                onChange={handleChange}
+                required
+              >
+                <option value={currentUser.name}>Myself</option>
+                <option value="John Smith">John Smith</option>
+                <option value="Sarah Wilson">Sarah Wilson</option>
+                <option value="Mike Johnson">Mike Johnson</option>
+                <option value="Emily Davis">Emily Davis</option>
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label>Priority</label>
+              <select
+                name="priority"
+                value={formData.priority}
+                onChange={handleChange}
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label>Due Date*</label>
+              <input
+                type="date"
+                name="dueDate"
+                value={formData.dueDate}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-field">
+              <label>Status</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+              >
+                <option value="to-do">To Do</option>
+                <option value="in-progress">In Progress</option>
+                <option value="blocked">Blocked</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-field full-width">
+            <label>Notes/Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Add details or context for this sub-task..."
+              rows="3"
+            />
+          </div>
+        </div>
+
+        <div className="subtask-form-actions">
+          <button type="button" className="btn-secondary" onClick={onCancel}>
+            Cancel
+          </button>
+          <button type="submit" className="btn-primary">
+            Create Sub-task
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
+
+function SubtaskSummary({ subtask, isExpanded, onExpand, onUpdate, onDelete, canEdit, canDelete, currentUser }) {
+  const [editingField, setEditingField] = useState(null)
+  const [editValue, setEditValue] = useState('')
+
+  const handleFieldEdit = (field, currentValue) => {
+    if (!canEdit) return
+    setEditingField(field)
+    setEditValue(currentValue)
+  }
+
+  const handleFieldSave = () => {
+    if (editingField && editValue !== subtask[editingField]) {
+      const updatedSubtask = { ...subtask, [editingField]: editValue }
+      onUpdate(updatedSubtask)
+    }
+    setEditingField(null)
+    setEditValue('')
+  }
+
+  const handleFieldCancel = () => {
+    setEditingField(null)
+    setEditValue('')
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleFieldSave()
+    } else if (e.key === 'Escape') {
+      handleFieldCancel()
+    }
+  }
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'completed': return '✅'
+      case 'in-progress': return '🔄'
+      case 'blocked': return '🚫'
+      default: return '⏸️'
+    }
+  }
+
+  const isOverdue = () => {
+    const today = new Date().toISOString().split('T')[0]
+    return subtask.dueDate < today && subtask.status !== 'completed'
+  }
+
+  return (
+    <div className={`subtask-summary ${isExpanded ? 'expanded' : ''} ${isOverdue() ? 'overdue' : ''}`}>
+      <div className="subtask-summary-main" onClick={onExpand}>
+        <div className="subtask-info">
+          <span className={`status-indicator ${subtask.status}`}>
+            {getStatusIcon(subtask.status)}
+          </span>
+          
+          <div className="subtask-details">
+            {editingField === 'title' ? (
+              <input
+                type="text"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onBlur={handleFieldSave}
+                onKeyDown={handleKeyPress}
+                autoFocus
+                className="inline-edit-input"
+                maxLength={60}
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <h4 
+                className={`subtask-title ${subtask.status === 'completed' ? 'completed' : ''}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleFieldEdit('title', subtask.title)
+                }}
+              >
+                {subtask.title}
+                {canEdit && <span className="edit-icon-small">✏️</span>}
+              </h4>
+            )}
+            
+            <div className="subtask-meta">
+              <div className="assignee-info">
+                <span className="assignee-avatar">{subtask.assignee.charAt(0)}</span>
+                <span className="assignee-name">{subtask.assignee}</span>
+              </div>
+              
+              <div className={`due-date ${isOverdue() ? 'overdue' : ''}`}>
+                {editingField === 'dueDate' ? (
+                  <input
+                    type="date"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={handleFieldSave}
+                    onKeyDown={handleKeyPress}
+                    autoFocus
+                    className="inline-edit-input"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                ) : (
+                  <span 
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleFieldEdit('dueDate', subtask.dueDate)
+                    }}
+                  >
+                    Due: {subtask.dueDate}
+                    {canEdit && <span className="edit-icon-small">✏️</span>}
+                  </span>
+                )}
+              </div>
+
+              <span className={`priority-indicator ${subtask.priority}`}>
+                {subtask.priority}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="expand-indicator">
+          {isExpanded ? '▼' : '▶'}
+        </div>
+      </div>
+
+      <div className="subtask-actions" onClick={(e) => e.stopPropagation()}>
+        {canDelete && (
+          <button 
+            className="btn-action delete"
+            onClick={() => {
+              if (window.confirm('Are you sure you want to delete this sub-task?')) {
+                onDelete(subtask.id)
+              }
+            }}
+            title="Delete sub-task"
+          >
+            🗑️
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function SubtaskDetailView({ subtask, onUpdate, onClose, canEdit, currentUser }) {
+  const [formData, setFormData] = useState({
+    ...subtask
+  })
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData({
+      ...formData,
+      [name]: value
+    })
+  }
+
+  const handleSave = () => {
+    onUpdate(formData)
+    onClose()
+  }
+
+  return (
+    <div className="subtask-detail-view">
+      <div className="subtask-detail-header">
+        <h4>Sub-task Details</h4>
+        <button className="close-button" onClick={onClose}>×</button>
+      </div>
+
+      <div className="subtask-detail-content">
+        <div className="detail-form">
+          <div className="form-row">
+            <div className="form-field">
+              <label>Status</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                disabled={!canEdit}
+              >
+                <option value="to-do">To Do</option>
+                <option value="in-progress">In Progress</option>
+                <option value="blocked">Blocked</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label>Priority</label>
+              <select
+                name="priority"
+                value={formData.priority}
+                onChange={handleChange}
+                disabled={!canEdit}
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+            </div>
+
+            <div className="form-field">
+              <label>Assignee</label>
+              <select
+                name="assignee"
+                value={formData.assignee}
+                onChange={handleChange}
+                disabled={!canEdit}
+              >
+                <option value="John Smith">John Smith</option>
+                <option value="Sarah Wilson">Sarah Wilson</option>
+                <option value="Mike Johnson">Mike Johnson</option>
+                <option value="Emily Davis">Emily Davis</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-field full-width">
+            <label>Description</label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Add notes or detailed description..."
+              rows="4"
+              disabled={!canEdit}
+            />
+          </div>
+        </div>
+
+        <div className="subtask-meta-info">
+          <div className="meta-item">
+            <strong>Created:</strong> {new Date(subtask.createdAt).toLocaleString()}
+          </div>
+          <div className="meta-item">
+            <strong>Created by:</strong> {subtask.createdBy}
+          </div>
+          <div className="meta-item">
+            <strong>Visibility:</strong> {subtask.visibility}
+          </div>
+        </div>
+
+        {canEdit && (
+          <div className="subtask-detail-actions">
+            <button className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button className="btn-primary" onClick={handleSave}>
+              Save Changes
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

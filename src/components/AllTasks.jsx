@@ -877,6 +877,11 @@ function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsno
     <div className="table-row">
       <div className="td task-title" onClick={onTaskClick}>
         <span className="task-title-text">{task.title}</span>
+        {task.subtasks && task.subtasks.length > 0 && (
+          <span className="subtask-count" title={`${task.subtasks.length} sub-tasks`}>
+            {task.subtasks.length} sub-tasks
+          </span>
+        )}
         {task.isRecurringInstance && (
           <span className="recurring-indicator" title="This is a recurring task instance">
             🔁
