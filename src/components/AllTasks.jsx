@@ -254,23 +254,34 @@ function CreateTaskDrawer({ onClose }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    priority: 'medium',
+    priority: 'low',
     status: 'pending',
-    assignee: '',
+    assignee: 'self',
     dueDate: '',
-    category: '',
-    tags: '',
+    visibility: 'private',
+    tags: [],
+    attachments: [],
     isRecurring: false,
     recurrence: {
-      frequency: 'daily',
-      repeatEvery: 1,
-      repeatOnDays: [],
-      startDate: '',
-      endConditionType: 'never',
-      endValue: '',
-      time: '09:00'
+      type: 'dates', // 'dates', 'monthly', 'weekly'
+      selectedDates: [],
+      monthlyDay: '',
+      weeklyDays: []
     }
   })
+
+  const [showMoreOptions, setShowMoreOptions] = useState(false)
+  const [dragOver, setDragOver] = useState(false)
+  const [currentUser] = useState({ id: 1, name: 'Current User', role: 'assignee' })
+  const [isOrgUser] = useState(false) // Toggle this based on your app's context
+  
+  // Priority to due date mapping
+  const priorityDueDays = {
+    low: 30,
+    medium: 14,
+    high: 7,
+    critical: 2
+  }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -278,7 +289,14 @@ function CreateTaskDrawer({ onClose }) {
     if (name === 'isRecurring') {
       setFormData({
         ...formData,
-        [name]: checked
+        [name]: checked,
+        dueDate: checked ? '' : calculateDueDate(formData.priority)
+      })
+    } else if (name === 'priority') {
+      setFormData({
+        ...formData,
+        [name]: value,
+        dueDate: formData.isRecurring ? '' : calculateDueDate(value)
       })
     } else if (name.startsWith('recurrence.')) {
       const field = name.split('.')[1]
@@ -297,9 +315,97 @@ function CreateTaskDrawer({ onClose }) {
     }
   }
 
-  const handleDayToggle = (day) => {
-    const days = formData.recurrence.repeatOnDays
-    const updatedDays = days.includes(day) 
+  const calculateDueDate = (priority) => {
+    const today = new Date()
+    const daysToAdd = priorityDueDays[priority] || 30
+    const dueDate = new Date(today.getTime() + (daysToAdd * 24 * 60 * 60 * 1000))
+    return dueDate.toISOString().split('T')[0]
+  }
+
+  // Initialize due date based on default priority
+  React.useEffect(() => {
+    if (!formData.isRecurring && !formData.dueDate) {
+      setFormData(prev => ({
+        ...prev,
+        dueDate: calculateDueDate(prev.priority)
+      }))
+    }
+  }, [])
+
+  const handleTagAdd = (tag) => {
+    if (tag && !formData.tags.includes(tag)) {
+      setFormData({
+        ...formData,
+        tags: [...formData.tags, tag]
+      })
+    }
+  }
+
+  const handleTagRemove = (tagToRemove) => {
+    setFormData({
+      ...formData,
+      tags: formData.tags.filter(tag => tag !== tagToRemove)
+    })
+  }
+
+  const handleFileUpload = (files) => {
+    const newFiles = Array.from(files).filter(file => {
+      const totalSize = formData.attachments.reduce((sum, att) => sum + att.size, 0) + file.size
+      return totalSize <= 5 * 1024 * 1024 // 5MB limit
+    })
+
+    const attachments = newFiles.map(file => ({
+      id: Date.now() + Math.random(),
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      file: file
+    }))
+
+    setFormData({
+      ...formData,
+      attachments: [...formData.attachments, ...attachments]
+    })
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    setDragOver(false)
+    const files = e.dataTransfer.files
+    handleFileUpload(files)
+  }
+
+  const handleRecurrenceTypeChange = (type) => {
+    setFormData({
+      ...formData,
+      recurrence: {
+        ...formData.recurrence,
+        type: type,
+        selectedDates: [],
+        monthlyDay: '',
+        weeklyDays: []
+      }
+    })
+  }
+
+  const handleDateSelection = (date) => {
+    const dates = formData.recurrence.selectedDates
+    const updatedDates = dates.includes(date)
+      ? dates.filter(d => d !== date)
+      : [...dates, date]
+    
+    setFormData({
+      ...formData,
+      recurrence: {
+        ...formData.recurrence,
+        selectedDates: updatedDates
+      }
+    })
+  }
+
+  const handleWeeklyDayToggle = (day) => {
+    const days = formData.recurrence.weeklyDays
+    const updatedDays = days.includes(day)
       ? days.filter(d => d !== day)
       : [...days, day]
     
@@ -307,7 +413,7 @@ function CreateTaskDrawer({ onClose }) {
       ...formData,
       recurrence: {
         ...formData.recurrence,
-        repeatOnDays: updatedDays
+        weeklyDays: updatedDays
       }
     })
   }
@@ -377,303 +483,389 @@ function CreateTaskDrawer({ onClose }) {
       </div>
 
       <form className="drawer-form" onSubmit={handleSubmit}>
-        <div className="form-grid">
-          <div className="form-group">
-            <label htmlFor="title">Task Title</label>
+        {/* Basic Fields - Always Visible */}
+        <div className="form-section">
+          <div className="form-group full-width">
+            <label htmlFor="title">Task Name*</label>
             <input
               type="text"
               id="title"
               name="title"
               value={formData.title}
               onChange={handleChange}
-              placeholder="Enter task title"
+              placeholder="Enter task title (max 20 characters)"
+              maxLength={20}
               required
+              className="task-name-input"
             />
+            <div className="character-count">
+              {formData.title.length}/20 characters
+            </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="category">Category</label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Select category</option>
-              <option value="Backend">Backend</option>
-              <option value="Frontend">Frontend</option>
-              <option value="Design">Design</option>
-              <option value="Documentation">Documentation</option>
-              <option value="Security">Security</option>
-              <option value="Testing">Testing</option>
-            </select>
-          </div>
+          <div className="form-grid">
+            <div className="form-group">
+              <label htmlFor="assignee">Assigned To*</label>
+              <select
+                id="assignee"
+                name="assignee"
+                value={formData.assignee}
+                onChange={handleChange}
+                required
+              >
+                <option value="self">Myself</option>
+                {isOrgUser && (
+                  <>
+                    <option value="john">John Smith</option>
+                    <option value="sarah">Sarah Wilson</option>
+                    <option value="mike">Mike Johnson</option>
+                  </>
+                )}
+              </select>
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="priority">Priority</label>
-            <select
-              id="priority"
-              name="priority"
-              value={formData.priority}
-              onChange={handleChange}
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
+            <div className="form-group">
+              <label htmlFor="priority">Priority*</label>
+              <select
+                id="priority"
+                name="priority"
+                value={formData.priority}
+                onChange={handleChange}
+                required
+              >
+                <option value="low">Low (Due in 30 days)</option>
+                <option value="medium">Medium (Due in 14 days)</option>
+                <option value="high">High (Due in 7 days)</option>
+                <option value="critical">Critical (Due in 2 days)</option>
+              </select>
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="status">Status</label>
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-            >
-              <option value="pending">Pending</option>
-              <option value="in-progress">In Progress</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
+            <div className="form-group">
+              <label htmlFor="dueDate">Due Date*</label>
+              <input
+                type="date"
+                id="dueDate"
+                name="dueDate"
+                value={formData.dueDate}
+                onChange={handleChange}
+                disabled={formData.isRecurring}
+                required={!formData.isRecurring}
+                className={formData.isRecurring ? 'disabled-input' : ''}
+              />
+              {formData.isRecurring && (
+                <small className="form-hint">Due date is disabled for recurring tasks</small>
+              )}
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="assignee">Assignee</label>
-            <input
-              type="text"
-              id="assignee"
-              name="assignee"
-              value={formData.assignee}
-              onChange={handleChange}
-              placeholder="Assign to team member"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="dueDate">Due Date</label>
-            <input
-              type="date"
-              id="dueDate"
-              name="dueDate"
-              value={formData.dueDate}
-              onChange={handleChange}
-            />
+            <div className="form-group">
+              <label htmlFor="visibility">Visibility*</label>
+              <select
+                id="visibility"
+                name="visibility"
+                value={formData.visibility}
+                onChange={handleChange}
+                required
+              >
+                <option value="private">Private</option>
+                {isOrgUser && <option value="public">Public</option>}
+              </select>
+            </div>
           </div>
         </div>
 
-        <div className="form-group full-width">
-          <label htmlFor="description">Description</label>
-          <textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Describe the task details..."
-            rows="4"
-          />
+        <div className="form-section">
+          <div className="form-group full-width">
+            <label htmlFor="description">Description</label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Add details, context, or notes. Supports formatting..."
+              rows="4"
+              className="rich-text-area"
+            />
+          </div>
+
+          <div className="form-group full-width">
+            <label>Labels / Tags</label>
+            <div className="tags-input-container">
+              <div className="tags-display">
+                {formData.tags.map(tag => (
+                  <span key={tag} className="tag-chip">
+                    {tag}
+                    <button 
+                      type="button" 
+                      className="tag-remove"
+                      onClick={() => handleTagRemove(tag)}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <input
+                type="text"
+                placeholder="Type and press Enter to add tags"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    const value = e.target.value.trim()
+                    if (value) {
+                      handleTagAdd(value)
+                      e.target.value = ''
+                    }
+                  }
+                }}
+                className="tag-input"
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="form-group full-width">
-          <label htmlFor="tags">Tags (comma separated)</label>
-          <input
-            type="text"
-            id="tags"
-            name="tags"
-            value={formData.tags}
-            onChange={handleChange}
-            placeholder="e.g., urgent, frontend, api"
-          />
+        {/* More Options Toggle */}
+        <div className="form-section">
+          <button
+            type="button"
+            className="more-options-toggle"
+            onClick={() => setShowMoreOptions(!showMoreOptions)}
+          >
+            {showMoreOptions ? '▼' : '▶'} More Options
+          </button>
         </div>
+
+        {showMoreOptions && (
+          <div className="form-section more-options">
+            {/* Attachments */}
+            <div className="form-group full-width">
+              <label>Attachments</label>
+              <div
+                className={`file-drop-zone ${dragOver ? 'drag-over' : ''}`}
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleDrop}
+              >
+                <div className="drop-zone-content">
+                  <span className="drop-icon">📎</span>
+                  <p>Drag and drop files here or click to upload</p>
+                  <small>Maximum total size: 5MB. Supports documents, images, and archives.</small>
+                  <input
+                    type="file"
+                    multiple
+                    onChange={(e) => handleFileUpload(e.target.files)}
+                    className="file-input-hidden"
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.zip,.rar"
+                  />
+                </div>
+              </div>
+              
+              {formData.attachments.length > 0 && (
+                <div className="attachments-list">
+                  {formData.attachments.map(attachment => (
+                    <div key={attachment.id} className="attachment-item">
+                      <span className="attachment-name">{attachment.name}</span>
+                      <span className="attachment-size">
+                        ({(attachment.size / 1024).toFixed(1)}KB)
+                      </span>
+                      <button
+                        type="button"
+                        className="attachment-remove"
+                        onClick={() => {
+                          setFormData({
+                            ...formData,
+                            attachments: formData.attachments.filter(a => a.id !== attachment.id)
+                          })
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Recurring Task Section */}
-        <div className="form-group full-width">
-          <div className="recurring-section">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                name="isRecurring"
-                checked={formData.isRecurring}
-                onChange={handleChange}
-              />
-              <span className="checkmark"></span>
-              Repeat this task
-            </label>
-            <p className="recurring-description">
-              Automatically create new instances of this task based on your schedule
-            </p>
+        <div className="form-section">
+          <div className="form-group full-width">
+            <div className="recurring-section">
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  name="isRecurring"
+                  checked={formData.isRecurring}
+                  onChange={handleChange}
+                />
+                <span className="checkmark"></span>
+                Make this a recurring task
+              </label>
+              <p className="recurring-description">
+                For recurring tasks, due date is managed by the recurrence schedule
+              </p>
+            </div>
           </div>
         </div>
 
         {formData.isRecurring && (
           <div className="recurring-options">
             <h4 className="recurring-title">Recurrence Settings</h4>
+            <p className="recurring-note">
+              Select how often this task should repeat. Only one option can be selected.
+            </p>
             
-            <div className="form-grid">
-              <div className="form-group">
-                <label htmlFor="frequency">Frequency</label>
-                <select
-                  id="frequency"
-                  name="recurrence.frequency"
-                  value={formData.recurrence.frequency}
-                  onChange={handleChange}
-                >
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="custom">Custom</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="repeatEvery">Repeat Every</label>
-                <div className="repeat-every-group">
+            <div className="recurrence-type-selector">
+              <div className="recurrence-option">
+                <label className="radio-label">
                   <input
-                    type="number"
-                    id="repeatEvery"
-                    name="recurrence.repeatEvery"
-                    value={formData.recurrence.repeatEvery}
-                    onChange={handleChange}
-                    min="1"
-                    max="365"
+                    type="radio"
+                    name="recurrence.type"
+                    value="dates"
+                    checked={formData.recurrence.type === 'dates'}
+                    onChange={(e) => handleRecurrenceTypeChange(e.target.value)}
                   />
-                  <span className="repeat-unit">
-                    {formData.recurrence.frequency === 'daily' ? 'day(s)' :
-                     formData.recurrence.frequency === 'weekly' ? 'week(s)' :
-                     formData.recurrence.frequency === 'monthly' ? 'month(s)' : 'period(s)'}
-                  </span>
-                </div>
+                  <span className="radio-custom"></span>
+                  Specific Dates (Calendar Multi-Select)
+                </label>
+                
+                {formData.recurrence.type === 'dates' && (
+                  <div className="calendar-multiselect">
+                    <p className="option-description">Select multiple dates from the calendar</p>
+                    <div className="calendar-grid">
+                      {/* Simple date picker implementation */}
+                      <input
+                        type="date"
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleDateSelection(e.target.value)
+                            e.target.value = '' // Reset for multiple selections
+                          }
+                        }}
+                        className="date-picker"
+                      />
+                      <div className="selected-dates">
+                        {formData.recurrence.selectedDates.map(date => (
+                          <span key={date} className="date-chip">
+                            {new Date(date).toLocaleDateString()}
+                            <button
+                              type="button"
+                              onClick={() => handleDateSelection(date)}
+                              className="date-remove"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div className="form-group">
-                <label htmlFor="startDate">Start Date</label>
-                <input
-                  type="date"
-                  id="startDate"
-                  name="recurrence.startDate"
-                  value={formData.recurrence.startDate}
-                  onChange={handleChange}
-                  required={formData.isRecurring}
-                />
-                <small className="form-hint">First task will be created on this date</small>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="time">Time of Creation</label>
-                <input
-                  type="time"
-                  id="time"
-                  name="recurrence.time"
-                  value={formData.recurrence.time}
-                  onChange={handleChange}
-                />
-                <small className="form-hint">Time when new tasks will be created</small>
-              </div>
-            </div>
-
-            {formData.recurrence.frequency === 'weekly' && (
-              <div className="form-group full-width">
-                <label>Repeat On Days</label>
-                <div className="days-selector">
-                  {[
-                    { key: 'Mon', label: 'Mon' },
-                    { key: 'Tue', label: 'Tue' },
-                    { key: 'Wed', label: 'Wed' },
-                    { key: 'Thu', label: 'Thu' },
-                    { key: 'Fri', label: 'Fri' },
-                    { key: 'Sat', label: 'Sat' },
-                    { key: 'Sun', label: 'Sun' }
-                  ].map(day => (
-                    <button
-                      key={day.key}
-                      type="button"
-                      className={`day-button ${formData.recurrence.repeatOnDays.includes(day.key) ? 'selected' : ''}`}
-                      onClick={() => handleDayToggle(day.key)}
+              <div className="recurrence-option">
+                <label className="radio-label">
+                  <input
+                    type="radio"
+                    name="recurrence.type"
+                    value="monthly"
+                    checked={formData.recurrence.type === 'monthly'}
+                    onChange={(e) => handleRecurrenceTypeChange(e.target.value)}
+                  />
+                  <span className="radio-custom"></span>
+                  Monthly (Every X day of month)
+                </label>
+                
+                {formData.recurrence.type === 'monthly' && (
+                  <div className="monthly-options">
+                    <p className="option-description">Select which day of each month</p>
+                    <select
+                      value={formData.recurrence.monthlyDay}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        recurrence: {
+                          ...formData.recurrence,
+                          monthlyDay: e.target.value
+                        }
+                      })}
+                      className="monthly-day-select"
                     >
-                      {day.label}
-                    </button>
-                  ))}
-                </div>
-                <small className="form-hint">Select which days of the week to repeat</small>
-              </div>
-            )}
-
-            <div className="form-grid">
-              <div className="form-group full-width">
-                <label>End Condition</label>
-                <div className="radio-group">
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      name="recurrence.endConditionType"
-                      value="never"
-                      checked={formData.recurrence.endConditionType === 'never'}
-                      onChange={handleChange}
-                    />
-                    <span className="radio-custom"></span>
-                    Never Ends
-                  </label>
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      name="recurrence.endConditionType"
-                      value="after"
-                      checked={formData.recurrence.endConditionType === 'after'}
-                      onChange={handleChange}
-                    />
-                    <span className="radio-custom"></span>
-                    Ends after number of occurrences
-                  </label>
-                  <label className="radio-label">
-                    <input
-                      type="radio"
-                      name="recurrence.endConditionType"
-                      value="on"
-                      checked={formData.recurrence.endConditionType === 'on'}
-                      onChange={handleChange}
-                    />
-                    <span className="radio-custom"></span>
-                    Ends by specific date
-                  </label>
-                </div>
+                      <option value="">Select day of month</option>
+                      {Array.from({length: 31}, (_, i) => i + 1).map(day => (
+                        <option key={day} value={day}>
+                          {day}{day === 1 ? 'st' : day === 2 ? 'nd' : day === 3 ? 'rd' : 'th'} of every month
+                        </option>
+                      ))}
+                      <option value="last">Last day of every month</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
-              {formData.recurrence.endConditionType === 'after' && (
-                <div className="form-group">
-                  <label htmlFor="endValue">Number of Occurrences</label>
+              <div className="recurrence-option">
+                <label className="radio-label">
                   <input
-                    type="number"
-                    id="endValue"
-                    name="recurrence.endValue"
-                    value={formData.recurrence.endValue}
-                    onChange={handleChange}
-                    min="1"
-                    placeholder="e.g., 10"
+                    type="radio"
+                    name="recurrence.type"
+                    value="weekly"
+                    checked={formData.recurrence.type === 'weekly'}
+                    onChange={(e) => handleRecurrenceTypeChange(e.target.value)}
                   />
-                  <small className="form-hint">Total number of tasks to create</small>
-                </div>
-              )}
-
-              {formData.recurrence.endConditionType === 'on' && (
-                <div className="form-group">
-                  <label htmlFor="endValue">End Date</label>
-                  <input
-                    type="date"
-                    id="endValue"
-                    name="recurrence.endValue"
-                    value={formData.recurrence.endValue}
-                    onChange={handleChange}
-                  />
-                  <small className="form-hint">Stop creating tasks after this date</small>
-                </div>
-              )}
+                  <span className="radio-custom"></span>
+                  Weekly (Every X day of week)
+                </label>
+                
+                {formData.recurrence.type === 'weekly' && (
+                  <div className="weekly-options">
+                    <p className="option-description">Select which days of the week</p>
+                    <div className="days-selector">
+                      {[
+                        { key: 'Monday', label: 'Mon' },
+                        { key: 'Tuesday', label: 'Tue' },
+                        { key: 'Wednesday', label: 'Wed' },
+                        { key: 'Thursday', label: 'Thu' },
+                        { key: 'Friday', label: 'Fri' },
+                        { key: 'Saturday', label: 'Sat' },
+                        { key: 'Sunday', label: 'Sun' }
+                      ].map(day => (
+                        <button
+                          key={day.key}
+                          type="button"
+                          className={`day-button ${formData.recurrence.weeklyDays.includes(day.key) ? 'selected' : ''}`}
+                          onClick={() => handleWeeklyDayToggle(day.key)}
+                        >
+                          {day.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="recurring-preview">
-              <h5>Preview</h5>
-              <p className="preview-text">
-                {getRecurrencePreview(formData.recurrence)}
-              </p>
+            {/* Recurrence Summary */}
+            <div className="recurrence-summary">
+              <h5>Recurrence Summary</h5>
+              <div className="summary-content">
+                {formData.recurrence.type === 'dates' && formData.recurrence.selectedDates.length > 0 && (
+                  <p>Task will be created on: {formData.recurrence.selectedDates.map(date => 
+                    new Date(date).toLocaleDateString()).join(', ')}</p>
+                )}
+                {formData.recurrence.type === 'monthly' && formData.recurrence.monthlyDay && (
+                  <p>Task will be created on the {formData.recurrence.monthlyDay === 'last' ? 'last day' : 
+                    `${formData.recurrence.monthlyDay}${formData.recurrence.monthlyDay === '1' ? 'st' : 
+                    formData.recurrence.monthlyDay === '2' ? 'nd' : 
+                    formData.recurrence.monthlyDay === '3' ? 'rd' : 'th'}`} of every month</p>
+                )}
+                {formData.recurrence.type === 'weekly' && formData.recurrence.weeklyDays.length > 0 && (
+                  <p>Task will be created every {formData.recurrence.weeklyDays.join(', ')}</p>
+                )}
+                {!((formData.recurrence.type === 'dates' && formData.recurrence.selectedDates.length > 0) ||
+                   (formData.recurrence.type === 'monthly' && formData.recurrence.monthlyDay) ||
+                   (formData.recurrence.type === 'weekly' && formData.recurrence.weeklyDays.length > 0)) && (
+                  <p className="no-selection">Please configure your recurrence settings above</p>
+                )}
+              </div>
             </div>
           </div>
         )}
