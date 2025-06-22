@@ -1061,17 +1061,114 @@ body {
   cursor: not-allowed;
 }
 
+/* More Options Toggle */
 .more-options-toggle {
   background: none;
   border: none;
   color: #3498db;
-  font-weight: 500;
   cursor: pointer;
+  font-size: 14px;
+  padding: 8px 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 0;
+}
+
+/* Task Deletion Styles */
+.delete-task-modal {
+  max-width: 500px;
+}
+
+.delete-task-info {
+  margin-bottom: 20px;
+}
+
+.task-to-delete {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+.deletion-warnings {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.deletion-warnings h4 {
+  color: #856404;
+  margin-bottom: 12px;
+}
+
+.warning-item {
+  color: #856404;
+  margin-bottom: 8px;
+}
+
+.deletion-options {
+  margin-bottom: 20px;
+}
+
+.deletion-options .checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.required-confirmation {
+  padding: 12px;
+  background-color: #fee;
+  border: 1px solid #fcc;
+  border-radius: 6px;
+  margin-top: 16px;
+}
+
+.required-confirmation strong {
+  color: #d63384;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
   font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.btn-danger:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.btn-action.delete {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-action.delete:hover:not(:disabled) {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-action.delete:disabled {
+  color: #6c757d;
+  border-color: #6c757d;
+  cursor: not-allowed;
 }
 
 .more-options-toggle:hover {
@@ -1321,6 +1418,7 @@ body {
 
 .summary-content p {
   margin: 0;
+  font-size: 14px;
   color: #495057;
   font-weight: 500;
 }

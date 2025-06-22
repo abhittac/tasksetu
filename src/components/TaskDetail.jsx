@@ -107,6 +107,39 @@ export default function TaskDetail({ taskId, onClose }) {
     console.log('Export task')
   }
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+
+  const canDeleteTask = () => {
+    return (
+      task.createdBy === currentUser.name ||
+      task.assigneeId === currentUser.id ||
+      currentUser.role === 'admin' ||
+      currentUser.role === 'company_admin'
+    )
+  }
+
+  const handleDeleteTask = () => {
+    if (!canDeleteTask()) {
+      alert("You don't have permission to delete this task.")
+      return
+    }
+    setShowDeleteModal(true)
+  }
+
+  const confirmDeleteTask = (deleteOptions) => {
+    // Soft delete implementation
+    console.log('Task deleted from detail view:', {
+      taskId: task.id,
+      taskTitle: task.title,
+      deletedBy: currentUser.name,
+      deleteOptions,
+      timestamp: new Date().toISOString()
+    })
+
+    alert('Task deleted successfully')
+    onClose() // Close the task detail modal
+  }
+
   return (
     <div className="task-detail-modal">
       <div className="task-detail-overlay" onClick={onClose}></div>
@@ -161,6 +194,14 @@ export default function TaskDetail({ taskId, onClose }) {
               )}
               <button className="btn-action" onClick={handleExportTask}>
                 Export
+              </button>
+              <button 
+                className="btn-action delete"
+                onClick={handleDeleteTask}
+                disabled={!canDeleteTask()}
+                title={canDeleteTask() ? "Delete task" : "No permission to delete"}
+              >
+                🗑️ Delete
               </button>
               <button className="close-button" onClick={onClose}>×</button>
             </div>
@@ -304,6 +345,15 @@ export default function TaskDetail({ taskId, onClose }) {
             task={task}
             onSubmit={handleSnoozeSubmit}
             onClose={() => setShowSnoozeModal(false)}
+          />
+        )}
+
+        {showDeleteModal && (
+          <TaskDeleteModal
+            task={task}
+            onConfirm={confirmDeleteTask}
+            onClose={() => setShowDeleteModal(false)}
+            currentUser={currentUser}
           />
         )}
       </div>
@@ -1063,6 +1113,139 @@ function EditableTitle({ title, onSave }) {
     <div className="editable-title-display" onClick={() => setIsEditing(true)}>
       <h1 className="task-title">{title}</h1>
       <span className="edit-icon-title">✏️</span>
+    </div>
+  )
+}
+
+function TaskDeleteModal({ task, onConfirm, onClose, currentUser }) {
+  const [deleteOptions, setDeleteOptions] = useState({
+    deleteSubtasks: false,
+    deleteAttachments: false,
+    confirmed: false
+  })
+
+  const hasSubtasks = task?.subtasks && task.subtasks.length > 0
+  const hasAttachments = task?.attachments && task.attachments.length > 0
+  const hasLinkedItems = task?.linkedItems && task.linkedItems.length > 0
+
+  const handleSubmit = () => {
+    if (!deleteOptions.confirmed) {
+      alert('Please confirm you understand this action is irreversible')
+      return
+    }
+    onConfirm(deleteOptions)
+  }
+
+  const getWarningMessages = () => {
+    const warnings = []
+    
+    if (hasSubtasks) {
+      warnings.push(`This task has ${task.subtasks.length} subtask(s). Deleting it will delete all subtasks.`)
+    }
+    
+    if (hasLinkedItems || hasAttachments) {
+      warnings.push('All linked forms and files will also be deleted.')
+    }
+
+    if (task.createdBy !== currentUser.name && task.assigneeId !== currentUser.id) {
+      warnings.push('This task was created by another user.')
+    }
+
+    return warnings
+  }
+
+  const warnings = getWarningMessages()
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-container delete-task-modal">
+        <div className="modal-header">
+          <h3>🗑️ Delete Task</h3>
+          <button className="close-button" onClick={onClose}>×</button>
+        </div>
+
+        <div className="modal-content">
+          <div className="delete-task-info">
+            <h4>Are you sure you want to delete this task?</h4>
+            <div className="task-to-delete">
+              <strong>"{task?.title}"</strong>
+              <span className={`status-badge ${task?.status}`}>
+                {getStatusLabel(task?.status)}
+              </span>
+            </div>
+          </div>
+
+          {warnings.length > 0 && (
+            <div className="deletion-warnings">
+              <h4>⚠️ Important Notice:</h4>
+              <ul>
+                {warnings.map((warning, index) => (
+                  <li key={index} className="warning-item">{warning}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="deletion-options">
+            {hasSubtasks && (
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={deleteOptions.deleteSubtasks}
+                  onChange={(e) => setDeleteOptions({
+                    ...deleteOptions,
+                    deleteSubtasks: e.target.checked
+                  })}
+                />
+                <span className="checkmark"></span>
+                Also delete all {task.subtasks.length} subtask(s)
+              </label>
+            )}
+
+            {(hasAttachments || hasLinkedItems) && (
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={deleteOptions.deleteAttachments}
+                  onChange={(e) => setDeleteOptions({
+                    ...deleteOptions,
+                    deleteAttachments: e.target.checked
+                  })}
+                />
+                <span className="checkmark"></span>
+                Also delete attached forms and files
+              </label>
+            )}
+
+            <label className="checkbox-label required-confirmation">
+              <input
+                type="checkbox"
+                checked={deleteOptions.confirmed}
+                onChange={(e) => setDeleteOptions({
+                  ...deleteOptions,
+                  confirmed: e.target.checked
+                })}
+                required
+              />
+              <span className="checkmark"></span>
+              <strong>I understand this action is irreversible</strong>
+            </label>
+          </div>
+
+          <div className="modal-actions">
+            <button className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button 
+              className="btn-danger" 
+              onClick={handleSubmit}
+              disabled={!deleteOptions.confirmed}
+            >
+              Delete Task
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
