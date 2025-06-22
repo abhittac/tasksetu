@@ -1,0 +1,62 @@
+🏢 COMPANY-LEVEL CONFIGURABLE STATUSES
+Each company admin can:
+•	Define their own statuses, label them, order them.
+•	Choose which ones are “active” vs “final” statuses.
+•	Map status change rules (e.g., "On Hold" can go back only to "Open" or "In Progress").
+•	Set default status for newly created tasks/sub-tasks.
+UI for Admin (Company Settings > Task Settings > Status Configuration):
+•	Add New Status (Text, Color Picker, Description)
+•	Drag-drop to reorder
+•	Mark as “Default” or “Final Status”
+•	Option to “Hide system statuses” (if fully custom)
+
+**** The same kind of logic shall be applicable for priority settings as well ****
+
+🧱 1. System-Defined Statuses (Tasksetu Core Layer)
+These are required to support core application logic, analytics, and consistency across features.
+Example system statuses:
+•	Not Started
+•	In Progress
+•	On Hold
+•	Completed
+•	Cancelled
+System status codes (e.g. SYS_NOT_STARTED) will never change, and must be used internally.
+________________________________________
+🏢 2. Company-Defined Statuses (Custom Layer)
+Companies can configure their own statuses via Admin Panel.
+Examples:
+•	Pending → mapped to Not Started
+•	Working On → mapped to In Progress
+•	Blocked → mapped to On Hold
+•	Closed, Done → both mapped to Completed
+🧩 Rules:
+•	One system status can have multiple company statuses.
+•	Each company status must be mapped to a valid system status.
+•	Mapping is mandatory at the time of status creation or update.
+•	Company can edit names, colors, order, but not delete a system status mapping.
+________________________________________
+⚙️ 3. Admin Status Configuration Flow
+Step-by-step:
+1.	Admin goes to Company Settings → Status Management
+2.	Sees existing company-defined statuses (editable inline)
+3.	Can click “+ Add New Status”
+o	Enters Status Name
+o	Selects Color
+o	Must map to a system status from dropdown
+4.	On Save, system checks:
+o	All system statuses have at least one mapping
+o	No duplication of status names
+o	System prompts: “Changing a status will affect existing tasks”
+
+🔄 4. What Happens to Existing Tasks?
+If a company renames or remaps a status:
+•	Existing tasks remain unchanged in database (linked to system code)
+•	UI dynamically renders using updated company-defined label
+•	Activity feed records:
+"Task status updated display from ‘Pending’ to ‘New Pending’"
+🛑 If a company tries to delete a status, system prevents it if it’s being used — or offers a merge option (move tasks to a different company status mapped to same system status).
+
+
+🌐 6. UI Considerations
+•	Status shown in dropdowns (e.g., task cards, Kanban board) will show company-defined statuses with color tags
+•	Admin view will have table:
