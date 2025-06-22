@@ -4,6 +4,21 @@ import TaskComments from './TaskComments'
 import ActivityFeed from './ActivityFeed'
 import TaskAttachments from './TaskAttachments'
 
+function getStatusLabel(statusCode) {
+  const statusMap = {
+    'OPEN': 'Open',
+    'INPROGRESS': 'In Progress', 
+    'ONHOLD': 'On Hold',
+    'DONE': 'Completed',
+    'CANCELLED': 'Cancelled',
+    // Legacy support
+    'pending': 'Open',
+    'in-progress': 'In Progress',
+    'completed': 'Completed'
+  }
+  return statusMap[statusCode] || statusCode
+}
+
 export default function TaskDetail({ taskId, onClose }) {
   const [activeTab, setActiveTab] = useState('details')
   const [showSnoozeModal, setShowSnoozeModal] = useState(false)
@@ -106,8 +121,8 @@ export default function TaskDetail({ taskId, onClose }) {
                 onSave={(newTitle) => setTask({...task, title: newTitle})}
               />
               <div className="task-badges">
-                <span className={`status-badge ${task.status}`}>
-                  {task.status.replace('-', ' ')}
+                <span className={`status-badge ${task.status.toLowerCase()}`}>
+                  {getStatusLabel(task.status)}
                 </span>
                 <span className={`priority-badge ${task.priority}`}>
                   {task.priority}

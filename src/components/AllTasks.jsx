@@ -838,6 +838,49 @@ function CreateTaskDrawer({ onClose }) {
   )
 }
 
+function getStatusLabel(statusCode) {
+  const statusMap = {
+    'OPEN': 'Open',
+    'INPROGRESS': 'In Progress', 
+    'ONHOLD': 'On Hold',
+    'DONE': 'Completed',
+    'CANCELLED': 'Cancelled',
+    // Legacy support
+    'pending': 'Open',
+    'in-progress': 'In Progress',
+    'completed': 'Completed'
+  }
+  return statusMap[statusCode] || statusCode
+}
+
+function getValidStatusTransitions(currentStatus) {
+  const statuses = [
+    { code: 'OPEN', label: 'Open', transitions: ['INPROGRESS', 'ONHOLD', 'CANCELLED'] },
+    { code: 'INPROGRESS', label: 'In Progress', transitions: ['ONHOLD', 'DONE', 'CANCELLED'] },
+    { code: 'ONHOLD', label: 'On Hold', transitions: ['INPROGRESS', 'CANCELLED'] },
+    { code: 'DONE', label: 'Completed', transitions: [] },
+    { code: 'CANCELLED', label: 'Cancelled', transitions: [] }
+  ]
+  
+  // Legacy status mapping
+  const legacyMap = {
+    'pending': 'OPEN',
+    'in-progress': 'INPROGRESS', 
+    'completed': 'DONE'
+  }
+  
+  const mappedStatus = legacyMap[currentStatus] || currentStatus
+  const currentStatusObj = statuses.find(s => s.code === mappedStatus)
+  
+  if (!currentStatusObj) return [{ code: currentStatus, label: getStatusLabel(currentStatus) }]
+  
+  const validTransitions = currentStatusObj.transitions.map(transitionCode => 
+    statuses.find(s => s.code === transitionCode)
+  ).filter(Boolean)
+  
+  return [currentStatusObj, ...validTransitions]
+}
+
 function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsnooze, onTaskUpdate, canSnoozeTask }) {
   const [editingField, setEditingField] = useState(null)
   const [editValue, setEditValue] = useState('')
@@ -870,7 +913,13 @@ function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsno
   }
 
   const priorities = ['low', 'medium', 'high', 'critical']
-  const statuses = ['pending', 'in-progress', 'completed']
+  const statuses = [
+    { code: 'OPEN', label: 'Open', transitions: ['INPROGRESS', 'ONHOLD', 'CANCELLED'] },
+    { code: 'INPROGRESS', label: 'In Progress', transitions: ['ONHOLD', 'DONE', 'CANCELLED'] },
+    { code: 'ONHOLD', label: 'On Hold', transitions: ['INPROGRESS', 'CANCELLED'] },
+    { code: 'DONE', label: 'Completed', transitions: [] },
+    { code: 'CANCELLED', label: 'Cancelled', transitions: [] }
+  ]
   const assignees = ['John Smith', 'Sarah Wilson', 'Mike Johnson', 'Emily Davis']
 
   return (
@@ -904,16 +953,16 @@ function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsno
             autoFocus
             className="inline-edit-select"
           >
-            {statuses.map(status => (
-              <option key={status} value={status}>
-                {status.replace('-', ' ')}
+            {getValidStatusTransitions(task.status).map(status => (
+              <option key={status.code} value={status.code}>
+                {status.label}
               </option>
             ))}
           </select>
         ) : (
           <div className="editable-content" onClick={() => handleFieldEdit('status', task.status)}>
-            <span className={`status-badge ${task.status}`}>
-              {task.status.replace('-', ' ')}
+            <span className={`status-badge ${task.status.toLowerCase()}`}>
+              {getStatusLabel(task.status)}
             </span>
             <span className="edit-icon">✏️</span>
           </div>

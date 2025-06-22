@@ -13,7 +13,8 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
     { id: 'attachments', label: 'Files & Links', icon: '📎', section: 'collab' },
     { id: 'notifications', label: 'Notifications', icon: '🔔', section: 'task' },
     { id: 'milestones', label: 'Milestones', icon: '⭐', section: 'task' },
-    { id: 'approvals', label: 'Approvals', icon: '✅', section: 'task' }
+    { id: 'approvals', label: 'Approvals', icon: '✅', section: 'task' },
+    { id: 'status-management', label: 'Status Management', icon: '⚙️', section: 'task' }
   ]
 
   return (
