@@ -1,0 +1,41 @@
+🧠 System Data Model (Backend)
+RecurringTaskMaster Table
+Field Name	Description
+id	Unique ID
+creator_user_id	Who created this pattern
+base_task_id	The task from which recurrence started
+frequency	Daily / Weekly / Monthly / Custom
+repeat_every	Interval number
+repeat_on_days	If weekly, which days (comma list)
+start_date	From when recurrence begins
+end_condition_type	Never / AfterN / EndDate
+end_value	e.g. 5 (occurrences) or 2025-12-31
+active	Boolean
+
+🔔 Notifications
+•	When a new instance is created via recurrence logic:
+o	The assignee receives a normal task creation notification.
+o	If collaborators were defined in base task, they're notified too.
+
+🖼️ UX Considerations
+Area	Behavior
+Calendar View	Only upcoming instance(s) visible, not all future repeats
+Task List	Shows each instance as a separate task with recurrence icon (🔁)
+Task Detail View	Shows “Recurring from Task #1234” if it’s part of a recurring pattern
+Manage Recurring Tasks	New tab under "My Tasks" or "Company Tasks" to list and manage patterns
+Editing a Recurring Task	Only the master pattern can be edited for future instances
+Stopping Recurrence	Button: "Stop recurrence" – removes only future generation, not past
+________________________________________
+⚠️ Edge Cases & Fail Safes
+Case	Handling
+User deletes master task	Prompt: “This will stop recurrence. Are you sure?”
+Company disables recurrence	Existing ones remain, but no new ones can be created
+Assignee changed mid-recurring	Only affects future instances post-change
+Weekend creation logic (optional)	Provide toggle: “Skip weekends” or “Adjust to next business day”
+________________________________________
+✅ Example Use Cases
+Use Case	How It Works
+Weekly Team Sync Task	Repeats every Monday at 10:00 AM with same assignees & forms
+Monthly Vendor Invoice Audit	Repeats on 1st of every month, ends after 12 cycles
+Daily Stand-up	Task created every weekday, due same day, auto-closed if not updated
+Annual Self-Appraisal Form	Recurs every year with a form attached, sent to employee email
