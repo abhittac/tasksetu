@@ -5,67 +5,6 @@ export default function ActivityFeed({ taskId }) {
   const [activities] = useState([
     {
       id: 1,
-      user: 'John Smith',
-      avatar: 'JS',
-      action: 'updated the status of',
-      target: 'Database Migration',
-      time: '2 hours ago',
-      type: 'status_change'
-    },
-    {
-      id: 2,
-      user: 'Sarah Wilson',
-      avatar: 'SW',
-      action: 'added a comment to',
-      target: 'Database Migration',
-      time: '4 hours ago',
-      type: 'comment'
-    },
-    {
-      id: 3,
-      user: 'Mike Johnson',
-      avatar: 'MJ',
-      action: 'completed subtask',
-      target: 'Set up PostgreSQL instance',
-      time: '1 day ago',
-      type: 'subtask'
-    },
-    {
-      id: 4,
-      user: 'Emily Davis',
-      avatar: 'ED',
-      action: 'was assigned to',
-      target: 'Test data integrity',
-      time: '2 days ago',
-      type: 'assignment'
-    }
-  ])
-
-  return (
-    <div className="activity-feed">
-      <div className="activity-list">
-        {activities.map(activity => (
-          <div key={activity.id} className="activity-item">
-            <div className="activity-avatar">
-              {activity.avatar}
-            </div>
-            <div className="activity-content">
-              <div className="activity-text">
-                <span className="activity-user">{activity.user}</span> {activity.action} <span className="activity-target">{activity.target}</span>
-              </div>
-              <div className="activity-time">{activity.time}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-export default function ActivityFeed({ taskId }) {
-  const [activities] = useState([
-    {
-      id: 1,
       type: 'task_created',
       user: 'John Smith',
       timestamp: '2024-01-15 09:00',
