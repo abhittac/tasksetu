@@ -10,7 +10,9 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
     { id: 'assigned-tasks', label: 'Assigned Tasks', icon: '👥', section: 'task' },
     { id: 'due-today', label: 'Due Today', icon: '⏰', section: 'task' },
     { id: 'comments', label: 'Comments & Activity', icon: '💬', section: 'collab' },
-    { id: 'attachments', label: 'Files & Links', icon: '📎', section: 'collab' }
+    { id: 'attachments', label: 'Files & Links', icon: '📎', section: 'collab' },
+    { id: 'notifications', label: 'Notifications', icon: '🔔', section: 'task'},
+    { id: 'milestones', label: 'Milestones', icon: '⭐', section: 'task'}
   ]
 
   return (
