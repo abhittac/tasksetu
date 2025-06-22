@@ -25,14 +25,37 @@ export default function TaskDetail({ taskId, onClose }) {
     createdAt: "2024-01-15 09:00",
     updatedAt: "2024-01-20 14:30",
     snoozedUntil: null,
-    snoozeNote: null
+    snoozeNote: null,
+    subtasks: [
+      { id: 101, title: "Backup existing database", status: "completed", assignee: "John Smith", dueDate: "2024-01-20" },
+      { id: 102, title: "Set up PostgreSQL instance", status: "completed", assignee: "Mike Johnson", dueDate: "2024-01-22" },
+      { id: 103, title: "Create migration scripts", status: "in-progress", assignee: "Sarah Wilson", dueDate: "2024-01-24" },
+      { id: 104, title: "Test data integrity", status: "pending", assignee: "Emily Davis", dueDate: "2024-01-26" },
+      { id: 105, title: "Update application configs", status: "pending", assignee: "John Smith", dueDate: "2024-01-27" }
+    ],
+    linkedItems: [
+      { id: 1, type: "form", title: "Migration Checklist", status: "in-progress" },
+      { id: 2, type: "document", title: "Migration Plan", status: "completed" },
+      { id: 3, type: "task", title: "Update Documentation", status: "pending" }
+    ],
+    milestones: [
+      { id: 1, title: "Database Backup Complete", status: "completed", date: "2024-01-20" },
+      { id: 2, title: "Migration Scripts Ready", status: "in-progress", date: "2024-01-24" },
+      { id: 3, title: "Full Migration Complete", status: "pending", date: "2024-01-28" }
+    ],
+    isApprovalTask: false,
+    reminders: [
+      { id: 1, type: "due_date", message: "Due in 3 days", date: "2024-01-25" }
+    ]
   })
 
   const tabs = [
     { id: 'details', label: 'Details', icon: '📋' },
+    { id: 'subtasks', label: 'Subtasks', icon: '📝', count: task.subtasks?.length || 0 },
     { id: 'comments', label: 'Comments', icon: '💬' },
     { id: 'activity', label: 'Activity', icon: '📊' },
-    { id: 'attachments', label: 'Files & Links', icon: '📎' }
+    { id: 'attachments', label: 'Files & Links', icon: '📎' },
+    { id: 'linked', label: 'Linked Items', icon: '🔗', count: task.linkedItems?.length || 0 }
   ]
 
   const now = new Date()
@@ -60,46 +83,108 @@ export default function TaskDetail({ taskId, onClose }) {
     })
   }
 
+  const handleCreateSubtask = () => {
+    // Implementation for creating subtask
+    console.log('Create subtask')
+  }
+
+  const handleExportTask = () => {
+    // Implementation for exporting task
+    console.log('Export task')
+  }
+
   return (
     <div className="task-detail-modal">
       <div className="task-detail-overlay" onClick={onClose}></div>
-      <div className="task-detail-container">
+      <div className="task-detail-container unified-view">
+        {/* Header Section */}
         <div className="task-detail-header">
-          <div className="task-detail-title">
-            <h2>
-              {task.title}
-              {isSnoozed && (
-                <span className="snooze-indicator-large" title={`Snoozed until ${snoozedUntil.toLocaleString()}`}>
-                  😴
+          <div className="task-header-main">
+            <div className="task-title-section">
+              <h1 className="task-title">{task.title}</h1>
+              <div className="task-badges">
+                <span className={`status-badge ${task.status}`}>
+                  {task.status.replace('-', ' ')}
                 </span>
+                <span className={`priority-badge ${task.priority}`}>
+                  {task.priority}
+                </span>
+                {task.tags.map(tag => (
+                  <span key={tag} className="tag-badge">#{tag}</span>
+                ))}
+                {isSnoozed && (
+                  <span className="snooze-indicator-large" title={`Snoozed until ${snoozedUntil.toLocaleString()}`}>
+                    😴 Snoozed
+                  </span>
+                )}
+              </div>
+            </div>
+            
+            {/* Quick Actions */}
+            <div className="quick-actions">
+              <button className="btn-action" onClick={handleCreateSubtask}>
+                + Subtask
+              </button>
+              {isSnoozed ? (
+                <button 
+                  className="btn-action"
+                  onClick={handleUnsnooze}
+                  disabled={!canSnoozeTask()}
+                >
+                  Unsnooze
+                </button>
+              ) : (
+                <button 
+                  className="btn-action"
+                  onClick={() => setShowSnoozeModal(true)}
+                  disabled={!canSnoozeTask()}
+                >
+                  Snooze
+                </button>
               )}
-            </h2>
-            <span className={`status-badge ${task.status}`}>
-              {task.status.replace('-', ' ')}
-            </span>
+              <button className="btn-action" onClick={handleExportTask}>
+                Export
+              </button>
+              <button className="close-button" onClick={onClose}>×</button>
+            </div>
           </div>
-          <div className="header-actions">
-            {isSnoozed ? (
-              <button 
-                className="btn-secondary"
-                onClick={handleUnsnooze}
-                disabled={!canSnoozeTask()}
-              >
-                Unsnooze
-              </button>
-            ) : (
-              <button 
-                className="btn-secondary"
-                onClick={() => setShowSnoozeModal(true)}
-                disabled={!canSnoozeTask()}
-              >
-                Snooze
-              </button>
+
+          {/* Info Panel */}
+          <div className="task-info-panel">
+            <div className="info-grid">
+              <div className="info-item">
+                <label>Assignee</label>
+                <span>{task.assignee}</span>
+              </div>
+              <div className="info-item">
+                <label>Due Date</label>
+                <span>{task.dueDate}</span>
+              </div>
+              <div className="info-item">
+                <label>Category</label>
+                <span>{task.category}</span>
+              </div>
+              <div className="info-item">
+                <label>Created By</label>
+                <span>{task.createdBy}</span>
+              </div>
+            </div>
+            
+            {task.reminders.length > 0 && (
+              <div className="reminders-section">
+                <h4>Reminders</h4>
+                {task.reminders.map(reminder => (
+                  <div key={reminder.id} className="reminder-item">
+                    <span className="reminder-icon">⏰</span>
+                    <span>{reminder.message}</span>
+                  </div>
+                ))}
+              </div>
             )}
-            <button className="close-button" onClick={onClose}>×</button>
           </div>
         </div>
 
+        {/* Tabs Navigation */}
         <div className="task-detail-tabs">
           {tabs.map(tab => (
             <button
@@ -109,10 +194,12 @@ export default function TaskDetail({ taskId, onClose }) {
             >
               <span className="tab-icon">{tab.icon}</span>
               {tab.label}
+              {tab.count > 0 && <span className="tab-count">({tab.count})</span>}
             </button>
           ))}
         </div>
 
+        {/* Content Section */}
         <div className="task-detail-content">
           {activeTab === 'details' && (
             <div className="task-details-panel">
@@ -121,55 +208,26 @@ export default function TaskDetail({ taskId, onClose }) {
                 <p>{task.description}</p>
               </div>
               
-              <div className="detail-grid">
-                <div className="detail-item">
-                  <label>Status</label>
-                  <select value={task.status} className="detail-input">
-                    <option value="pending">Pending</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                  </select>
+              {/* Milestone/Approval Visual Cues */}
+              {task.milestones.length > 0 && (
+                <div className="milestones-section">
+                  <h3>Milestones</h3>
+                  <div className="milestone-list">
+                    {task.milestones.map(milestone => (
+                      <div key={milestone.id} className="milestone-item">
+                        <span className={`milestone-icon ${milestone.status}`}>
+                          {milestone.status === 'completed' ? '✅' : 
+                           milestone.status === 'in-progress' ? '🔄' : '⭐'}
+                        </span>
+                        <div className="milestone-info">
+                          <span className="milestone-title">{milestone.title}</span>
+                          <span className="milestone-date">{milestone.date}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                
-                <div className="detail-item">
-                  <label>Priority</label>
-                  <select value={task.priority} className="detail-input">
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                </div>
-                
-                <div className="detail-item">
-                  <label>Assignee</label>
-                  <input type="text" value={task.assignee} className="detail-input" />
-                </div>
-                
-                <div className="detail-item">
-                  <label>Due Date</label>
-                  <input type="date" value={task.dueDate} className="detail-input" />
-                </div>
-                
-                <div className="detail-item">
-                  <label>Category</label>
-                  <select value={task.category} className="detail-input">
-                    <option value="Backend">Backend</option>
-                    <option value="Frontend">Frontend</option>
-                    <option value="Design">Design</option>
-                    <option value="Documentation">Documentation</option>
-                  </select>
-                </div>
-                
-                <div className="detail-item">
-                  <label>Tags</label>
-                  <input 
-                    type="text" 
-                    value={task.tags.join(', ')} 
-                    className="detail-input"
-                    placeholder="Comma separated tags"
-                  />
-                </div>
-              </div>
+              )}
               
               {isSnoozed && (
                 <div className="snooze-info">
@@ -189,7 +247,7 @@ export default function TaskDetail({ taskId, onClose }) {
 
               <div className="detail-meta">
                 <div className="meta-item">
-                  <strong>Created by:</strong> {task.createdBy} on {task.createdAt}
+                  <strong>Created:</strong> {task.createdAt}
                 </div>
                 <div className="meta-item">
                   <strong>Last updated:</strong> {task.updatedAt}
@@ -198,9 +256,17 @@ export default function TaskDetail({ taskId, onClose }) {
             </div>
           )}
 
+          {activeTab === 'subtasks' && (
+            <SubtasksPanel subtasks={task.subtasks} onCreateSubtask={handleCreateSubtask} />
+          )}
+
           {activeTab === 'comments' && <TaskComments taskId={taskId} />}
           {activeTab === 'activity' && <ActivityFeed taskId={taskId} />}
           {activeTab === 'attachments' && <TaskAttachments taskId={taskId} />}
+          
+          {activeTab === 'linked' && (
+            <LinkedItemsPanel linkedItems={task.linkedItems} />
+          )}
         </div>
 
         {showSnoozeModal && (
@@ -210,6 +276,83 @@ export default function TaskDetail({ taskId, onClose }) {
             onClose={() => setShowSnoozeModal(false)}
           />
         )}
+      </div>
+    </div>
+  )
+}
+
+function SubtasksPanel({ subtasks, onCreateSubtask }) {
+  const [filter, setFilter] = useState('all')
+
+  const filteredSubtasks = subtasks.filter(subtask => {
+    if (filter === 'all') return true
+    return subtask.status === filter
+  })
+
+  return (
+    <div className="subtasks-panel">
+      <div className="subtasks-header">
+        <h3>Subtasks ({subtasks.length})</h3>
+        <div className="subtasks-filters">
+          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+          <button className="btn-primary" onClick={onCreateSubtask}>
+            + Add Subtask
+          </button>
+        </div>
+      </div>
+
+      <div className="subtasks-list">
+        {filteredSubtasks.map(subtask => (
+          <div key={subtask.id} className="subtask-item">
+            <div className="subtask-info">
+              <span className={`status-indicator ${subtask.status}`}>
+                {subtask.status === 'completed' ? '✅' : 
+                 subtask.status === 'in-progress' ? '🔄' : '⏸️'}
+              </span>
+              <div className="subtask-details">
+                <h4>{subtask.title}</h4>
+                <div className="subtask-meta">
+                  <span>Assignee: {subtask.assignee}</span>
+                  <span>Due: {subtask.dueDate}</span>
+                </div>
+              </div>
+            </div>
+            <div className="subtask-actions">
+              <button className="btn-action">Edit</button>
+              <button className="btn-action">Delete</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function LinkedItemsPanel({ linkedItems }) {
+  return (
+    <div className="linked-items-panel">
+      <h3>Linked Items ({linkedItems.length})</h3>
+      <div className="linked-items-list">
+        {linkedItems.map(item => (
+          <div key={item.id} className="linked-item">
+            <div className="item-icon">
+              {item.type === 'form' ? '📋' : 
+               item.type === 'document' ? '📄' : '🔗'}
+            </div>
+            <div className="item-info">
+              <h4>{item.title}</h4>
+              <span className="item-type">{item.type}</span>
+            </div>
+            <span className={`status-badge ${item.status}`}>
+              {item.status}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   )
