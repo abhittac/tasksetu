@@ -161,62 +161,19 @@ export default function AllTasks() {
           const isSnoozed = snoozedUntil && snoozedUntil > now
           
           return (
-          <div key={task.id} className="table-row">
-            <div className="td task-title">
-              {task.title}
-              {task.isRecurringInstance && (
-                <span className="recurring-indicator" title="This is a recurring task instance">
-                  🔁
-                </span>
-              )}
-              {isSnoozed && (
-                <span className="snooze-indicator" title={`Snoozed until ${snoozedUntil.toLocaleString()}`}>
-                  😴
-                </span>
-              )}
-            </div>
-            <div className="td">
-              <span className={`status-badge ${task.status}`}>
-                {task.status.replace('-', ' ')}
-              </span>
-            </div>
-            <div className="td">
-              <span className={`priority-badge ${task.priority}`}>
-                {task.priority}
-              </span>
-            </div>
-            <div className="td">{task.assignee}</div>
-            <div className="td">{task.dueDate}</div>
-            <div className="td">{task.category}</div>
-            <div className="td">
-              <div className="action-buttons">
-                <button 
-                  className="btn-action"
-                  onClick={() => setSelectedTaskId(task.id)}
-                >
-                  Edit
-                </button>
-                {isSnoozed ? (
-                  <button 
-                    className="btn-action"
-                    onClick={() => handleUnsnoozeTask(task.id)}
-                    disabled={!canSnoozeTask(task)}
-                  >
-                    Unsnooze
-                  </button>
-                ) : (
-                  <button 
-                    className="btn-action"
-                    onClick={() => handleSnoozeTask(task)}
-                    disabled={!canSnoozeTask(task)}
-                  >
-                    Snooze
-                  </button>
-                )}
-                <button className="btn-action">Delete</button>
-              </div>
-            </div>
-          </div>
+          <TaskRow 
+            key={task.id} 
+            task={task} 
+            isSnoozed={isSnoozed}
+            snoozedUntil={snoozedUntil}
+            onTaskClick={() => setSelectedTaskId(task.id)}
+            onSnooze={handleSnoozeTask}
+            onUnsnooze={handleUnsnoozeTask}
+            onTaskUpdate={(updatedTask) => {
+              setTasks(tasks.map(t => t.id === updatedTask.id ? updatedTask : t))
+            }}
+            canSnoozeTask={canSnoozeTask}
+          />
         )
         })}
       </div>
@@ -877,6 +834,185 @@ function CreateTaskDrawer({ onClose }) {
           </button>
         </div>
       </form>
+    </div>
+  )
+}
+
+function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsnooze, onTaskUpdate, canSnoozeTask }) {
+  const [editingField, setEditingField] = useState(null)
+  const [editValue, setEditValue] = useState('')
+
+  const handleFieldEdit = (field, currentValue) => {
+    setEditingField(field)
+    setEditValue(currentValue)
+  }
+
+  const handleFieldSave = () => {
+    if (editingField && editValue !== task[editingField]) {
+      const updatedTask = { ...task, [editingField]: editValue }
+      onTaskUpdate(updatedTask)
+    }
+    setEditingField(null)
+    setEditValue('')
+  }
+
+  const handleFieldCancel = () => {
+    setEditingField(null)
+    setEditValue('')
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleFieldSave()
+    } else if (e.key === 'Escape') {
+      handleFieldCancel()
+    }
+  }
+
+  const priorities = ['low', 'medium', 'high', 'critical']
+  const statuses = ['pending', 'in-progress', 'completed']
+  const assignees = ['John Smith', 'Sarah Wilson', 'Mike Johnson', 'Emily Davis']
+
+  return (
+    <div className="table-row">
+      <div className="td task-title" onClick={onTaskClick}>
+        <span className="task-title-text">{task.title}</span>
+        {task.isRecurringInstance && (
+          <span className="recurring-indicator" title="This is a recurring task instance">
+            🔁
+          </span>
+        )}
+        {isSnoozed && (
+          <span className="snooze-indicator" title={`Snoozed until ${snoozedUntil.toLocaleString()}`}>
+            😴
+          </span>
+        )}
+      </div>
+      
+      <div className="td editable-field" onMouseEnter={(e) => e.target.classList.add('hover')}>
+        {editingField === 'status' ? (
+          <select 
+            value={editValue} 
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleFieldSave}
+            onKeyDown={handleKeyPress}
+            autoFocus
+            className="inline-edit-select"
+          >
+            {statuses.map(status => (
+              <option key={status} value={status}>
+                {status.replace('-', ' ')}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <div className="editable-content" onClick={() => handleFieldEdit('status', task.status)}>
+            <span className={`status-badge ${task.status}`}>
+              {task.status.replace('-', ' ')}
+            </span>
+            <span className="edit-icon">✏️</span>
+          </div>
+        )}
+      </div>
+      
+      <div className="td editable-field" onMouseEnter={(e) => e.target.classList.add('hover')}>
+        {editingField === 'priority' ? (
+          <select 
+            value={editValue} 
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleFieldSave}
+            onKeyDown={handleKeyPress}
+            autoFocus
+            className="inline-edit-select"
+          >
+            {priorities.map(priority => (
+              <option key={priority} value={priority}>
+                {priority}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <div className="editable-content" onClick={() => handleFieldEdit('priority', task.priority)}>
+            <span className={`priority-badge ${task.priority}`}>
+              {task.priority}
+            </span>
+            <span className="edit-icon">✏️</span>
+          </div>
+        )}
+      </div>
+      
+      <div className="td editable-field" onMouseEnter={(e) => e.target.classList.add('hover')}>
+        {editingField === 'assignee' ? (
+          <select 
+            value={editValue} 
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleFieldSave}
+            onKeyDown={handleKeyPress}
+            autoFocus
+            className="inline-edit-select"
+          >
+            {assignees.map(assignee => (
+              <option key={assignee} value={assignee}>
+                {assignee}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <div className="editable-content" onClick={() => handleFieldEdit('assignee', task.assignee)}>
+            <span>{task.assignee}</span>
+            <span className="edit-icon">✏️</span>
+          </div>
+        )}
+      </div>
+      
+      <div className="td editable-field" onMouseEnter={(e) => e.target.classList.add('hover')}>
+        {editingField === 'dueDate' ? (
+          <input 
+            type="date"
+            value={editValue} 
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleFieldSave}
+            onKeyDown={handleKeyPress}
+            autoFocus
+            className="inline-edit-input"
+          />
+        ) : (
+          <div className="editable-content" onClick={() => handleFieldEdit('dueDate', task.dueDate)}>
+            <span>{task.dueDate}</span>
+            <span className="edit-icon">✏️</span>
+          </div>
+        )}
+      </div>
+      
+      <div className="td">{task.category}</div>
+      <div className="td">
+        <div className="action-buttons">
+          <button 
+            className="btn-action"
+            onClick={onTaskClick}
+          >
+            Edit
+          </button>
+          {isSnoozed ? (
+            <button 
+              className="btn-action"
+              onClick={() => onUnsnooze(task.id)}
+              disabled={!canSnoozeTask(task)}
+            >
+              Unsnooze
+            </button>
+          ) : (
+            <button 
+              className="btn-action"
+              onClick={() => onSnooze(task)}
+              disabled={!canSnoozeTask(task)}
+            >
+              Snooze
+            </button>
+          )}
+          <button className="btn-action">Delete</button>
+        </div>
+      </div>
     </div>
   )
 }

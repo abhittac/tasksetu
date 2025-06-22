@@ -1189,6 +1189,207 @@ body {
   font-style: italic;
 }
 
+/* Contextual Editing Styles */
+.editable-field {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.editable-field .edit-icon {
+  opacity: 0;
+  margin-left: 8px;
+  font-size: 12px;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.editable-field:hover .edit-icon,
+.editable-field.hover .edit-icon {
+  opacity: 1;
+}
+
+.editable-field:hover {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.editable-content {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.editable-content:hover {
+  background-color: #e9ecef;
+}
+
+.inline-edit-input,
+.inline-edit-select {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #3498db;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.inline-edit-input:focus,
+.inline-edit-select:focus {
+  outline: none;
+  border-color: #2980b9;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Task Title Editing */
+.editable-title-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editable-title-input {
+  font-size: 24px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border: 2px solid #3498db;
+  border-radius: 6px;
+  background-color: white;
+  flex: 1;
+}
+
+.editable-title-input:focus {
+  outline: none;
+  border-color: #2980b9;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.editable-title-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.editable-title-display:hover {
+  background-color: #f8f9fa;
+}
+
+.edit-icon-title {
+  opacity: 0;
+  font-size: 16px;
+  transition: opacity 0.2s ease;
+}
+
+.editable-title-display:hover .edit-icon-title {
+  opacity: 1;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-save,
+.btn-cancel {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-save {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: #218838;
+}
+
+.btn-cancel {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background-color: #c82333;
+}
+
+/* Info Panel Editing */
+.editable-info-item {
+  position: relative;
+}
+
+.info-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  min-height: 24px;
+}
+
+.info-display:hover {
+  background-color: #f8f9fa;
+}
+
+.edit-icon-small {
+  opacity: 0;
+  font-size: 12px;
+  transition: opacity 0.2s ease;
+}
+
+.info-display:hover .edit-icon-small {
+  opacity: 1;
+}
+
+.info-edit-container {
+  margin-top: 4px;
+}
+
+.info-edit-input,
+.info-edit-select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #3498db;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.info-edit-input:focus,
+.info-edit-select:focus {
+  outline: none;
+  border-color: #2980b9;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Task Row Styling */
+.task-title-text {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.task-title-text:hover {
+  color: #3498db;
+  text-decoration: underline;
+}
+
 /* Enhanced Recurring Task Manager Styles */
 .task-title-section {
   display: flex;

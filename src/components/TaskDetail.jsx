@@ -101,7 +101,10 @@ export default function TaskDetail({ taskId, onClose }) {
         <div className="task-detail-header">
           <div className="task-header-main">
             <div className="task-title-section">
-              <h1 className="task-title">{task.title}</h1>
+              <EditableTitle 
+                title={task.title} 
+                onSave={(newTitle) => setTask({...task, title: newTitle})}
+              />
               <div className="task-badges">
                 <span className={`status-badge ${task.status}`}>
                   {task.status.replace('-', ' ')}
@@ -152,18 +155,26 @@ export default function TaskDetail({ taskId, onClose }) {
           {/* Info Panel */}
           <div className="task-info-panel">
             <div className="info-grid">
-              <div className="info-item">
-                <label>Assignee</label>
-                <span>{task.assignee}</span>
-              </div>
-              <div className="info-item">
-                <label>Due Date</label>
-                <span>{task.dueDate}</span>
-              </div>
-              <div className="info-item">
-                <label>Category</label>
-                <span>{task.category}</span>
-              </div>
+              <EditableInfoItem
+                label="Assignee"
+                value={task.assignee}
+                type="select"
+                options={['John Smith', 'Sarah Wilson', 'Mike Johnson', 'Emily Davis']}
+                onSave={(newValue) => setTask({...task, assignee: newValue})}
+              />
+              <EditableInfoItem
+                label="Due Date"
+                value={task.dueDate}
+                type="date"
+                onSave={(newValue) => setTask({...task, dueDate: newValue})}
+              />
+              <EditableInfoItem
+                label="Priority"
+                value={task.priority}
+                type="select"
+                options={['low', 'medium', 'high', 'critical']}
+                onSave={(newValue) => setTask({...task, priority: newValue})}
+              />
               <div className="info-item">
                 <label>Created By</label>
                 <span>{task.createdBy}</span>
@@ -354,6 +365,127 @@ function LinkedItemsPanel({ linkedItems }) {
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+function EditableInfoItem({ label, value, type, options, onSave }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editValue, setEditValue] = useState(value)
+
+  const handleSave = () => {
+    if (editValue !== value) {
+      onSave(editValue)
+    }
+    setIsEditing(false)
+  }
+
+  const handleCancel = () => {
+    setEditValue(value)
+    setIsEditing(false)
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSave()
+    } else if (e.key === 'Escape') {
+      handleCancel()
+    }
+  }
+
+  return (
+    <div className="info-item editable-info-item">
+      <label>{label}</label>
+      {isEditing ? (
+        <div className="info-edit-container">
+          {type === 'select' ? (
+            <select
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={handleSave}
+              onKeyDown={handleKeyPress}
+              autoFocus
+              className="info-edit-select"
+            >
+              {options.map(option => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              type={type}
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={handleSave}
+              onKeyDown={handleKeyPress}
+              autoFocus
+              className="info-edit-input"
+            />
+          )}
+        </div>
+      ) : (
+        <div className="info-display" onClick={() => setIsEditing(true)}>
+          <span className={type === 'select' && label === 'Priority' ? `priority-badge ${value}` : ''}>
+            {value}
+          </span>
+          <span className="edit-icon-small">✏️</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function EditableTitle({ title, onSave }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editValue, setEditValue] = useState(title)
+
+  const handleSave = () => {
+    if (editValue.trim() && editValue !== title) {
+      onSave(editValue.trim())
+    }
+    setIsEditing(false)
+  }
+
+  const handleCancel = () => {
+    setEditValue(title)
+    setIsEditing(false)
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSave()
+    } else if (e.key === 'Escape') {
+      handleCancel()
+    }
+  }
+
+  if (isEditing) {
+    return (
+      <div className="editable-title-container">
+        <input
+          type="text"
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onBlur={handleSave}
+          onKeyDown={handleKeyPress}
+          autoFocus
+          className="editable-title-input"
+          maxLength={50}
+        />
+        <div className="edit-actions">
+          <button onClick={handleSave} className="btn-save">✓</button>
+          <button onClick={handleCancel} className="btn-cancel">✗</button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="editable-title-display" onClick={() => setIsEditing(true)}>
+      <h1 className="task-title">{title}</h1>
+      <span className="edit-icon-title">✏️</span>
     </div>
   )
 }
