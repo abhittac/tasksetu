@@ -14,7 +14,8 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
     { id: 'notifications', label: 'Notifications', icon: '🔔', section: 'task' },
     { id: 'milestones', label: 'Milestones', icon: '⭐', section: 'task' },
     { id: 'approvals', label: 'Approvals', icon: '✅', section: 'task' },
-    { id: 'status-management', label: 'Status Management', icon: '⚙️', section: 'task' }
+    { id: 'status-management', label: 'Status Management', icon: '⚙️', section: 'task' },
+    { id: 'priority-management', label: 'Priority Management', icon: '🔥', section: 'task'}
   ]
 
   return (
@@ -76,6 +77,26 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
               </li>
             ))}
           </ul>
+        </div>
+         {/* Settings & Configuration */}
+         <div className="nav-section">
+          <h3>Configuration</h3>
+          <li
+            key="status-management"
+            className={`nav-item ${currentPage === 'status-management' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('status-management')}
+          >
+            <span className="nav-icon">🔄</span>
+            Status Management
+          </li>
+          <li
+            key="priority-management"
+            className={`nav-item ${currentPage === 'priority-management' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('priority-management')}
+          >
+            <span className="nav-icon">🔥</span>
+            Priority Management
+          </li>
         </div>
       </nav>
     </div>

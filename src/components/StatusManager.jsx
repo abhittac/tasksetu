@@ -3,7 +3,58 @@ import React, { useState } from 'react'
 
 export default function StatusManager() {
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' })
-  const [statuses, setStatuses] = useState([
+  
+  // System-defined statuses (Core Layer - cannot be deleted)
+  const [systemStatuses] = useState([
+    {
+      id: 'SYS_NOT_STARTED',
+      code: 'SYS_NOT_STARTED',
+      label: 'Not Started',
+      description: 'System status for tasks not yet started',
+      color: '#6c757d',
+      isFinal: false,
+      isSystem: true
+    },
+    {
+      id: 'SYS_IN_PROGRESS',
+      code: 'SYS_IN_PROGRESS',
+      label: 'In Progress',
+      description: 'System status for active tasks',
+      color: '#3498db',
+      isFinal: false,
+      isSystem: true
+    },
+    {
+      id: 'SYS_ON_HOLD',
+      code: 'SYS_ON_HOLD',
+      label: 'On Hold',
+      description: 'System status for paused tasks',
+      color: '#f39c12',
+      isFinal: false,
+      isSystem: true
+    },
+    {
+      id: 'SYS_COMPLETED',
+      code: 'SYS_COMPLETED',
+      label: 'Completed',
+      description: 'System status for finished tasks',
+      color: '#28a745',
+      isFinal: true,
+      isSystem: true
+    },
+    {
+      id: 'SYS_CANCELLED',
+      code: 'SYS_CANCELLED',
+      label: 'Cancelled',
+      description: 'System status for terminated tasks',
+      color: '#dc3545',
+      isFinal: true,
+      isSystem: true
+    }
+  ])
+
+  // Company-defined statuses (Custom Layer)
+  const [companyStatuses, setCompanyStatuses] = useState([
     {
       id: 1,
       code: 'OPEN',
@@ -14,7 +65,9 @@ export default function StatusManager() {
       isDefault: true,
       active: true,
       order: 1,
-      allowedTransitions: ['INPROGRESS', 'ONHOLD', 'CANCELLED']
+      systemMapping: 'SYS_NOT_STARTED',
+      allowedTransitions: ['INPROGRESS', 'ONHOLD', 'CANCELLED'],
+      isSystem: false
     },
     {
       id: 2,
@@ -26,7 +79,9 @@ export default function StatusManager() {
       isDefault: false,
       active: true,
       order: 2,
-      allowedTransitions: ['ONHOLD', 'DONE', 'CANCELLED']
+      systemMapping: 'SYS_IN_PROGRESS',
+      allowedTransitions: ['ONHOLD', 'DONE', 'CANCELLED'],
+      isSystem: false
     },
     {
       id: 3,
@@ -38,7 +93,9 @@ export default function StatusManager() {
       isDefault: false,
       active: true,
       order: 3,
-      allowedTransitions: ['INPROGRESS', 'CANCELLED']
+      systemMapping: 'SYS_ON_HOLD',
+      allowedTransitions: ['INPROGRESS', 'CANCELLED'],
+      isSystem: false
     },
     {
       id: 4,
@@ -50,7 +107,9 @@ export default function StatusManager() {
       isDefault: false,
       active: true,
       order: 4,
-      allowedTransitions: []
+      systemMapping: 'SYS_COMPLETED',
+      allowedTransitions: [],
+      isSystem: false
     },
     {
       id: 5,
@@ -62,9 +121,13 @@ export default function StatusManager() {
       isDefault: false,
       active: true,
       order: 5,
-      allowedTransitions: []
+      systemMapping: 'SYS_CANCELLED',
+      allowedTransitions: [],
+      isSystem: false
     }
   ])
+
+  const [showSystemStatuses, setShowSystemStatuses] = useState(true)
 
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingStatus, setEditingStatus] = useState(null)
@@ -75,14 +138,15 @@ export default function StatusManager() {
       id: Date.now(),
       ...statusData,
       active: true,
-      order: statuses.length + 1
+      order: companyStatuses.length + 1,
+      isSystem: false
     }
-    setStatuses([...statuses, newStatus])
+    setCompanyStatuses([...companyStatuses, newStatus])
     setShowAddForm(false)
   }
 
   const handleUpdateStatus = (updatedStatus) => {
-    setStatuses(statuses.map(status => 
+    setCompanyStatuses(companyStatuses.map(status => 
       status.id === updatedStatus.id ? updatedStatus : status
     ))
     setEditingStatus(null)
@@ -90,7 +154,7 @@ export default function StatusManager() {
 
   const handleDeleteStatus = (statusId, mappingStatusId) => {
     // Update tasks that use this status to the mapping status
-    setStatuses(statuses.map(status => 
+    setCompanyStatuses(companyStatuses.map(status => 
       status.id === statusId ? { ...status, active: false } : status
     ))
     setDeleteModal(null)
@@ -98,54 +162,86 @@ export default function StatusManager() {
   }
 
   const handleSetDefault = (statusId) => {
-    setStatuses(statuses.map(status => ({
+    setCompanyStatuses(companyStatuses.map(status => ({
       ...status,
       isDefault: status.id === statusId
     })))
   }
 
+  const handleReorderStatuses = (reorderedStatuses) => {
+    const updatedStatuses = reorderedStatuses.map((status, index) => ({
+      ...status,
+      order: index + 1
+    }))
+    setCompanyStatuses(updatedStatuses)
+  }
+
   const getValidTransitions = (currentStatusCode) => {
-    const currentStatus = statuses.find(s => s.code === currentStatusCode)
+    const currentStatus = companyStatuses.find(s => s.code === currentStatusCode)
     return currentStatus ? currentStatus.allowedTransitions : []
   }
+
+  const getSystemStatusLabel = (systemCode) => {
+    const systemStatus = systemStatuses.find(s => s.code === systemCode)
+    return systemStatus ? systemStatus.label : systemCode
+  }
+
+  const activeStatuses = showSystemStatuses 
+    ? [...companyStatuses.filter(s => s.active), ...systemStatuses]
+    : companyStatuses.filter(s => s.active)
 
   return (
     <div className="status-manager">
       <div className="page-header">
-        <h1>Status Management</h1>
-        <p>Configure task statuses and workflow transitions</p>
+        <h1>Company Status Configuration</h1>
+        <p>Configure custom task statuses for your organization</p>
       </div>
 
       <div className="status-manager-actions">
-        <button 
-          className="btn-primary"
-          onClick={() => setShowAddForm(true)}
-        >
-          + Add Status
-        </button>
+        <div className="left-actions">
+          <button 
+            className="btn-primary"
+            onClick={() => setShowAddForm(true)}
+          >
+            + Add Custom Status
+          </button>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={showSystemStatuses}
+              onChange={(e) => setShowSystemStatuses(e.target.checked)}
+            />
+            <span className="checkmark"></span>
+            Show System Statuses
+          </label>
+        </div>
         <div className="status-info">
           <span className="info-text">
-            Total Statuses: {statuses.filter(s => s.active).length}
+            Company Statuses: {companyStatuses.filter(s => s.active).length} | 
+            System Statuses: {systemStatuses.length}
           </span>
         </div>
       </div>
 
       <div className="status-workflow-diagram">
-        <h3>Status Workflow</h3>
+        <h3>Company Status Workflow</h3>
         <div className="workflow-visualization">
-          {statuses.filter(s => s.active).sort((a, b) => a.order - b.order).map(status => (
+          {companyStatuses.filter(s => s.active).sort((a, b) => a.order - b.order).map(status => (
             <div key={status.id} className="workflow-node">
               <div 
-                className="status-node"
+                className="status-node company-status"
                 style={{ backgroundColor: status.color }}
               >
                 <span className="status-label">{status.label}</span>
                 {status.isDefault && <span className="default-indicator">DEFAULT</span>}
+                <span className="system-mapping">
+                  → {getSystemStatusLabel(status.systemMapping)}
+                </span>
               </div>
               {status.allowedTransitions.length > 0 && (
                 <div className="transitions">
                   {status.allowedTransitions.map(transitionCode => {
-                    const targetStatus = statuses.find(s => s.code === transitionCode)
+                    const targetStatus = companyStatuses.find(s => s.code === transitionCode)
                     return targetStatus ? (
                       <div key={transitionCode} className="transition-arrow">
                         → {targetStatus.label}
@@ -159,35 +255,67 @@ export default function StatusManager() {
         </div>
       </div>
 
-      <div className="status-list">
-        <h3>Status Configuration</h3>
-        <div className="status-table">
-          <div className="table-header">
-            <div className="th">Status</div>
-            <div className="th">Code</div>
-            <div className="th">Description</div>
-            <div className="th">Type</div>
-            <div className="th">Actions</div>
+      <div className="status-sections">
+        <div className="status-list company-statuses">
+          <div className="section-header">
+            <h3>Company Statuses</h3>
+            <p>Custom statuses configured for your organization</p>
           </div>
-          
-          {statuses.filter(s => s.active).map(status => (
-            <StatusRow
-              key={status.id}
-              status={status}
-              onEdit={() => setEditingStatus(status)}
-              onDelete={() => setDeleteModal(status)}
-              onSetDefault={() => handleSetDefault(status.id)}
-              canEdit={currentUser.role === 'admin'}
-            />
-          ))}
+          <div className="status-table">
+            <div className="table-header">
+              <div className="th">Order</div>
+              <div className="th">Status</div>
+              <div className="th">Code</div>
+              <div className="th">System Mapping</div>
+              <div className="th">Type</div>
+              <div className="th">Actions</div>
+            </div>
+            
+            {companyStatuses.filter(s => s.active).sort((a, b) => a.order - b.order).map(status => (
+              <CompanyStatusRow
+                key={status.id}
+                status={status}
+                systemStatuses={systemStatuses}
+                onEdit={() => setEditingStatus(status)}
+                onDelete={() => setDeleteModal(status)}
+                onSetDefault={() => handleSetDefault(status.id)}
+                canEdit={currentUser.role === 'admin'}
+              />
+            ))}
+          </div>
         </div>
+
+        {showSystemStatuses && (
+          <div className="status-list system-statuses">
+            <div className="section-header">
+              <h3>System Statuses (Read-Only)</h3>
+              <p>Core statuses used for internal logic and analytics</p>
+            </div>
+            <div className="status-table">
+              <div className="table-header">
+                <div className="th">Status</div>
+                <div className="th">Code</div>
+                <div className="th">Description</div>
+                <div className="th">Type</div>
+              </div>
+              
+              {systemStatuses.map(status => (
+                <SystemStatusRow
+                  key={status.id}
+                  status={status}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {showAddForm && (
         <StatusFormModal
           onSubmit={handleAddStatus}
           onClose={() => setShowAddForm(false)}
-          existingStatuses={statuses}
+          existingStatuses={companyStatuses}
+          systemStatuses={systemStatuses}
         />
       )}
 
@@ -196,7 +324,8 @@ export default function StatusManager() {
           status={editingStatus}
           onSubmit={handleUpdateStatus}
           onClose={() => setEditingStatus(null)}
-          existingStatuses={statuses}
+          existingStatuses={companyStatuses}
+          systemStatuses={systemStatuses}
           isEdit={true}
         />
       )}
@@ -204,11 +333,102 @@ export default function StatusManager() {
       {deleteModal && (
         <DeleteStatusModal
           status={deleteModal}
-          statuses={statuses.filter(s => s.active && s.id !== deleteModal.id)}
+          statuses={companyStatuses.filter(s => s.active && s.id !== deleteModal.id)}
           onConfirm={handleDeleteStatus}
           onClose={() => setDeleteModal(null)}
         />
       )}
+    </div>
+  )
+}
+
+function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefault, canEdit }) {
+  const getSystemStatusLabel = (systemCode) => {
+    const systemStatus = systemStatuses.find(s => s.code === systemCode)
+    return systemStatus ? systemStatus.label : systemCode
+  }
+
+  return (
+    <div className="table-row">
+      <div className="td">
+        <div className="drag-handle">⋮⋮</div>
+        <span className="order-number">{status.order}</span>
+      </div>
+      <div className="td">
+        <div className="status-display">
+          <span 
+            className="status-color-indicator"
+            style={{ backgroundColor: status.color }}
+          ></span>
+          <span className="status-name">{status.label}</span>
+          {status.isDefault && (
+            <span className="badge badge-primary">DEFAULT</span>
+          )}
+        </div>
+      </div>
+      <div className="td">
+        <code className="status-code">{status.code}</code>
+      </div>
+      <div className="td">
+        <div className="system-mapping-display">
+          <span className="system-status-label">
+            {getSystemStatusLabel(status.systemMapping)}
+          </span>
+          <code className="system-status-code">({status.systemMapping})</code>
+        </div>
+      </div>
+      <div className="td">
+        <span className={`status-type ${status.isFinal ? 'final' : 'active'}`}>
+          {status.isFinal ? 'Final' : 'Active'}
+        </span>
+      </div>
+      <div className="td">
+        <div className="action-buttons">
+          {canEdit && (
+            <>
+              <button className="btn-action" onClick={onEdit}>
+                Edit
+              </button>
+              {!status.isDefault && (
+                <button className="btn-action" onClick={onSetDefault}>
+                  Set Default
+                </button>
+              )}
+              <button className="btn-action danger" onClick={onDelete}>
+                Delete
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SystemStatusRow({ status }) {
+  return (
+    <div className="table-row system-row">
+      <div className="td">
+        <div className="status-display">
+          <span 
+            className="status-color-indicator"
+            style={{ backgroundColor: status.color }}
+          ></span>
+          <span className="status-name">{status.label}</span>
+          <span className="badge badge-secondary">SYSTEM</span>
+        </div>
+      </div>
+      <div className="td">
+        <code className="status-code">{status.code}</code>
+      </div>
+      <div className="td">
+        <span className="status-description">{status.description}</span>
+      </div>
+      <div className="td">
+        <span className={`status-type ${status.isFinal ? 'final' : 'active'}`}>
+          {status.isFinal ? 'Final' : 'Active'}
+        </span>
+      </div>
     </div>
   )
 }
@@ -262,13 +482,14 @@ function StatusRow({ status, onEdit, onDelete, onSetDefault, canEdit }) {
   )
 }
 
-function StatusFormModal({ status, onSubmit, onClose, existingStatuses, isEdit = false }) {
+function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemStatuses, isEdit = false }) {
   const [formData, setFormData] = useState({
     code: status?.code || '',
     label: status?.label || '',
     description: status?.description || '',
     color: status?.color || '#3498db',
     isFinal: status?.isFinal || false,
+    systemMapping: status?.systemMapping || systemStatuses[0]?.code || '',
     allowedTransitions: status?.allowedTransitions || []
   })
 

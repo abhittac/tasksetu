@@ -9,6 +9,8 @@ import RecurringTaskManager from './components/RecurringTaskManager'
 import NotificationCenter from './components/NotificationCenter'
 import MilestoneManager from './components/MilestoneManager'
 import ApprovalManager from './components/ApprovalManager'
+import StatusManager from './components/StatusManager'
+import PriorityManager from './components/PriorityManager'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('dashboard')
@@ -35,6 +37,10 @@ export default function App() {
         return <MilestoneManager />
       case 'approvals':
         return <ApprovalManager />
+      case 'status-management':
+        return <StatusManager />
+      case 'priority-management':
+        return <PriorityManager />
       default:
         return <Dashboard />
     }
