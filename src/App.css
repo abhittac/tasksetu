@@ -1178,7 +1178,8 @@ body {
 .more-options {
   background-color: #f8f9fa;
   padding: 20px;
-  border-radius: 8px;
+  ```python
+border-radius: 8px;
   margin-top: 16px;
 }
 
@@ -2324,7 +2325,7 @@ body {
 
 .priority-table .table-header {
   display: grid;
-  grid-template-columns: 80px 200px 120px 100px 200px 150px;```text
+  grid-template-columns: 80px 200px 120px 100px 200px 150px;
   gap: 16px;
   padding: 12px 16px;
   background: #f8f9fa;
@@ -2947,4 +2948,488 @@ body {
   font-size: 11px;
   top: -1px;
   left: 2px;
+}
+
+/* Milestone Manager Styles */
+.milestone-manager {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.milestone-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.filter-group {
+  display: flex;
+  gap: 12px;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  background: white;
+}
+
+.milestones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.milestone-card {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+
+.milestone-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.milestone-card.ready_for_confirmation {
+  border-left: 4px solid #ffc107;
+  animation: pulseGlow 2s infinite;
+}
+
+.milestone-card.achieved {
+  border-left: 4px solid #28a745;
+  background: linear-gradient(135deg, #f8fff9 0%, #ffffff 100%);
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  50% { box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3); }
+}
+
+.milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.milestone-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.milestone-title h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.milestone-icon {
+  font-size: 20px;
+}
+
+.priority-indicator {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.priority-indicator.low {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.priority-indicator.medium {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.priority-indicator.high {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.priority-indicator.critical {
+  background: #d6336c;
+  color: white;
+}
+
+.milestone-body {
+  margin-bottom: 16px;
+}
+
+.milestone-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.meta-item {
+  display: flex;
+  gap: 8px;
+}
+
+.meta-label {
+  font-weight: 500;
+  color: #6c757d;
+  min-width: 60px;
+}
+
+.meta-value {
+  color: #2c3e50;
+}
+
+.milestone-description {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.milestone-description p {
+  margin: 0;
+  font-size: 14px;
+  color: #495057;
+  line-height: 1.4;
+}
+
+.collaborators-section {
+  margin: 12px 0;
+}
+
+.collaborator-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.collaborator-badge {
+  background: #e9ecef;
+  color: #495057;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.linked-tasks {
+  margin-top: 16px;
+}
+
+.linked-tasks h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.progress-section {
+  margin-bottom: 12px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #20c997);
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.linked-task {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.task-status {
+  font-size: 14px;
+}
+
+.task-title {
+  font-size: 13px;
+  color: #495057;
+}
+
+.milestone-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  margin-top: 12px;
+  font-weight: 500;
+  color: #856404;
+}
+
+.alert-icon {
+  font-size: 16px;
+}
+
+.milestone-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-success:hover {
+  background: #218838;
+}
+
+.btn-success:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.empty-milestones {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.empty-content {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.empty-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.empty-content h3 {
+  color: #6c757d;
+  margin-bottom: 12px;
+}
+
+.empty-content p {
+  color: #6c757d;
+  margin-bottom: 24px;
+}
+
+/* Create Milestone Modal */
+.large-modal {
+  max-width: 800px;
+  width: 90%;
+}
+
+.task-selection, .collaborator-selection {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 12px;
+  background: #f8f9fa;
+}
+
+.task-selection .checkbox-label {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.task-selection .checkbox-label:last-child {
+  border-bottom: none;
+}
+
+.task-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.task-info .task-title {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.task-info .task-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.collaborator-selection .checkbox-label {
+  display: flex;
+  align-items: center;
+  padding: 6px 0;
+  margin-right: 16px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+.form-group input.error, 
+.form-group select.error {
+  border-color: #dc3545;
+}
+
+/* Milestone Detail Modal */
+.milestone-detail-modal .modal-container {
+  max-width: 700px;
+}
+
+.dependencies-section h3 {
+  margin: 20px 0 12px 0;
+  color: #2c3e50;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 8px;
+}
+
+.dependency-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dependency-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.dependency-status {
+  font-size: 16px;
+}
+
+.dependency-title {
+  flex: 1;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-item label {
+  font-weight: 500;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.description-section {
+  margin: 20px 0;
+}
+
+.description-section h4 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+}
+
+.description-section p {
+  margin: 0;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+.milestone-timeline {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e9ecef;
+}
+
+.timeline-item {
+  padding: 4px 0;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.timeline-item.achieved {
+  color: #28a745;
+  font-weight: 500;
+}
+
+/* Status Badge Variants for Milestones */
+.status-badge.achieved {
+  background: #28a745;
+  color: white;
+}
+
+.status-badge.ready {
+  background: #ffc107;
+  color: #212529;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.status-badge.confirmed {
+  background: #17a2b8;
+  color: white;
 }

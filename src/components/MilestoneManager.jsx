@@ -11,6 +11,10 @@ export default function MilestoneManager() {
       assignee: "John Smith",
       assigneeId: 1,
       dueDate: "2024-01-25",
+      description: "Complete all core backend functionality and initial frontend setup",
+      visibility: "private",
+      priority: "high",
+      collaborators: ["Sarah Wilson", "Mike Johnson"],
       linkedTasks: [
         { id: 101, title: "Database Setup", status: "completed" },
         { id: 102, title: "API Endpoints", status: "completed" },
@@ -18,7 +22,8 @@ export default function MilestoneManager() {
       ],
       confirmed: false,
       createdBy: "Project Manager",
-      createdAt: "2024-01-15"
+      createdAt: "2024-01-15",
+      isAchieved: false
     },
     {
       id: 2,
@@ -28,10 +33,15 @@ export default function MilestoneManager() {
       assignee: "Emily Davis",
       assigneeId: 4,
       dueDate: "2024-02-01",
+      description: "Complete comprehensive security review and vulnerability assessment",
+      visibility: "public",
+      priority: "critical",
+      collaborators: ["Security Team"],
       linkedTasks: [],
       confirmed: false,
       createdBy: "Security Team",
-      createdAt: "2024-01-20"
+      createdAt: "2024-01-20",
+      isAchieved: false
     },
     {
       id: 3,
@@ -41,6 +51,10 @@ export default function MilestoneManager() {
       assignee: "Sarah Wilson",
       assigneeId: 3,
       dueDate: "2024-02-15",
+      description: "All MVP features complete and ready for production deployment",
+      visibility: "public",
+      priority: "critical",
+      collaborators: ["John Smith", "Emily Davis"],
       linkedTasks: [
         { id: 201, title: "Testing Complete", status: "in-progress" },
         { id: 202, title: "Documentation", status: "pending" },
@@ -48,14 +62,32 @@ export default function MilestoneManager() {
       ],
       confirmed: false,
       createdBy: "Product Owner",
-      createdAt: "2024-01-18"
+      createdAt: "2024-01-18",
+      isAchieved: false
     }
   ])
 
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' })
   const [selectedMilestone, setSelectedMilestone] = useState(null)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [filter, setFilter] = useState('all')
+  const [typeFilter, setTypeFilter] = useState('all')
+
+  // Available tasks for linking (in real app, this would come from API)
+  const [availableTasks] = useState([
+    { id: 101, title: "Database Setup", status: "completed" },
+    { id: 102, title: "API Endpoints", status: "completed" },
+    { id: 103, title: "Frontend Integration", status: "completed" },
+    { id: 201, title: "Testing Complete", status: "in-progress" },
+    { id: 202, title: "Documentation", status: "pending" },
+    { id: 203, title: "Deployment Setup", status: "completed" },
+    { id: 301, title: "User Authentication", status: "completed" },
+    { id: 302, title: "Payment Integration", status: "in-progress" },
+    { id: 303, title: "Email Notifications", status: "pending" }
+  ])
 
   const getMilestoneStatus = (milestone) => {
+    if (milestone.isAchieved) return 'achieved'
     if (milestone.confirmed) return 'confirmed'
     if (milestone.type === 'standalone') return milestone.status
     
@@ -68,7 +100,8 @@ export default function MilestoneManager() {
       pending: 'status-badge pending',
       in_progress: 'status-badge in-progress',
       ready_for_confirmation: 'status-badge ready',
-      confirmed: 'status-badge completed'
+      confirmed: 'status-badge confirmed',
+      achieved: 'status-badge achieved'
     }
     return statusClasses[status] || 'status-badge'
   }
@@ -78,10 +111,23 @@ export default function MilestoneManager() {
            && getMilestoneStatus(milestone) === 'ready_for_confirmation'
   }
 
+  const canMarkAchieved = (milestone) => {
+    return (milestone.assigneeId === currentUser.id || currentUser.role === 'admin') 
+           && milestone.confirmed && !milestone.isAchieved
+  }
+
   const confirmMilestone = (milestoneId) => {
     setMilestones(milestones.map(milestone => 
       milestone.id === milestoneId 
         ? { ...milestone, confirmed: true, status: 'confirmed' }
+        : milestone
+    ))
+  }
+
+  const markMilestoneAchieved = (milestoneId) => {
+    setMilestones(milestones.map(milestone => 
+      milestone.id === milestoneId 
+        ? { ...milestone, isAchieved: true, achievedAt: new Date().toISOString() }
         : milestone
     ))
   }
@@ -94,42 +140,71 @@ export default function MilestoneManager() {
     return Math.round((completedTasks / milestone.linkedTasks.length) * 100)
   }
 
+  const handleCreateMilestone = (milestoneData) => {
+    const newMilestone = {
+      id: Date.now(),
+      ...milestoneData,
+      createdBy: currentUser.name,
+      createdAt: new Date().toISOString(),
+      confirmed: false,
+      isAchieved: false,
+      status: 'pending'
+    }
+    setMilestones([...milestones, newMilestone])
+    setShowCreateModal(false)
+  }
+
+  const filteredMilestones = milestones.filter(milestone => {
+    const status = getMilestoneStatus(milestone)
+    const statusMatch = filter === 'all' || status === filter
+    const typeMatch = typeFilter === 'all' || milestone.type === typeFilter
+    return statusMatch && typeMatch
+  })
+
   return (
     <div className="milestone-manager">
       <div className="page-header">
-        <h1>Milestone Tasks</h1>
-        <p>Track and manage project milestones</p>
+        <h1>⭐ Milestone Tasks</h1>
+        <p>Track and manage project milestones and significant checkpoints</p>
       </div>
 
       <div className="milestone-filters">
         <div className="filter-group">
-          <select className="filter-select">
-            <option>All Milestones</option>
-            <option>Pending</option>
-            <option>In Progress</option>
-            <option>Ready for Confirmation</option>
-            <option>Confirmed</option>
+          <select className="filter-select" value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="in_progress">In Progress</option>
+            <option value="ready_for_confirmation">Ready for Confirmation</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="achieved">Achieved</option>
           </select>
-          <select className="filter-select">
-            <option>All Types</option>
-            <option>Standalone</option>
-            <option>Linked</option>
+          <select className="filter-select" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+            <option value="all">All Types</option>
+            <option value="standalone">Standalone</option>
+            <option value="linked">Linked to Tasks</option>
           </select>
         </div>
-        <button className="btn-primary">+ Create Milestone</button>
+        <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
+          ⭐ Create Milestone
+        </button>
       </div>
 
       <div className="milestones-grid">
-        {milestones.map(milestone => {
+        {filteredMilestones.map(milestone => {
           const status = getMilestoneStatus(milestone)
           const completionPercentage = getCompletionPercentage(milestone)
           
           return (
-            <div key={milestone.id} className="milestone-card">
+            <div key={milestone.id} className={`milestone-card ${status}`}>
               <div className="milestone-header">
                 <div className="milestone-title">
-                  <span className="milestone-icon">⭐</span>
+                  <span className="milestone-icon">
+                    {milestone.isAchieved ? '🏆' : '⭐'}
+                  </span>
                   <h3>{milestone.title}</h3>
+                  <span className={`priority-indicator ${milestone.priority}`}>
+                    {milestone.priority}
+                  </span>
                 </div>
                 <span className={getStatusBadge(status)}>
                   {status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -150,7 +225,30 @@ export default function MilestoneManager() {
                     <span className="meta-label">Due Date:</span>
                     <span className="meta-value">{milestone.dueDate}</span>
                   </div>
+                  <div className="meta-item">
+                    <span className="meta-label">Visibility:</span>
+                    <span className="meta-value">{milestone.visibility}</span>
+                  </div>
                 </div>
+
+                {milestone.description && (
+                  <div className="milestone-description">
+                    <p>{milestone.description}</p>
+                  </div>
+                )}
+
+                {milestone.collaborators.length > 0 && (
+                  <div className="collaborators-section">
+                    <span className="meta-label">Collaborators:</span>
+                    <div className="collaborator-list">
+                      {milestone.collaborators.map((collaborator, index) => (
+                        <span key={index} className="collaborator-badge">
+                          {collaborator}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {milestone.type === 'linked' && (
                   <div className="linked-tasks">
@@ -168,12 +266,20 @@ export default function MilestoneManager() {
                       {milestone.linkedTasks.map(task => (
                         <div key={task.id} className="linked-task">
                           <span className={`task-status ${task.status}`}>
-                            {task.status === 'completed' ? '✅' : '⏳'}
+                            {task.status === 'completed' ? '✅' : 
+                             task.status === 'in-progress' ? '🔄' : '⏳'}
                           </span>
                           <span className="task-title">{task.title}</span>
                         </div>
                       ))}
                     </div>
+                  </div>
+                )}
+
+                {status === 'ready_for_confirmation' && (
+                  <div className="milestone-alert">
+                    <span className="alert-icon">🎯</span>
+                    <span>All dependencies complete! Ready for confirmation.</span>
                   </div>
                 )}
               </div>
@@ -193,10 +299,31 @@ export default function MilestoneManager() {
                     Confirm Milestone
                   </button>
                 )}
+                {canMarkAchieved(milestone) && (
+                  <button 
+                    className="btn-success"
+                    onClick={() => markMilestoneAchieved(milestone.id)}
+                  >
+                    🏆 Mark Achieved
+                  </button>
+                )}
               </div>
             </div>
           )
         })}
+
+        {filteredMilestones.length === 0 && (
+          <div className="empty-milestones">
+            <div className="empty-content">
+              <span className="empty-icon">⭐</span>
+              <h3>No milestones found</h3>
+              <p>Create your first milestone to track important project checkpoints.</p>
+              <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
+                ⭐ Create First Milestone
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {selectedMilestone && (
@@ -204,15 +331,270 @@ export default function MilestoneManager() {
           milestone={selectedMilestone}
           onClose={() => setSelectedMilestone(null)}
           onConfirm={confirmMilestone}
+          onMarkAchieved={markMilestoneAchieved}
           canConfirm={canConfirmMilestone(selectedMilestone)}
+          canMarkAchieved={canMarkAchieved(selectedMilestone)}
+        />
+      )}
+
+      {showCreateModal && (
+        <CreateMilestoneModal
+          availableTasks={availableTasks}
+          onSubmit={handleCreateMilestone}
+          onClose={() => setShowCreateModal(false)}
+          currentUser={currentUser}
         />
       )}
     </div>
   )
 }
 
-function MilestoneDetail({ milestone, onClose, onConfirm, canConfirm }) {
-  const status = milestone.confirmed ? 'confirmed' : 
+function CreateMilestoneModal({ availableTasks, onSubmit, onClose, currentUser }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    type: 'standalone',
+    linkedTasks: [],
+    dueDate: '',
+    assignee: currentUser.name,
+    assigneeId: currentUser.id,
+    description: '',
+    visibility: 'private',
+    priority: 'medium',
+    collaborators: []
+  })
+
+  const [errors, setErrors] = useState({})
+  const [availableCollaborators] = useState([
+    'John Smith', 'Sarah Wilson', 'Mike Johnson', 'Emily Davis', 'Security Team'
+  ])
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: '' })
+    }
+  }
+
+  const handleLinkedTasksChange = (taskId) => {
+    const task = availableTasks.find(t => t.id === parseInt(taskId))
+    const updatedTasks = formData.linkedTasks.some(t => t.id === parseInt(taskId))
+      ? formData.linkedTasks.filter(t => t.id !== parseInt(taskId))
+      : [...formData.linkedTasks, task]
+    
+    setFormData({ ...formData, linkedTasks: updatedTasks })
+  }
+
+  const handleCollaboratorToggle = (collaborator) => {
+    const updatedCollaborators = formData.collaborators.includes(collaborator)
+      ? formData.collaborators.filter(c => c !== collaborator)
+      : [...formData.collaborators, collaborator]
+    
+    setFormData({ ...formData, collaborators: updatedCollaborators })
+  }
+
+  const validateForm = () => {
+    const newErrors = {}
+    
+    if (!formData.title.trim()) {
+      newErrors.title = 'Task name is required'
+    }
+    
+    if (!formData.dueDate) {
+      newErrors.dueDate = 'Due date is required'
+    }
+    
+    if (!formData.assignee) {
+      newErrors.assignee = 'Assignee is required'
+    }
+    
+    if (formData.type === 'linked' && formData.linkedTasks.length === 0) {
+      newErrors.linkedTasks = 'At least one task must be selected for linked milestones'
+    }
+    
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (validateForm()) {
+      onSubmit(formData)
+    }
+  }
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-container large-modal">
+        <div className="modal-header">
+          <h2>⭐ Create Milestone Task</h2>
+          <button className="close-button" onClick={onClose}>×</button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="modal-content">
+          <div className="form-grid">
+            <div className="form-group full-width">
+              <label htmlFor="title">Task Name *</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                placeholder="Enter milestone name"
+                className={errors.title ? 'error' : ''}
+                maxLength={100}
+              />
+              {errors.title && <span className="error-message">{errors.title}</span>}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="type">Milestone Type *</label>
+              <select
+                id="type"
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+              >
+                <option value="standalone">Standalone</option>
+                <option value="linked">Linked to Tasks</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="priority">Priority</label>
+              <select
+                id="priority"
+                name="priority"
+                value={formData.priority}
+                onChange={handleChange}
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="dueDate">Due Date *</label>
+              <input
+                type="date"
+                id="dueDate"
+                name="dueDate"
+                value={formData.dueDate}
+                onChange={handleChange}
+                className={errors.dueDate ? 'error' : ''}
+              />
+              {errors.dueDate && <span className="error-message">{errors.dueDate}</span>}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="assignee">Assigned To *</label>
+              <select
+                id="assignee"
+                name="assignee"
+                value={formData.assignee}
+                onChange={handleChange}
+                className={errors.assignee ? 'error' : ''}
+              >
+                <option value="John Smith">John Smith</option>
+                <option value="Sarah Wilson">Sarah Wilson</option>
+                <option value="Mike Johnson">Mike Johnson</option>
+                <option value="Emily Davis">Emily Davis</option>
+              </select>
+              {errors.assignee && <span className="error-message">{errors.assignee}</span>}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="visibility">Visibility</label>
+              <select
+                id="visibility"
+                name="visibility"
+                value={formData.visibility}
+                onChange={handleChange}
+              >
+                <option value="private">Private</option>
+                <option value="public">Public</option>
+              </select>
+            </div>
+          </div>
+
+          {formData.type === 'linked' && (
+            <div className="form-group full-width">
+              <label>Link to Tasks *</label>
+              <div className="task-selection">
+                {availableTasks.map(task => (
+                  <label key={task.id} className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.linkedTasks.some(t => t.id === task.id)}
+                      onChange={() => handleLinkedTasksChange(task.id)}
+                    />
+                    <span className="checkmark"></span>
+                    <span className="task-info">
+                      <span className="task-title">{task.title}</span>
+                      <span className={`task-status ${task.status}`}>
+                        {task.status === 'completed' ? '✅' : 
+                         task.status === 'in-progress' ? '🔄' : '⏳'}
+                        {task.status.replace('-', ' ')}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+              {errors.linkedTasks && <span className="error-message">{errors.linkedTasks}</span>}
+            </div>
+          )}
+
+          <div className="form-group full-width">
+            <label htmlFor="description">Description</label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Describe the milestone criteria, purpose, and background..."
+              rows="4"
+            />
+          </div>
+
+          <div className="form-group full-width">
+            <label>Collaborators</label>
+            <div className="collaborator-selection">
+              {availableCollaborators.map(collaborator => (
+                <label key={collaborator} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={formData.collaborators.includes(collaborator)}
+                    onChange={() => handleCollaboratorToggle(collaborator)}
+                  />
+                  <span className="checkmark"></span>
+                  {collaborator}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="modal-actions">
+            <button type="button" className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-primary">
+              ⭐ Create Milestone
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function MilestoneDetail({ milestone, onClose, onConfirm, onMarkAchieved, canConfirm, canMarkAchieved }) {
+  const status = milestone.isAchieved ? 'achieved' :
+                milestone.confirmed ? 'confirmed' :
                 milestone.type === 'standalone' ? milestone.status :
                 milestone.linkedTasks.every(task => task.status === 'completed') ? 'ready_for_confirmation' : 'in_progress'
 
@@ -222,7 +604,9 @@ function MilestoneDetail({ milestone, onClose, onConfirm, canConfirm }) {
       <div className="modal-container">
         <div className="modal-header">
           <h2>
-            <span className="milestone-icon">⭐</span>
+            <span className="milestone-icon">
+              {milestone.isAchieved ? '🏆' : '⭐'}
+            </span>
             {milestone.title}
           </h2>
           <button className="close-button" onClick={onClose}>×</button>
@@ -242,6 +626,12 @@ function MilestoneDetail({ milestone, onClose, onConfirm, canConfirm }) {
                 <span>{milestone.type}</span>
               </div>
               <div className="info-item">
+                <label>Priority:</label>
+                <span className={`priority-badge ${milestone.priority}`}>
+                  {milestone.priority}
+                </span>
+              </div>
+              <div className="info-item">
                 <label>Assignee:</label>
                 <span>{milestone.assignee}</span>
               </div>
@@ -250,14 +640,30 @@ function MilestoneDetail({ milestone, onClose, onConfirm, canConfirm }) {
                 <span>{milestone.dueDate}</span>
               </div>
               <div className="info-item">
-                <label>Created By:</label>
-                <span>{milestone.createdBy}</span>
-              </div>
-              <div className="info-item">
-                <label>Created:</label>
-                <span>{milestone.createdAt}</span>
+                <label>Visibility:</label>
+                <span>{milestone.visibility}</span>
               </div>
             </div>
+
+            {milestone.description && (
+              <div className="description-section">
+                <h4>Description</h4>
+                <p>{milestone.description}</p>
+              </div>
+            )}
+
+            {milestone.collaborators.length > 0 && (
+              <div className="collaborators-section">
+                <h4>Collaborators</h4>
+                <div className="collaborator-list">
+                  {milestone.collaborators.map((collaborator, index) => (
+                    <span key={index} className="collaborator-badge">
+                      {collaborator}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {milestone.type === 'linked' && (
@@ -279,6 +685,22 @@ function MilestoneDetail({ milestone, onClose, onConfirm, canConfirm }) {
               </div>
             </div>
           )}
+
+          <div className="milestone-timeline">
+            <div className="timeline-item">
+              <strong>Created:</strong> {milestone.createdAt} by {milestone.createdBy}
+            </div>
+            {milestone.confirmed && (
+              <div className="timeline-item">
+                <strong>Confirmed:</strong> Ready for achievement marking
+              </div>
+            )}
+            {milestone.isAchieved && (
+              <div className="timeline-item achieved">
+                <strong>🏆 Achieved:</strong> {new Date(milestone.achievedAt).toLocaleString()}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="modal-actions">
@@ -292,6 +714,17 @@ function MilestoneDetail({ milestone, onClose, onConfirm, canConfirm }) {
               }}
             >
               Confirm Milestone
+            </button>
+          )}
+          {canMarkAchieved && (
+            <button 
+              className="btn-success"
+              onClick={() => {
+                onMarkAchieved(milestone.id)
+                onClose()
+              }}
+            >
+              🏆 Mark Achieved
             </button>
           )}
         </div>
