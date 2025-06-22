@@ -1,101 +1,150 @@
-
 import React, { useState } from 'react'
 
 export default function TaskComments({ taskId }) {
   const [comments, setComments] = useState([
     {
       id: 1,
-      author: "John Smith",
-      content: "I've completed the initial setup for this task. @Sarah Wilson please review the implementation.",
-      timestamp: "2024-01-15 10:30",
-      isEdited: false,
-      attachments: [
-        { id: 1, name: "setup-screenshot.png", type: "image", size: "245KB" }
-      ],
-      reactions: [
-        { emoji: "👍", users: ["Sarah Wilson", "Mike Johnson"], count: 2 },
-        { emoji: "🎉", users: ["Emily Davis"], count: 1 }
-      ]
+      author: 'John Smith',
+      content: 'I\'ve started working on the database schema migration. The initial analysis shows we need to handle about 2.5M records.',
+      timestamp: '2024-01-22 10:30:00',
+      avatar: 'JS',
+      mentions: [],
+      attachments: []
     },
     {
       id: 2,
-      author: "Sarah Wilson",
-      content: "Great work! The implementation looks solid. I've added some additional documentation.",
-      timestamp: "2024-01-15 14:20",
-      isEdited: true,
+      author: 'Sarah Wilson',
+      content: '@John Smith - Great! Please make sure to backup the data before starting the migration process. Also, have you considered the downtime window?',
+      timestamp: '2024-01-22 11:15:00',
+      avatar: 'SW',
+      mentions: ['John Smith'],
+      attachments: []
+    },
+    {
+      id: 3,
+      author: 'Mike Johnson',
+      content: 'I can help with the testing phase. Let me know when you\'re ready for the staging environment setup.',
+      timestamp: '2024-01-22 14:20:00',
+      avatar: 'MJ',
+      mentions: [],
       attachments: [
-        { id: 2, name: "documentation.pdf", type: "document", size: "1.2MB" }
-      ],
-      reactions: []
+        { name: 'test-plan.pdf', size: '245KB', type: 'pdf' }
+      ]
     }
   ])
 
   const [newComment, setNewComment] = useState('')
-  const [selectedFiles, setSelectedFiles] = useState([])
-  const [userRole] = useState('assignee') // This would come from auth context
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showMentionSuggestions, setShowMentionSuggestions] = useState(false)
+  const [mentionQuery, setMentionQuery] = useState('')
+  const [mentionPosition, setMentionPosition] = useState({ start: 0, end: 0 })
 
-  const handleCommentSubmit = (e) => {
+  const currentUser = { id: 1, name: 'Current User', avatar: 'CU' }
+
+  // Mock team members for mentions
+  const teamMembers = [
+    { id: 1, name: 'John Smith', avatar: 'JS' },
+    { id: 2, name: 'Sarah Wilson', avatar: 'SW' },
+    { id: 3, name: 'Mike Johnson', avatar: 'MJ' },
+    { id: 4, name: 'Emily Davis', avatar: 'ED' }
+  ]
+
+  const handleCommentChange = (e) => {
+    const value = e.target.value
+    const cursorPosition = e.target.selectionStart
+
+    setNewComment(value)
+
+    // Handle @ mentions
+    const atIndex = value.lastIndexOf('@', cursorPosition - 1)
+    if (atIndex !== -1) {
+      const afterAt = value.substring(atIndex + 1, cursorPosition)
+      if (!afterAt.includes(' ') && afterAt.length >= 0) {
+        setMentionQuery(afterAt)
+        setMentionPosition({ start: atIndex, end: cursorPosition })
+        setShowMentionSuggestions(true)
+      } else {
+        setShowMentionSuggestions(false)
+      }
+    } else {
+      setShowMentionSuggestions(false)
+    }
+  }
+
+  const handleMentionSelect = (member) => {
+    const beforeMention = newComment.substring(0, mentionPosition.start)
+    const afterMention = newComment.substring(mentionPosition.end)
+    const newValue = beforeMention + `@${member.name} ` + afterMention
+
+    setNewComment(newValue)
+    setShowMentionSuggestions(false)
+    setMentionQuery('')
+  }
+
+  const filteredMembers = teamMembers.filter(member =>
+    member.name.toLowerCase().includes(mentionQuery.toLowerCase())
+  )
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!newComment.trim()) return
+    if (!newComment.trim() || isSubmitting) return
 
-    const comment = {
-      id: comments.length + 1,
-      author: "Current User",
-      content: newComment,
-      timestamp: new Date().toLocaleString(),
-      isEdited: false,
-      attachments: selectedFiles.map((file, index) => ({
-        id: index + 1,
-        name: file.name,
-        type: file.type.startsWith('image/') ? 'image' : 'document',
-        size: `${(file.size / 1024).toFixed(1)}KB`
-      })),
-      reactions: []
+    setIsSubmitting(true)
+
+    // Extract mentions from comment
+    const mentionRegex = /@(\w+(?:\s+\w+)*)/g
+    const mentions = []
+    let match
+    while ((match = mentionRegex.exec(newComment)) !== null) {
+      mentions.push(match[1])
     }
 
-    setComments([...comments, comment])
-    setNewComment('')
-    setSelectedFiles([])
-  }
+    const comment = {
+      id: Date.now(),
+      author: currentUser.name,
+      content: newComment.trim(),
+      timestamp: new Date().toISOString(),
+      avatar: currentUser.avatar,
+      mentions,
+      attachments: []
+    }
 
-  const handleFileSelect = (e) => {
-    const files = Array.from(e.target.files)
-    const validFiles = files.filter(file => file.size <= 2 * 1024 * 1024) // 2MB limit
-    setSelectedFiles(validFiles)
-  }
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500))
 
-  const handleReaction = (commentId, emoji) => {
-    setComments(comments.map(comment => {
-      if (comment.id === commentId) {
-        const existingReaction = comment.reactions.find(r => r.emoji === emoji)
-        if (existingReaction) {
-          // Toggle reaction
-          if (existingReaction.users.includes("Current User")) {
-            existingReaction.users = existingReaction.users.filter(u => u !== "Current User")
-            existingReaction.count = existingReaction.users.length
-          } else {
-            existingReaction.users.push("Current User")
-            existingReaction.count = existingReaction.users.length
-          }
-        } else {
-          // Add new reaction
-          comment.reactions.push({
-            emoji: emoji,
-            users: ["Current User"],
-            count: 1
-          })
-        }
+      setComments([...comments, comment])
+      setNewComment('')
+
+      // Log mention notifications
+      if (mentions.length > 0) {
+        console.log('Mention notifications sent to:', mentions)
       }
-      return comment
-    }))
+    } catch (error) {
+      console.error('Error posting comment:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  const canEditComment = (comment) => {
-    return userRole === 'admin' || comment.author === "Current User"
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp)
+    const now = new Date()
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60))
+
+    if (diffInHours < 1) {
+      const diffInMinutes = Math.floor((now - date) / (1000 * 60))
+      return `${diffInMinutes} minutes ago`
+    } else if (diffInHours < 24) {
+      return `${diffInHours} hours ago`
+    } else {
+      const diffInDays = Math.floor(diffInHours / 24)
+      return `${diffInDays} days ago`
+    }
   }
 
-  const canDeleteComment = (comment) => {
-    return userRole === 'admin' || comment.author === "Current User"
+  const highlightMentions = (content) => {
+    return content.replace(/@(\w+(?:\s+\w+)*)/g, '<span class="mention">@$1</span>')
   }
 
   return (
@@ -107,190 +156,94 @@ export default function TaskComments({ taskId }) {
       <div className="comments-list">
         {comments.map(comment => (
           <div key={comment.id} className="comment-item">
-            <div className="comment-avatar">
-              {comment.author.charAt(0)}
-            </div>
+            <div className="comment-avatar">{comment.avatar}</div>
             <div className="comment-content">
               <div className="comment-header">
                 <span className="comment-author">{comment.author}</span>
-                <span className="comment-timestamp">
-                  {comment.timestamp}
-                  {comment.isEdited && <span className="edited-indicator">(edited)</span>}
-                </span>
-                <div className="comment-actions">
-                  {canEditComment(comment) && (
-                    <button className="comment-action">Edit</button>
-                  )}
-                  {canDeleteComment(comment) && (
-                    <button className="comment-action delete">Delete</button>
-                  )}
-                </div>
+                <span className="comment-timestamp">{formatTimestamp(comment.timestamp)}</span>
               </div>
-              
-              <div className="comment-text">
-                {comment.content}
-              </div>
-
+              <div 
+                className="comment-text"
+                dangerouslySetInnerHTML={{ __html: highlightMentions(comment.content) }}
+              />
               {comment.attachments.length > 0 && (
                 <div className="comment-attachments">
-                  {comment.attachments.map(attachment => (
-                    <div key={attachment.id} className="attachment-item">
-                      <div className="attachment-icon">
-                        {attachment.type === 'image' ? '🖼️' : '📄'}
-                      </div>
+                  {comment.attachments.map((attachment, index) => (
+                    <div key={index} className="attachment-item">
+                      <span className="attachment-icon">📎</span>
                       <span className="attachment-name">{attachment.name}</span>
                       <span className="attachment-size">({attachment.size})</span>
                     </div>
                   ))}
                 </div>
               )}
-
-              <div className="comment-reactions">
-                {comment.reactions.map(reaction => (
-                  <button
-                    key={reaction.emoji}
-                    className={`reaction-button ${reaction.users.includes("Current User") ? 'active' : ''}`}
-                    onClick={() => handleReaction(comment.id, reaction.emoji)}
-                  >
-                    {reaction.emoji} {reaction.count}
-                  </button>
-                ))}
-                <button 
-                  className="add-reaction"
-                  onClick={() => handleReaction(comment.id, '👍')}
-                >
-                  +
-                </button>
-              </div>
+              {comment.mentions.length > 0 && (
+                <div className="comment-mentions">
+                  <span className="mentions-label">Mentioned:</span>
+                  {comment.mentions.map((mention, index) => (
+                    <span key={index} className="mentioned-user">@{mention}</span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
 
-      {(userRole === 'admin' || userRole === 'assignee' || userRole === 'collaborator') && (
-        <form className="comment-form" onSubmit={handleCommentSubmit}>
-          <div className="comment-input-container">
+      <form onSubmit={handleSubmit} className="comment-form">
+        <div className="comment-input-container">
+          <div className="comment-avatar">{currentUser.avatar}</div>
+          <div className="comment-input-wrapper">
             <textarea
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Add a comment... Use @ to mention users"
+              onChange={handleCommentChange}
+              placeholder="Add a comment... Use @ to mention team members"
               className="comment-input"
               rows="3"
+              disabled={isSubmitting}
             />
-            
-            <div className="comment-form-actions">
-              <div className="file-upload">
-                <input
-                  type="file"
-                  id="comment-files"
-                  multiple
-                  onChange={handleFileSelect}
-                  className="file-input"
-                  accept="image/*,.pdf,.doc,.docx,.zip"
-                />
-                <label htmlFor="comment-files" className="file-upload-label">
-                  📎 Attach files
-                </label>
-              </div>
-              
-              <button type="submit" className="btn-primary" disabled={!newComment.trim()}>
-                Comment
-              </button>
-            </div>
-          </div>
-          
-          {selectedFiles.length > 0 && (
-            <div className="selected-files">
-              {selectedFiles.map((file, index) => (
-                <div key={index} className="selected-file">
-                  <span>{file.name}</span>
-                  <button 
-                    type="button" 
-                    onClick={() => setSelectedFiles(selectedFiles.filter((_, i) => i !== index))}
-                    className="remove-file"
+
+            {showMentionSuggestions && filteredMembers.length > 0 && (
+              <div className="mention-suggestions">
+                {filteredMembers.map(member => (
+                  <div
+                    key={member.id}
+                    className="mention-suggestion"
+                    onClick={() => handleMentionSelect(member)}
                   >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </form>
-      )}
-    </div>
-  )
-}
-
-export default function TaskComments({ taskId }) {
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      user: 'John Doe',
-      avatar: 'JD',
-      text: 'This task is progressing well. Need to complete the database setup first.',
-      timestamp: '2024-01-22 10:30:00',
-      mentions: []
-    },
-    {
-      id: 2,
-      user: 'Jane Smith',
-      avatar: 'JS',
-      text: 'I can help with the frontend once the API is ready.',
-      timestamp: '2024-01-22 09:15:00',
-      mentions: []
-    }
-  ])
-  
-  const [newComment, setNewComment] = useState('')
-
-  const handleSubmitComment = (e) => {
-    e.preventDefault()
-    if (!newComment.trim()) return
-
-    const comment = {
-      id: Date.now(),
-      user: 'Current User',
-      avatar: 'CU',
-      text: newComment,
-      timestamp: new Date().toLocaleString(),
-      mentions: []
-    }
-
-    setComments([...comments, comment])
-    setNewComment('')
-  }
-
-  return (
-    <div className="task-comments">
-      <div className="comments-list">
-        {comments.map(comment => (
-          <div key={comment.id} className="comment-item">
-            <div className="comment-avatar">{comment.avatar}</div>
-            <div className="comment-content">
-              <div className="comment-header">
-                <span className="comment-user">{comment.user}</span>
-                <span className="comment-time">{comment.timestamp}</span>
+                    <span className="mention-avatar">{member.avatar}</span>
+                    <span className="mention-name">{member.name}</span>
+                  </div>
+                ))}
               </div>
-              <div className="comment-text">{comment.text}</div>
-            </div>
+            )}
           </div>
-        ))}
-      </div>
-      
-      <form onSubmit={handleSubmitComment} className="comment-form">
-        <textarea
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Add a comment..."
-          className="comment-input"
-          rows="3"
-        />
+        </div>
+
         <div className="comment-actions">
-          <button type="submit" className="btn-primary">
-            Add Comment
+          <div className="comment-tools">
+            <button type="button" className="tool-button" title="Add attachment">
+              📎
+            </button>
+            <button type="button" className="tool-button" title="Add emoji">
+              😀
+            </button>
+          </div>
+          <button 
+            type="submit" 
+            className="btn-primary"
+            disabled={!newComment.trim() || isSubmitting}
+          >
+            {isSubmitting ? 'Posting...' : 'Post Comment'}
           </button>
         </div>
       </form>
+
+      {comments.length === 0 && (
+        <div className="empty-comments">
+          <p>No comments yet. Be the first to comment!</p>
+        </div>
+      )}
     </div>
   )
 }

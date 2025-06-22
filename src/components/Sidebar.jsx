@@ -1,6 +1,19 @@
 import React from 'react'
 
 export default function Sidebar({ currentPage, setCurrentPage }) {
+  // Mock data for demonstration
+  const taskCounts = {
+    total: 12,
+    overdue: 3,
+    dueToday: 2,
+    upcoming: 7
+  }
+
+  const notificationCounts = {
+    unread: 5,
+    total: 15
+  }
+
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '🏠', section: 'main' },
     { id: 'all-tasks', label: 'All Tasks', icon: '📋', section: 'task' },

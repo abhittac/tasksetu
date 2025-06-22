@@ -78,8 +78,41 @@ export default function ActivityFeed({ taskId }) {
       user: 'Emily Davis',
       timestamp: '2024-01-16 08:15',
       details: {}
+    },
+    {
+      id: 9,
+      type: 'reminder_sent',
+      user: 'System',
+      timestamp: '2024-01-22 09:00',
+      details: {
+        reminderType: 'due_date',
+        message: 'Task due in 3 days'
+      }
+    },
+    {
+      id: 10,
+      type: 'notification_sent',
+      user: 'System',
+      timestamp: '2024-01-22 10:00',
+      details: {
+        notificationType: 'assignment',
+        recipient: 'John Smith'
+      }
     }
   ])
+
+  const [filter, setFilter] = useState('all')
+
+  const filteredActivities = activities.filter(activity => {
+    if (filter === 'all') return true
+    if (filter === 'comments') return activity.type === 'comment_added'
+    if (filter === 'updates') return activity.type === 'field_updated'
+    if (filter === 'files') return activity.type === 'file_uploaded' || activity.type === 'file_deleted'
+    if (filter === 'assignments') return activity.type === 'assignment'
+    if (filter === 'snooze') return activity.type === 'task_snoozed' || activity.type === 'task_unsnoozed'
+    if (filter === 'notifications') return activity.type === 'reminder_sent' || activity.type === 'notification_sent'
+    return true
+  })
 
   const getActivityIcon = (type) => {
     const icons = {
@@ -93,7 +126,9 @@ export default function ActivityFeed({ taskId }) {
       approval_requested: '⏳',
       approval_granted: '✅',
       task_snoozed: '😴',
-      task_unsnoozed: '⏰'
+      task_unsnoozed: '⏰',
+      reminder_sent: '🔔',
+      notification_sent: '📬'
     }
     return icons[type] || '📝'
   }
@@ -126,6 +161,10 @@ export default function ActivityFeed({ taskId }) {
         return `${user} snoozed task until ${snoozeDate}${noteText}`
       case 'task_unsnoozed':
         return `${user} unsnoozed the task`
+      case 'reminder_sent':
+        return `System sent reminder: ${details.message}`
+      case 'notification_sent':
+        return `System sent ${details.notificationType} notification to ${details.recipient}`
       default:
         return `${user} performed an action`
     }
@@ -152,18 +191,24 @@ export default function ActivityFeed({ taskId }) {
       <div className="activity-header">
         <h3>Activity Feed</h3>
         <div className="activity-filters">
-          <select className="filter-select small">
+          <select 
+            className="filter-select small"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
             <option value="all">All Activities</option>
             <option value="comments">Comments</option>
             <option value="updates">Field Updates</option>
             <option value="files">File Actions</option>
             <option value="assignments">Assignments</option>
+            <option value="snooze">Snooze Actions</option>
+            <option value="notifications">Notifications</option>
           </select>
         </div>
       </div>
 
       <div className="activity-timeline">
-        {activities.map(activity => (
+        {filteredActivities.map(activity => (
           <div key={activity.id} className="activity-item">
             <div className="activity-icon">
               {getActivityIcon(activity.type)}
@@ -179,53 +224,12 @@ export default function ActivityFeed({ taskId }) {
           </div>
         ))}
       </div>
-    </div>
-  )
-}
 
-export default function ActivityFeed({ taskId }) {
-  const [activities] = useState([
-    {
-      id: 1,
-      type: 'status_change',
-      user: 'John Doe',
-      action: 'changed status from "To Do" to "In Progress"',
-      timestamp: '2024-01-22 10:30:00',
-      avatar: 'JD'
-    },
-    {
-      id: 2,
-      type: 'comment',
-      user: 'Jane Smith',
-      action: 'added a comment',
-      timestamp: '2024-01-22 09:15:00',
-      avatar: 'JS'
-    },
-    {
-      id: 3,
-      type: 'assignment',
-      user: 'Admin',
-      action: 'assigned task to John Doe',
-      timestamp: '2024-01-22 08:00:00',
-      avatar: 'A'
-    }
-  ])
-
-  return (
-    <div className="activity-feed">
-      <div className="activity-list">
-        {activities.map(activity => (
-          <div key={activity.id} className="activity-item">
-            <div className="activity-avatar">{activity.avatar}</div>
-            <div className="activity-content">
-              <div className="activity-text">
-                <span className="activity-user">{activity.user}</span> {activity.action}
-              </div>
-              <div className="activity-time">{activity.timestamp}</div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {filteredActivities.length === 0 && (
+        <div className="empty-activity">
+          <p>No activities found for the selected filter.</p>
+        </div>
+      )}
     </div>
   )
 }
