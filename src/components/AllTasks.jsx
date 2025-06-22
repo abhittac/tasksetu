@@ -1092,8 +1092,8 @@ function TaskRow({ task, isSnoozed, snoozedUntil, isSelected, onTaskClick, onTas
           />
           <span className="checkmark"></span>
         </label>
-        <div className="task-title-content" onClick={onTaskClick}></div>
-        <span className="task-title-text">{task.title}</span>
+        <div className="task-title-content" onClick={onTaskClick}>
+          <span className="task-title-text">{task.title}</span>
           {task.subtasks && task.subtasks.length > 0 && (
             <span className="subtask-count" title={`${task.subtasks.length} sub-tasks`}>
               {task.subtasks.length} sub-tasks
