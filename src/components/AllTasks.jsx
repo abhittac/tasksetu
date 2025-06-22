@@ -1,7 +1,9 @@
 
-import React from 'react'
+import React, { useState } from 'react'
+import TaskDetail from './TaskDetail'
 
 export default function AllTasks() {
+  const [selectedTaskId, setSelectedTaskId] = useState(null)
   const tasks = [
     {
       id: 1,
@@ -102,13 +104,25 @@ export default function AllTasks() {
             <div className="td">{task.category}</div>
             <div className="td">
               <div className="action-buttons">
-                <button className="btn-action">Edit</button>
+                <button 
+                  className="btn-action"
+                  onClick={() => setSelectedTaskId(task.id)}
+                >
+                  Edit
+                </button>
                 <button className="btn-action">Delete</button>
               </div>
             </div>
           </div>
         ))}
       </div>
+      
+      {selectedTaskId && (
+        <TaskDetail 
+          taskId={selectedTaskId} 
+          onClose={() => setSelectedTaskId(null)} 
+        />
+      )}
     </div>
   )
 }
