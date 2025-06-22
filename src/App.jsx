@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard'
 import AllTasks from './components/AllTasks'
 import CreateTask from './components/CreateTask'
 import TaskAnalytics from './components/TaskAnalytics'
+import RecurringTaskManager from './components/RecurringTaskManager'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('dashboard')
@@ -18,6 +19,8 @@ export default function App() {
         return <AllTasks />
       case 'create-task':
         return <CreateTask />
+      case 'recurring-tasks':
+        return <RecurringTaskManager />
       case 'task-analytics':
         return <TaskAnalytics />
       case 'assigned-tasks':

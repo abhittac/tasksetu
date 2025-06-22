@@ -1,4 +1,3 @@
-
 import React from 'react'
 
 export default function Sidebar({ currentPage, setCurrentPage }) {
@@ -6,6 +5,7 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
     { id: 'dashboard', label: 'Dashboard', icon: '🏠', section: 'main' },
     { id: 'all-tasks', label: 'All Tasks', icon: '📋', section: 'task' },
     { id: 'create-task', label: 'Create Task', icon: '➕', section: 'task' },
+    { id: 'recurring-tasks', label: 'Recurring Tasks', icon: '🔄', section: 'task' },
     { id: 'task-analytics', label: 'Task Analytics', icon: '📊', section: 'task' },
     { id: 'assigned-tasks', label: 'Assigned Tasks', icon: '👥', section: 'task' },
     { id: 'due-today', label: 'Due Today', icon: '⏰', section: 'task' }
@@ -22,7 +22,7 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
           <span>Admin User</span>
         </div>
       </div>
-      
+
       <nav className="sidebar-nav">
         <div className="nav-section">
           <span className="nav-label">MAIN</span>
@@ -39,7 +39,7 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
             ))}
           </ul>
         </div>
-        
+
         <div className="nav-section">
           <span className="nav-label">TASK MANAGEMENT</span>
           <ul>
