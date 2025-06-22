@@ -1619,58 +1619,7 @@ function EditableInfoItem({ label, value, type, options, onSave }) {
   )
 }
 
-function EditableTitle({ title, onSave, canEdit }) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [editValue, setEditValue] = useState(title)
 
-  const handleSave = () => {
-    if (editValue.trim() && editValue !== title) {
-      onSave(editValue.trim())
-    }
-    setIsEditing(false)
-  }
-
-  const handleCancel = () => {
-    setEditValue(title)
-    setIsEditing(false)
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSave()
-    } else if (e.key === 'Escape') {
-      handleCancel()
-    }
-  }
-
-  if (isEditing) {
-    return (
-      <div className="editable-title-container">
-        <input
-          type="text"
-          value={editValue}
-          onChange={(e) => setEditValue(e.target.value)}
-          onBlur={handleSave}
-          onKeyDown={handleKeyPress}
-          autoFocus
-          className="editable-title-input"
-          maxLength={50}
-        />
-        <div className="edit-actions">
-          <button onClick={handleSave} className="btn-save">✓</button>
-          <button onClick={handleCancel} className="btn-cancel">✗</button>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="editable-title-display" onClick={() => setIsEditing(true)}>
-      <h1 className="task-title">{title}</h1>
-      <span className="edit-icon-title">✏️</span>
-    </div>
-  )
-}
 
 function TaskDeleteModal({ task, onConfirm, onClose, currentUser }) {
   const [deleteOptions, setDeleteOptions] = useState({
