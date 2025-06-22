@@ -164,6 +164,11 @@ export default function AllTasks() {
           <div key={task.id} className="table-row">
             <div className="td task-title">
               {task.title}
+              {task.isRecurringInstance && (
+                <span className="recurring-indicator" title="This is a recurring task instance">
+                  🔁
+                </span>
+              )}
               {isSnoozed && (
                 <span className="snooze-indicator" title={`Snoozed until ${snoozedUntil.toLocaleString()}`}>
                   😴
@@ -307,9 +312,59 @@ function CreateTaskDrawer({ onClose }) {
     })
   }
 
+  const getRecurrencePreview = (recurrence) => {
+    if (!recurrence.frequency) return ''
+    
+    let preview = `Repeats every ${recurrence.repeatEvery} ${recurrence.frequency}`
+    
+    if (recurrence.frequency === 'weekly' && recurrence.repeatOnDays.length > 0) {
+      preview += ` on ${recurrence.repeatOnDays.join(', ')}`
+    }
+    
+    if (recurrence.time) {
+      preview += ` at ${recurrence.time}`
+    }
+    
+    if (recurrence.endConditionType === 'after' && recurrence.endValue) {
+      preview += `. Ends after ${recurrence.endValue} occurrences.`
+    } else if (recurrence.endConditionType === 'on' && recurrence.endValue) {
+      preview += `. Ends on ${recurrence.endValue}.`
+    } else {
+      preview += '. Never ends.'
+    }
+    
+    return preview
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('Task created:', formData)
+    
+    const taskData = {
+      ...formData,
+      id: Date.now(), // Simple ID generation
+      createdAt: new Date().toISOString(),
+      isRecurringInstance: false,
+      recurringMasterId: formData.isRecurring ? `recurring_${Date.now()}` : null
+    }
+    
+    console.log('Task created:', taskData)
+    
+    if (formData.isRecurring) {
+      console.log('Recurring pattern will be stored:', {
+        id: taskData.recurringMasterId,
+        creatorUserId: 1, // Current user ID
+        baseTaskId: taskData.id,
+        frequency: formData.recurrence.frequency,
+        repeatEvery: formData.recurrence.repeatEvery,
+        repeatOnDays: formData.recurrence.repeatOnDays.join(','),
+        startDate: formData.recurrence.startDate,
+        endConditionType: formData.recurrence.endConditionType,
+        endValue: formData.recurrence.endValue,
+        time: formData.recurrence.time,
+        active: true
+      })
+    }
+    
     // Add task creation logic here
     onClose() // Close drawer after submit
   }
@@ -442,13 +497,18 @@ function CreateTaskDrawer({ onClose }) {
                 onChange={handleChange}
               />
               <span className="checkmark"></span>
-              Make this a recurring task
+              Repeat this task
             </label>
+            <p className="recurring-description">
+              Automatically create new instances of this task based on your schedule
+            </p>
           </div>
         </div>
 
         {formData.isRecurring && (
           <div className="recurring-options">
+            <h4 className="recurring-title">Recurrence Settings</h4>
+            
             <div className="form-grid">
               <div className="form-group">
                 <label htmlFor="frequency">Frequency</label>
@@ -461,7 +521,7 @@ function CreateTaskDrawer({ onClose }) {
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
-                  <option value="yearly">Yearly</option>
+                  <option value="custom">Custom</option>
                 </select>
               </div>
 
@@ -480,7 +540,7 @@ function CreateTaskDrawer({ onClose }) {
                   <span className="repeat-unit">
                     {formData.recurrence.frequency === 'daily' ? 'day(s)' :
                      formData.recurrence.frequency === 'weekly' ? 'week(s)' :
-                     formData.recurrence.frequency === 'monthly' ? 'month(s)' : 'year(s)'}
+                     formData.recurrence.frequency === 'monthly' ? 'month(s)' : 'period(s)'}
                   </span>
                 </div>
               </div>
@@ -495,10 +555,11 @@ function CreateTaskDrawer({ onClose }) {
                   onChange={handleChange}
                   required={formData.isRecurring}
                 />
+                <small className="form-hint">First task will be created on this date</small>
               </div>
 
               <div className="form-group">
-                <label htmlFor="time">Time</label>
+                <label htmlFor="time">Time of Creation</label>
                 <input
                   type="time"
                   id="time"
@@ -506,6 +567,7 @@ function CreateTaskDrawer({ onClose }) {
                   value={formData.recurrence.time}
                   onChange={handleChange}
                 />
+                <small className="form-hint">Time when new tasks will be created</small>
               </div>
             </div>
 
@@ -513,51 +575,105 @@ function CreateTaskDrawer({ onClose }) {
               <div className="form-group full-width">
                 <label>Repeat On Days</label>
                 <div className="days-selector">
-                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                  {[
+                    { key: 'Mon', label: 'Mon' },
+                    { key: 'Tue', label: 'Tue' },
+                    { key: 'Wed', label: 'Wed' },
+                    { key: 'Thu', label: 'Thu' },
+                    { key: 'Fri', label: 'Fri' },
+                    { key: 'Sat', label: 'Sat' },
+                    { key: 'Sun', label: 'Sun' }
+                  ].map(day => (
                     <button
-                      key={day}
+                      key={day.key}
                       type="button"
-                      className={`day-button ${formData.recurrence.repeatOnDays.includes(day) ? 'selected' : ''}`}
-                      onClick={() => handleDayToggle(day)}
+                      className={`day-button ${formData.recurrence.repeatOnDays.includes(day.key) ? 'selected' : ''}`}
+                      onClick={() => handleDayToggle(day.key)}
                     >
-                      {day}
+                      {day.label}
                     </button>
                   ))}
                 </div>
+                <small className="form-hint">Select which days of the week to repeat</small>
               </div>
             )}
 
             <div className="form-grid">
-              <div className="form-group">
-                <label htmlFor="endCondition">End Condition</label>
-                <select
-                  id="endCondition"
-                  name="recurrence.endConditionType"
-                  value={formData.recurrence.endConditionType}
-                  onChange={handleChange}
-                >
-                  <option value="never">Never</option>
-                  <option value="after">After number of occurrences</option>
-                  <option value="on">On specific date</option>
-                </select>
+              <div className="form-group full-width">
+                <label>End Condition</label>
+                <div className="radio-group">
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="recurrence.endConditionType"
+                      value="never"
+                      checked={formData.recurrence.endConditionType === 'never'}
+                      onChange={handleChange}
+                    />
+                    <span className="radio-custom"></span>
+                    Never Ends
+                  </label>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="recurrence.endConditionType"
+                      value="after"
+                      checked={formData.recurrence.endConditionType === 'after'}
+                      onChange={handleChange}
+                    />
+                    <span className="radio-custom"></span>
+                    Ends after number of occurrences
+                  </label>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="recurrence.endConditionType"
+                      value="on"
+                      checked={formData.recurrence.endConditionType === 'on'}
+                      onChange={handleChange}
+                    />
+                    <span className="radio-custom"></span>
+                    Ends by specific date
+                  </label>
+                </div>
               </div>
 
-              {formData.recurrence.endConditionType !== 'never' && (
+              {formData.recurrence.endConditionType === 'after' && (
                 <div className="form-group">
-                  <label htmlFor="endValue">
-                    {formData.recurrence.endConditionType === 'after' ? 'Number of Occurrences' : 'End Date'}
-                  </label>
+                  <label htmlFor="endValue">Number of Occurrences</label>
                   <input
-                    type={formData.recurrence.endConditionType === 'after' ? 'number' : 'date'}
+                    type="number"
                     id="endValue"
                     name="recurrence.endValue"
                     value={formData.recurrence.endValue}
                     onChange={handleChange}
-                    min={formData.recurrence.endConditionType === 'after' ? '1' : undefined}
-                    placeholder={formData.recurrence.endConditionType === 'after' ? 'e.g., 10' : ''}
+                    min="1"
+                    placeholder="e.g., 10"
                   />
+                  <small className="form-hint">Total number of tasks to create</small>
                 </div>
               )}
+
+              {formData.recurrence.endConditionType === 'on' && (
+                <div className="form-group">
+                  <label htmlFor="endValue">End Date</label>
+                  <input
+                    type="date"
+                    id="endValue"
+                    name="recurrence.endValue"
+                    value={formData.recurrence.endValue}
+                    onChange={handleChange}
+                  />
+                  <small className="form-hint">Stop creating tasks after this date</small>
+                </div>
+              )}
+            </div>
+
+            <div className="recurring-preview">
+              <h5>Preview</h5>
+              <p className="preview-text">
+                {getRecurrencePreview(formData.recurrence)}
+              </p>
             </div>
           </div>
         )}
