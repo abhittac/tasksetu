@@ -21,6 +21,8 @@ function getStatusLabel(statusCode) {
 export default function TaskDetail({ taskId, onClose }) {
   const [activeTab, setActiveTab] = useState('details')
   const [showSnoozeModal, setShowSnoozeModal] = useState(false)
+  const [showReassignModal, setShowReassignModal] = useState(false)
+  const [showRiskModal, setShowRiskModal] = useState(false)
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'assignee' })
 
   // Mock task data - in real app this would come from props or API
@@ -34,12 +36,19 @@ export default function TaskDetail({ taskId, onClose }) {
     assigneeId: 1,
     category: "Backend",
     dueDate: "2024-01-25",
+    startDate: "2024-01-15",
+    timeEstimate: "40 hours",
     tags: ["database", "migration", "backend"],
     createdBy: "Sarah Wilson",
+    creatorId: 2,
     createdAt: "2024-01-15 09:00",
     updatedAt: "2024-01-20 14:30",
     snoozedUntil: null,
     snoozeNote: null,
+    taskType: "normal", // normal, milestone, approval
+    isRisky: false,
+    riskNote: "",
+    parentTaskId: null,
     subtasks: [
       { id: 101, title: "Backup existing database", status: "completed", assignee: "John Smith", dueDate: "2024-01-20" },
       { id: 102, title: "Set up PostgreSQL instance", status: "completed", assignee: "Mike Johnson", dueDate: "2024-01-22" },
@@ -48,9 +57,9 @@ export default function TaskDetail({ taskId, onClose }) {
       { id: 105, title: "Update application configs", status: "pending", assignee: "John Smith", dueDate: "2024-01-27" }
     ],
     linkedItems: [
-      { id: 1, type: "form", title: "Migration Checklist", status: "in-progress" },
+      { id: 1, type: "task", title: "Update Documentation", status: "pending" },
       { id: 2, type: "document", title: "Migration Plan", status: "completed" },
-      { id: 3, type: "task", title: "Update Documentation", status: "pending" }
+      { id: 3, type: "form", title: "Migration Checklist", status: "in-progress" }
     ],
     milestones: [
       { id: 1, title: "Database Backup Complete", status: "completed", date: "2024-01-20" },
@@ -58,26 +67,47 @@ export default function TaskDetail({ taskId, onClose }) {
       { id: 3, title: "Full Migration Complete", status: "pending", date: "2024-01-28" }
     ],
     isApprovalTask: false,
+    approvalStatus: null,
     reminders: [
       { id: 1, type: "due_date", message: "Due in 3 days", date: "2024-01-25" }
-    ]
+    ],
+    forms: [
+      { id: 1, title: "Migration Checklist", type: "checklist", status: "in-progress" }
+    ],
+    collaborators: ["Mike Johnson", "Emily Davis"]
   })
 
   const tabs = [
-    { id: 'details', label: 'Details', icon: '📋' },
+    { id: 'details', label: 'Core Info', icon: '📋' },
     { id: 'subtasks', label: 'Subtasks', icon: '📝', count: task.subtasks?.length || 0 },
     { id: 'comments', label: 'Comments', icon: '💬' },
-    { id: 'activity', label: 'Activity', icon: '📊' },
+    { id: 'activity', label: 'Activity Feed', icon: '📊' },
     { id: 'attachments', label: 'Files & Links', icon: '📎' },
-    { id: 'linked', label: 'Linked Items', icon: '🔗', count: task.linkedItems?.length || 0 }
+    { id: 'linked', label: 'Linked Items', icon: '🔗', count: task.linkedItems?.length || 0 },
+    { id: 'forms', label: 'Forms', icon: '📄', count: task.forms?.length || 0 }
   ]
 
   const now = new Date()
   const snoozedUntil = task.snoozedUntil ? new Date(task.snoozedUntil) : null
   const isSnoozed = snoozedUntil && snoozedUntil > now
 
-  const canSnoozeTask = () => {
-    return task.assigneeId === currentUser.id || currentUser.role === 'admin'
+  // Permission checks
+  const permissions = {
+    canView: true, // All roles can view
+    canEdit: task.creatorId === currentUser.id || task.assigneeId === currentUser.id || currentUser.role === 'admin',
+    canReassign: task.creatorId === currentUser.id || currentUser.role === 'admin',
+    canDelete: task.creatorId === currentUser.id || currentUser.role === 'admin',
+    canComment: true, // All roles can comment
+    canAddFiles: true, // All roles can add files
+    canChangeStatus: task.assigneeId === currentUser.id || task.creatorId === currentUser.id || currentUser.role === 'admin'
+  }
+
+  const handleStatusChange = (newStatus) => {
+    setTask({ ...task, status: newStatus })
+  }
+
+  const handlePriorityChange = (newPriority) => {
+    setTask({ ...task, priority: newPriority })
   }
 
   const handleSnoozeSubmit = (snoozeData) => {
@@ -97,161 +127,201 @@ export default function TaskDetail({ taskId, onClose }) {
     })
   }
 
-  const handleCreateSubtask = () => {
-    // Implementation for creating subtask
-    console.log('Create subtask')
+  const handleReassign = (newAssignee) => {
+    setTask({
+      ...task,
+      assignee: newAssignee.name,
+      assigneeId: newAssignee.id
+    })
+    setShowReassignModal(false)
+  }
+
+  const handleMarkRisk = (riskData) => {
+    setTask({
+      ...task,
+      isRisky: true,
+      riskNote: riskData.note
+    })
+    setShowRiskModal(false)
+  }
+
+  const handleMarkDone = () => {
+    if (window.confirm('Mark this task as completed?')) {
+      setTask({ ...task, status: 'DONE' })
+    }
   }
 
   const handleExportTask = () => {
-    // Implementation for exporting task
-    console.log('Export task')
+    console.log('Exporting task:', task)
   }
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-
-  const canDeleteTask = () => {
-    return (
-      task.createdBy === currentUser.name ||
-      task.assigneeId === currentUser.id ||
-      currentUser.role === 'admin' ||
-      currentUser.role === 'company_admin'
-    )
-  }
-
-  const handleDeleteTask = () => {
-    if (!canDeleteTask()) {
-      alert("You don't have permission to delete this task.")
-      return
+  const getTaskTypeIcon = () => {
+    switch (task.taskType) {
+      case 'milestone': return '🎯'
+      case 'approval': return '✅'
+      default: return '📋'
     }
-    setShowDeleteModal(true)
   }
 
-  const confirmDeleteTask = (deleteOptions) => {
-    // Soft delete implementation
-    console.log('Task deleted from detail view:', {
-      taskId: task.id,
-      taskTitle: task.title,
-      deletedBy: currentUser.name,
-      deleteOptions,
-      timestamp: new Date().toISOString()
-    })
-
-    alert('Task deleted successfully')
-    onClose() // Close the task detail modal
+  const getTaskTypeLabel = () => {
+    switch (task.taskType) {
+      case 'milestone': return 'Milestone'
+      case 'approval': return 'Approval'
+      default: return 'Normal'
+    }
   }
 
   return (
-    <div className="task-detail-modal">
-      <div className="task-detail-overlay" onClick={onClose}></div>
-      <div className="task-detail-container unified-view">
-        {/* Header Section */}
-        <div className="task-detail-header">
-          <div className="task-header-main">
-            <div className="task-title-section">
-              <EditableTitle 
-                title={task.title} 
-                onSave={(newTitle) => setTask({...task, title: newTitle})}
-              />
-              <div className="task-badges">
-                <span className={`status-badge ${task.status.toLowerCase()}`}>
-                  {getStatusLabel(task.status)}
-                </span>
-                <span className={`priority-badge ${task.priority}`}>
-                  {task.priority}
-                </span>
-                {task.tags.map(tag => (
-                  <span key={tag} className="tag-badge">#{tag}</span>
-                ))}
-                {isSnoozed && (
-                  <span className="snooze-indicator-large" title={`Snoozed until ${snoozedUntil.toLocaleString()}`}>
-                    😴 Snoozed
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="quick-actions">
-              <button className="btn-action" onClick={handleCreateSubtask}>
-                + Subtask
-              </button>
-              {isSnoozed ? (
-                <button 
-                  className="btn-action"
-                  onClick={handleUnsnooze}
-                  disabled={!canSnoozeTask()}
-                >
-                  Unsnooze
-                </button>
-              ) : (
-                <button 
-                  className="btn-action"
-                  onClick={() => setShowSnoozeModal(true)}
-                  disabled={!canSnoozeTask()}
-                >
-                  Snooze
-                </button>
-              )}
-              <button className="btn-action" onClick={handleExportTask}>
-                Export
-              </button>
-              <button 
-                className="btn-action delete"
-                onClick={handleDeleteTask}
-                disabled={!canDeleteTask()}
-                title={canDeleteTask() ? "Delete task" : "No permission to delete"}
-              >
-                🗑️ Delete
-              </button>
-              <button className="close-button" onClick={onClose}>×</button>
-            </div>
+    <div className="task-detail-fullpage">
+      {/* Header Bar */}
+      <div className="task-header-bar">
+        <div className="header-main-content">
+          <div className="task-type-indicator">
+            <span className="task-type-icon">{getTaskTypeIcon()}</span>
+            <span className="task-type-label">{getTaskTypeLabel()}</span>
           </div>
 
-          {/* Info Panel */}
-          <div className="task-info-panel">
-            <div className="info-grid">
-              <EditableInfoItem
-                label="Assignee"
-                value={task.assignee}
-                type="select"
-                options={['John Smith', 'Sarah Wilson', 'Mike Johnson', 'Emily Davis']}
-                onSave={(newValue) => setTask({...task, assignee: newValue})}
-              />
-              <EditableInfoItem
-                label="Due Date"
-                value={task.dueDate}
-                type="date"
-                onSave={(newValue) => setTask({...task, dueDate: newValue})}
-              />
-              <EditableInfoItem
-                label="Priority"
-                value={task.priority}
-                type="select"
-                options={['low', 'medium', 'high', 'critical']}
-                onSave={(newValue) => setTask({...task, priority: newValue})}
-              />
-              <div className="info-item">
-                <label>Created By</label>
-                <span>{task.createdBy}</span>
-              </div>
-            </div>
+          <EditableTitle 
+            title={task.title} 
+            onSave={(newTitle) => setTask({...task, title: newTitle})}
+            canEdit={permissions.canEdit}
+          />
 
-            {task.reminders.length > 0 && (
-              <div className="reminders-section">
-                <h4>Reminders</h4>
-                {task.reminders.map(reminder => (
-                  <div key={reminder.id} className="reminder-item">
-                    <span className="reminder-icon">⏰</span>
-                    <span>{reminder.message}</span>
-                  </div>
-                ))}
-              </div>
+          <div className="header-controls">
+            <StatusDropdown
+              status={task.status}
+              onChange={handleStatusChange}
+              canEdit={permissions.canChangeStatus}
+            />
+
+            <PriorityDropdown
+              priority={task.priority}
+              onChange={handlePriorityChange}
+              canEdit={permissions.canEdit}
+            />
+
+            <AssigneeSelector
+              assignee={task.assignee}
+              assigneeId={task.assigneeId}
+              onChange={(assignee) => setTask({...task, assignee: assignee.name, assigneeId: assignee.id})}
+              canEdit={permissions.canEdit}
+            />
+          </div>
+
+          <div className="header-badges">
+            {task.tags.map(tag => (
+              <span key={tag} className="tag-badge">#{tag}</span>
+            ))}
+
+            {isSnoozed && (
+              <span className="status-indicator snoozed" title={`Snoozed until ${snoozedUntil.toLocaleString()}`}>
+                😴 Snoozed
+              </span>
+            )}
+
+            {task.isRisky && (
+              <span className="status-indicator risky" title={`At Risk: ${task.riskNote}`}>
+                ⚠️ At Risk
+              </span>
+            )}
+
+            {task.taskType === 'milestone' && (
+              <span className="status-indicator milestone">
+                🎯 Milestone
+              </span>
+            )}
+
+            {task.taskType === 'approval' && (
+              <span className="status-indicator approval">
+                ✅ Approval Required
+              </span>
             )}
           </div>
         </div>
 
+        <button className="close-button" onClick={onClose}>×</button>
+      </div>
+
+      {/* Quick Actions Bar */}
+      <div className="quick-actions-bar">
+        <button 
+          className="action-btn primary"
+          onClick={() => console.log('Create subtask')}
+          disabled={!permissions.canEdit}
+        >
+          🟢 Create Subtask
+        </button>
+
+        <button 
+          className="action-btn"
+          onClick={() => console.log('Edit task')}
+          disabled={!permissions.canEdit}
+        >
+          ✏️ Edit
+        </button>
+
+        <button 
+          className="action-btn danger"
+          onClick={() => console.log('Delete task')}
+          disabled={!permissions.canDelete}
+        >
+          ❌ Delete
+        </button>
+
+        <button 
+          className="action-btn"
+          onClick={() => setShowReassignModal(true)}
+          disabled={!permissions.canReassign}
+        >
+          🔁 Reassign
+        </button>
+
+        {isSnoozed ? (
+          <button 
+            className="action-btn"
+            onClick={handleUnsnooze}
+            disabled={!permissions.canEdit}
+          >
+            ⏰ Unsnooze
+          </button>
+        ) : (
+          <button 
+            className="action-btn"
+            onClick={() => setShowSnoozeModal(true)}
+            disabled={!permissions.canEdit}
+          >
+            ⏸️ Snooze
+          </button>
+        )}
+
+        <button 
+          className="action-btn warning"
+          onClick={() => setShowRiskModal(true)}
+          disabled={!permissions.canEdit}
+        >
+          🧠 Mark Risk
+        </button>
+
+        <button 
+          className="action-btn success"
+          onClick={handleMarkDone}
+          disabled={!permissions.canChangeStatus || task.status === 'DONE'}
+        >
+          ✅ Mark Done
+        </button>
+
+        <button 
+          className="action-btn"
+          onClick={handleExportTask}
+        >
+          📤 Export
+        </button>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="task-content-area">
         {/* Tabs Navigation */}
-        <div className="task-detail-tabs">
+        <div className="task-tabs">
           {tabs.map(tab => (
             <button
               key={tab.id}
@@ -265,67 +335,20 @@ export default function TaskDetail({ taskId, onClose }) {
           ))}
         </div>
 
-        {/* Content Section */}
-        <div className="task-detail-content">
+        {/* Tab Content */}
+        <div className="tab-content">
           {activeTab === 'details' && (
-            <div className="task-details-panel">
-              <div className="detail-section">
-                <h3>Description</h3>
-                <p>{task.description}</p>
-              </div>
-
-              {/* Milestone/Approval Visual Cues */}
-              {task.milestones.length > 0 && (
-                <div className="milestones-section">
-                  <h3>Milestones</h3>
-                  <div className="milestone-list">
-                    {task.milestones.map(milestone => (
-                      <div key={milestone.id} className="milestone-item">
-                        <span className={`milestone-icon ${milestone.status}`}>
-                          {milestone.status === 'completed' ? '✅' : 
-                           milestone.status === 'in-progress' ? '🔄' : '⭐'}
-                        </span>
-                        <div className="milestone-info">
-                          <span className="milestone-title">{milestone.title}</span>
-                          <span className="milestone-date">{milestone.date}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {isSnoozed && (
-                <div className="snooze-info">
-                  <h4>Snooze Information</h4>
-                  <div className="snooze-details">
-                    <div className="meta-item">
-                      <strong>Snoozed until:</strong> {snoozedUntil.toLocaleString()}
-                    </div>
-                    {task.snoozeNote && (
-                      <div className="meta-item">
-                        <strong>Snooze note:</strong> {task.snoozeNote}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              <div className="detail-meta">
-                <div className="meta-item">
-                  <strong>Created:</strong> {task.createdAt}
-                </div>
-                <div className="meta-item">
-                  <strong>Last updated:</strong> {task.updatedAt}
-                </div>
-              </div>
-            </div>
+            <CoreInfoPanel 
+              task={task} 
+              onUpdate={setTask}
+              permissions={permissions}
+            />
           )}
 
           {activeTab === 'subtasks' && (
             <SubtasksPanel 
               subtasks={task.subtasks} 
-              onCreateSubtask={handleCreateSubtask}
+              onCreateSubtask={() => console.log('Create subtask')}
               parentTask={task}
               currentUser={currentUser}
             />
@@ -338,29 +361,561 @@ export default function TaskDetail({ taskId, onClose }) {
           {activeTab === 'linked' && (
             <LinkedItemsPanel linkedItems={task.linkedItems} />
           )}
+
+          {activeTab === 'forms' && (
+            <FormsPanel forms={task.forms} taskId={taskId} />
+          )}
+        </div>
+      </div>
+
+      {/* Modals */}
+      {showSnoozeModal && (
+        <SnoozeModal
+          task={task}
+          onSubmit={handleSnoozeSubmit}
+          onClose={() => setShowSnoozeModal(false)}
+        />
+      )}
+
+      {showReassignModal && (
+        <ReassignModal
+          task={task}
+          onSubmit={handleReassign}
+          onClose={() => setShowReassignModal(false)}
+        />
+      )}
+
+      {showRiskModal && (
+        <RiskModal
+          task={task}
+          onSubmit={handleMarkRisk}
+          onClose={() => setShowRiskModal(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+function CoreInfoPanel({ task, onUpdate, permissions }) {
+  return (
+    <div className="core-info-panel">
+      <div className="info-grid">
+        {/* Description */}
+        <div className="info-section full-width">
+          <h3>Description</h3>
+          <EditableTextArea
+            value={task.description}
+            onSave={(newDesc) => onUpdate({...task, description: newDesc})}
+            canEdit={permissions.canEdit}
+            placeholder="Add task description..."
+          />
         </div>
 
-        {showSnoozeModal && (
-          <SnoozeModal
-            task={task}
-            onSubmit={handleSnoozeSubmit}
-            onClose={() => setShowSnoozeModal(false)}
-          />
+        {/* Date Information */}
+        <div className="info-section">
+          <h4>Timeline</h4>
+          <div className="info-field">
+            <label>Start Date:</label>
+            <EditableDateField
+              value={task.startDate}
+              onSave={(newDate) => onUpdate({...task, startDate: newDate})}
+              canEdit={permissions.canEdit}
+            />
+          </div>
+          <div className="info-field">
+            <label>Due Date:</label>
+            <EditableDateField
+              value={task.dueDate}
+              onSave={(newDate) => onUpdate({...task, dueDate: newDate})}
+              canEdit={permissions.canEdit}
+            />
+          </div>
+          <div className="info-field">
+            <label>Time Estimate:</label>
+            <EditableTextField
+              value={task.timeEstimate}
+              onSave={(newEstimate) => onUpdate({...task, timeEstimate: newEstimate})}
+              canEdit={permissions.canEdit}
+            />
+          </div>
+        </div>
+
+        {/* Task Relationships */}
+        <div className="info-section">
+          <h4>Relationships</h4>
+          {task.parentTaskId && (
+            <div className="info-field">
+              <label>Parent Task:</label>
+              <span className="linked-task">Task #{task.parentTaskId}</span>
+            </div>
+          )}
+          <div className="info-field">
+            <label>Collaborators:</label>
+            <div className="collaborators-list">
+              {task.collaborators.map(collab => (
+                <span key={collab} className="collaborator-badge">{collab}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Creation Info */}
+        <div className="info-section">
+          <h4>Task Details</h4>
+          <div className="info-field">
+            <label>Created By:</label>
+            <span>{task.createdBy}</span>
+          </div>
+          <div className="info-field">
+            <label>Created:</label>
+            <span>{task.createdAt}</span>
+          </div>
+          <div className="info-field">
+            <label>Last Updated:</label>
+            <span>{task.updatedAt}</span>
+          </div>
+        </div>
+
+        {/* Reminders */}
+        {task.reminders.length > 0 && (
+          <div className="info-section full-width">
+            <h4>Active Reminders</h4>
+            <div className="reminders-list">
+              {task.reminders.map(reminder => (
+                <div key={reminder.id} className="reminder-item">
+                  <span className="reminder-icon">⏰</span>
+                  <span>{reminder.message}</span>
+                  <span className="reminder-date">({reminder.date})</span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
-        {showDeleteModal && (
-          <TaskDeleteModal
-            task={task}
-            onConfirm={confirmDeleteTask}
-            onClose={() => setShowDeleteModal(false)}
-            currentUser={currentUser}
-          />
+        {/* Milestone Information */}
+        {task.taskType === 'milestone' && task.milestones.length > 0 && (
+          <div className="info-section full-width">
+            <h4>Milestone Progress</h4>
+            <div className="milestone-list">
+              {task.milestones.map(milestone => (
+                <div key={milestone.id} className="milestone-item">
+                  <span className={`milestone-icon ${milestone.status}`}>
+                    {milestone.status === 'completed' ? '✅' : 
+                     milestone.status === 'in-progress' ? '🔄' : '⭐'}
+                  </span>
+                  <div className="milestone-info">
+                    <span className="milestone-title">{milestone.title}</span>
+                    <span className="milestone-date">{milestone.date}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Approval Information */}
+        {task.taskType === 'approval' && (
+          <div className="info-section full-width">
+            <h4>Approval Status</h4>
+            <div className="approval-info">
+              <div className="approval-status">
+                <span className={`approval-badge ${task.approvalStatus || 'pending'}`}>
+                  {task.approvalStatus || 'Pending Approval'}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Risk Information */}
+        {task.isRisky && (
+          <div className="info-section full-width risk-section">
+            <h4>⚠️ Risk Information</h4>
+            <div className="risk-details">
+              <p>{task.riskNote}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Snooze Information */}
+        {task.snoozedUntil && (
+          <div className="info-section full-width snooze-section">
+            <h4>😴 Snooze Information</h4>
+            <div className="snooze-details">
+              <div className="snooze-field">
+                <strong>Snoozed until:</strong> {new Date(task.snoozedUntil).toLocaleString()}
+              </div>
+              {task.snoozeNote && (
+                <div className="snooze-field">
+                  <strong>Snooze note:</strong> {task.snoozeNote}
+                </div>
+              )}
+            </div>
+          </div>
         )}
       </div>
     </div>
   )
 }
 
+function FormsPanel({ forms, taskId }) {
+  return (
+    <div className="forms-panel">
+      <div className="forms-header">
+        <h3>Attached Forms ({forms.length})</h3>
+        <button className="btn-primary">+ Add Form</button>
+      </div>
+
+      <div className="forms-list">
+        {forms.map(form => (
+          <div key={form.id} className="form-item">
+            <div className="form-icon">📄</div>
+            <div className="form-info">
+              <h4>{form.title}</h4>
+              <span className="form-type">{form.type}</span>
+              <span className={`form-status ${form.status}`}>{form.status}</span>
+            </div>
+            <div className="form-actions">
+              <button className="btn-action">View</button>
+              <button className="btn-action">Edit</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {forms.length === 0 && (
+        <div className="empty-forms">
+          <p>No forms attached to this task.</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function StatusDropdown({ status, onChange, canEdit }) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const statuses = [
+    { value: 'OPEN', label: 'Open', color: '#ffc107' },
+    { value: 'INPROGRESS', label: 'In Progress', color: '#17a2b8' },
+    { value: 'ONHOLD', label: 'On Hold', color: '#6c757d' },
+    { value: 'DONE', label: 'Completed', color: '#28a745' },
+    { value: 'CANCELLED', label: 'Cancelled', color: '#dc3545' }
+  ]
+
+  const currentStatus = statuses.find(s => s.value === status) || statuses[0]
+
+  if (!canEdit) {
+    return (
+      <div className="status-display readonly">
+        <span className={`status-badge ${status.toLowerCase()}`}>
+          {getStatusLabel(status)}
+        </span>
+        <span className="readonly-indicator">🔒</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="status-dropdown">
+      <button 
+        className={`status-button ${status.toLowerCase()}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {getStatusLabel(status)}
+        <span className="dropdown-arrow">▼</span>
+      </button>
+
+      {isOpen && (
+        <div className="status-options">
+          {statuses.map(statusOption => (
+            <button
+              key={statusOption.value}
+              className={`status-option ${statusOption.value === status ? 'selected' : ''}`}
+              onClick={() => {
+                onChange(statusOption.value)
+                setIsOpen(false)
+              }}
+            >
+              {statusOption.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PriorityDropdown({ priority, onChange, canEdit }) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const priorities = [
+    { value: 'low', label: 'Low', color: '#28a745' },
+    { value: 'medium', label: 'Medium', color: '#ffc107' },
+    { value: 'high', label: 'High', color: '#fd7e14' },
+    { value: 'critical', label: 'Critical', color: '#dc3545' }
+  ]
+
+  if (!canEdit) {
+    return (
+      <div className="priority-display readonly">
+        <span className={`priority-badge ${priority}`}>
+          {priority}
+        </span>
+        <span className="readonly-indicator">🔒</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="priority-dropdown">
+      <button 
+        className={`priority-button ${priority}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {priority}
+        <span className="dropdown-arrow">▼</span>
+      </button>
+
+      {isOpen && (
+        <div className="priority-options">
+          {priorities.map(priorityOption => (
+            <button
+              key={priorityOption.value}
+              className={`priority-option ${priorityOption.value === priority ? 'selected' : ''}`}
+              onClick={() => {
+                onChange(priorityOption.value)
+                setIsOpen(false)
+              }}
+            >
+              {priorityOption.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function AssigneeSelector({ assignee, assigneeId, onChange, canEdit }) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const teamMembers = [
+    { id: 1, name: 'John Smith', avatar: 'JS' },
+    { id: 2, name: 'Sarah Wilson', avatar: 'SW' },
+    { id: 3, name: 'Mike Johnson', avatar: 'MJ' },
+    { id: 4, name: 'Emily Davis', avatar: 'ED' }
+  ]
+
+  const currentAssignee = teamMembers.find(m => m.id === assigneeId) || teamMembers[0]
+
+  if (!canEdit) {
+    return (
+      <div className="assignee-display readonly">
+        <span className="assignee-avatar">{currentAssignee.avatar}</span>
+        <span className="assignee-name">{assignee}</span>
+        <span className="readonly-indicator">🔒</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="assignee-selector">
+      <button 
+        className="assignee-button"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="assignee-avatar">{currentAssignee.avatar}</span>
+        <span className="assignee-name">{assignee}</span>
+        <span className="dropdown-arrow">▼</span>
+      </button>
+
+      {isOpen && (
+        <div className="assignee-options">
+          {teamMembers.map(member => (
+            <button
+              key={member.id}
+              className={`assignee-option ${member.id === assigneeId ? 'selected' : ''}`}
+              onClick={() => {
+                onChange(member)
+                setIsOpen(false)
+              }}
+            >
+              <span className="assignee-avatar">{member.avatar}</span>
+              <span className="assignee-name">{member.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Editable field components
+function EditableTitle({ title, onSave, canEdit }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editValue, setEditValue] = useState(title)
+
+  const handleSave = () => {
+    if (editValue.trim() && editValue !== title) {
+      onSave(editValue.trim())
+    }
+    setIsEditing(false)
+  }
+
+  const handleCancel = () => {
+    setEditValue(title)
+    setIsEditing(false)
+  }
+
+  if (!canEdit) {
+    return <h1 className="task-title readonly">{title}</h1>
+  }
+
+  if (isEditing) {
+    return (
+      <div className="editable-title-container">
+        <input
+          type="text"
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onBlur={handleSave}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSave()
+            if (e.key === 'Escape') handleCancel()
+          }}
+          autoFocus
+          className="editable-title-input"
+          maxLength={100}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <h1 className="task-title editable" onClick={() => setIsEditing(true)}>
+      {title}
+      <span className="edit-icon">✏️</span>
+    </h1>
+  )
+}
+
+function EditableTextArea({ value, onSave, canEdit, placeholder }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editValue, setEditValue] = useState(value)
+
+  const handleSave = () => {
+    if (editValue !== value) {
+      onSave(editValue)
+    }
+    setIsEditing(false)
+  }
+
+  if (!canEdit) {
+    return <p className="readonly-text">{value || placeholder}</p>
+  }
+
+  if (isEditing) {
+    return (
+      <div className="editable-textarea-container">
+        <textarea
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onBlur={handleSave}
+          autoFocus
+          className="editable-textarea"
+          rows="4"
+          placeholder={placeholder}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="editable-text-display" onClick={() => setIsEditing(true)}>
+      <p>{value || placeholder}</p>
+      <span className="edit-icon">✏️</span>
+    </div>
+  )
+}
+
+function EditableTextField({ value, onSave, canEdit }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editValue, setEditValue] = useState(value)
+
+  const handleSave = () => {
+    if (editValue !== value) {
+      onSave(editValue)
+    }
+    setIsEditing(false)
+  }
+
+  if (!canEdit) {
+    return <span className="readonly-text">{value}</span>
+  }
+
+  if (isEditing) {
+    return (
+      <input
+        type="text"
+        value={editValue}
+        onChange={(e) => setEditValue(e.target.value)}
+        onBlur={handleSave}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') handleSave()
+          if (e.key === 'Escape') { setEditValue(value); setIsEditing(false) }
+        }}
+        autoFocus
+        className="editable-input"
+      />
+    )
+  }
+
+  return (
+    <span className="editable-field" onClick={() => setIsEditing(true)}>
+      {value}
+      <span className="edit-icon">✏️</span>
+    </span>
+  )
+}
+
+function EditableDateField({ value, onSave, canEdit }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [editValue, setEditValue] = useState(value)
+
+  const handleSave = () => {
+    if (editValue !== value) {
+      onSave(editValue)
+    }
+    setIsEditing(false)
+  }
+
+  if (!canEdit) {
+    return <span className="readonly-text">{value}</span>
+  }
+
+  if (isEditing) {
+    return (
+      <input
+        type="date"
+        value={editValue}
+        onChange={(e) => setEditValue(e.target.value)}
+        onBlur={handleSave}
+        autoFocus
+        className="editable-input"
+      />
+    )
+  }
+
+  return (
+    <span className="editable-field" onClick={() => setIsEditing(true)}>
+      {value}
+      <span className="edit-icon">✏️</span>
+    </span>
+  )
+}
+
+// Existing components (SubtasksPanel, LinkedItemsPanel, etc.)
 function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
   const [filter, setFilter] = useState('all')
   const [showInlineAdd, setShowInlineAdd] = useState(false)
@@ -406,7 +961,7 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
   const canDeleteSubtask = (subtask) => {
     return subtask.createdBy === currentUser.name || currentUser.role === 'admin'
   }
-
+  // Previous implementation
   return (
     <div className="subtasks-panel">
       <div className="subtasks-header">
@@ -1064,7 +1619,7 @@ function EditableInfoItem({ label, value, type, options, onSave }) {
   )
 }
 
-function EditableTitle({ title, onSave }) {
+function EditableTitle({ title, onSave, canEdit }) {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(title)
 
@@ -1310,6 +1865,109 @@ function SnoozeModal({ task, onSubmit, onClose }) {
             </button>
             <button type="submit" className="btn-primary">
               Snooze Task
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function ReassignModal({ task, onSubmit, onClose }) {
+  const [assignee, setAssignee] = useState(task.assignee)
+  const [assigneeId, setAssigneeId] = useState(task.assigneeId)
+
+  const teamMembers = [
+    { id: 1, name: 'John Smith', avatar: 'JS' },
+    { id: 2, name: 'Sarah Wilson', avatar: 'SW' },
+    { id: 3, name: 'Mike Johnson', avatar: 'MJ' },
+    { id: 4, name: 'Emily Davis', avatar: 'ED' }
+  ]
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const newAssignee = teamMembers.find(member => member.id === assigneeId)
+    onSubmit(newAssignee)
+  }
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-container">
+        <div className="modal-header">
+          <h3>Reassign Task: {task?.title}</h3>
+          <button className="close-button" onClick={onClose}>×</button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="modal-content">
+          <div className="form-group">
+            <label>Select new assignee:</label>
+            <select
+              value={assignee}
+              onChange={(e) => {
+                setAssignee(e.target.value)
+                setAssigneeId(parseInt(e.target.value))
+              }}
+              required
+              className="form-input"
+            >
+              {teamMembers.map(member => (
+                <option key={member.id} value={member.id}>
+                  {member.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="modal-actions">
+            <button type="button" className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-primary">
+              Reassign Task
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function RiskModal({ task, onSubmit, onClose }) {
+  const [riskData, setRiskData] = useState({
+    note: task.riskNote || ""
+  })
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    onSubmit(riskData)
+  }
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-container">
+        <div className="modal-header">
+          <h3>Mark Task as At Risk: {task?.title}</h3>
+          <button className="close-button" onClick={onClose}>×</button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="modal-content">
+          <div className="form-group">
+            <label>Risk Note:</label>
+            <textarea
+              value={riskData.note}
+              onChange={(e) => setRiskData({...riskData, note: e.target.value})}
+              placeholder="Describe the risks associated with this task"
+              className="form-input"
+              rows="4"
+            />
+          </div>
+
+          <div className="modal-actions">
+            <button type="button" className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-primary">
+              Mark as At Risk
             </button>
           </div>
         </form>
