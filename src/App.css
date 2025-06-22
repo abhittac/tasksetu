@@ -1230,18 +1230,29 @@ body {
 .inline-edit-select {
   width: 100%;
   padding: 4px 8px;
-  border: 1px solid #3498db;
+  border: 2px solid #3498db;
   border-radius: 4px;
   font-size: 14px;
   background-color: white;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  transition: all 0.2s ease;
 }
 
 .inline-edit-input:focus,
 .inline-edit-select:focus {
   outline: none;
   border-color: #2980b9;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Instant visual feedback for typing */
+.subtask-title-input {
+  transition: all 0.1s ease;
+}
+
+.subtask-title-input:focus {
+  transform: scale(1.01);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
 }
 
 /* Task Title Editing */
@@ -1350,11 +1361,35 @@ body {
 .edit-icon-small {
   opacity: 0;
   font-size: 12px;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
+  margin-left: 4px;
+  color: #3498db;
 }
 
-.info-display:hover .edit-icon-small {
+.info-display:hover .edit-icon-small,
+.editable-field:hover .edit-icon-small {
   opacity: 1;
+}
+
+/* Field focus indicators for keyboard navigation */
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+
+/* Visual feedback for active field */
+.form-field:has(input:focus),
+.form-field:has(select:focus),
+.form-field:has(textarea:focus) {
+  background-color: rgba(52, 152, 219, 0.02);
+  border-radius: 6px;
+  padding: 4px;
+  margin: -4px;
 }
 
 .info-edit-container {
@@ -1393,6 +1428,19 @@ body {
 /* Sub-task Styles */
 .subtasks-panel {
   padding: 0;
+}
+
+/* Enhanced Editable Field Styling */
+.editable-field {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+.editable-field:hover {
+  background-color: rgba(52, 152, 219, 0.05);
 }
 
 .subtasks-header {
@@ -1526,6 +1574,24 @@ body {
 
 .subtask-summary.overdue {
   border-left: 4px solid #e74c3c;
+}
+
+.subtask-summary.completed-task {
+  opacity: 0.7;
+  background-color: #f8f9fa;
+}
+
+.subtask-summary.completed-task .subtask-title {
+  text-decoration: line-through;
+  color: #6c757d;
+}
+
+.subtask-summary.overdue .due-date {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
 }
 
 .subtask-summary-main {
@@ -3559,6 +3625,48 @@ body {
 /* Subtasks Panel */
 .subtasks-panel {
   padding: 0;
+}
+
+/* Instant feedback animations */
+@keyframes subtaskAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.subtask-item {
+  animation: subtaskAppear 0.3s ease-out;
+}
+
+/* Typing feedback */
+.subtask-title-input {
+  transition: all 0.15s ease;
+}
+
+.subtask-title-input:not(:placeholder-shown) {
+  border-color: #28a745;
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.1);
+}
+
+/* Character count styling */
+.character-count {
+  font-size: 12px;
+  color: #6c757d;
+  text-align: right;
+  transition: color 0.2s ease;
+}
+
+.character-count.warning {
+  color: #ffc107;
+}
+
+.character-count.danger {
+  color: #dc3545;
 }
 
 .subtasks-header {

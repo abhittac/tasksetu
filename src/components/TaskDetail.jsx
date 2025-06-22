@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import TaskComments from './TaskComments'
 import ActivityFeed from './ActivityFeed'
 import TaskAttachments from './TaskAttachments'
@@ -430,6 +430,8 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
     attachments: []
   })
 
+  const [currentFieldIndex, setCurrentFieldIndex] = useState(0)
+  const fieldRefs = useRef([])
   const priorityDueDays = { low: 30, medium: 14, high: 7, critical: 2 }
 
   const calculateDueDate = (priority) => {
@@ -473,10 +475,33 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      handleSubmit(e)
+      if (e.target.name === 'title' && formData.title.trim()) {
+        handleSubmit(e)
+      } else {
+        // Move to next field
+        const nextIndex = currentFieldIndex + 1
+        if (nextIndex < fieldRefs.current.length) {
+          setCurrentFieldIndex(nextIndex)
+          fieldRefs.current[nextIndex]?.focus()
+        }
+      }
+    } else if (e.key === 'Tab') {
+      // Handle tab navigation
+      const isShift = e.shiftKey
+      const nextIndex = isShift ? currentFieldIndex - 1 : currentFieldIndex + 1
+      
+      if (nextIndex >= 0 && nextIndex < fieldRefs.current.length) {
+        e.preventDefault()
+        setCurrentFieldIndex(nextIndex)
+        fieldRefs.current[nextIndex]?.focus()
+      }
     } else if (e.key === 'Escape') {
       onCancel()
     }
+  }
+
+  const handleFieldFocus = (index) => {
+    setCurrentFieldIndex(index)
   }
 
   return (
@@ -503,9 +528,12 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
             <div className="form-field">
               <label>Assigned To*</label>
               <select
+                ref={el => fieldRefs.current[0] = el}
                 name="assignee"
                 value={formData.assignee}
                 onChange={handleChange}
+                onKeyDown={handleKeyPress}
+                onFocus={() => handleFieldFocus(0)}
                 required
               >
                 <option value={currentUser.name}>Myself</option>
@@ -519,9 +547,12 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
             <div className="form-field">
               <label>Priority</label>
               <select
+                ref={el => fieldRefs.current[1] = el}
                 name="priority"
                 value={formData.priority}
                 onChange={handleChange}
+                onKeyDown={handleKeyPress}
+                onFocus={() => handleFieldFocus(1)}
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -533,10 +564,13 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
             <div className="form-field">
               <label>Due Date*</label>
               <input
+                ref={el => fieldRefs.current[2] = el}
                 type="date"
                 name="dueDate"
                 value={formData.dueDate}
                 onChange={handleChange}
+                onKeyDown={handleKeyPress}
+                onFocus={() => handleFieldFocus(2)}
                 required
               />
             </div>
@@ -544,9 +578,12 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
             <div className="form-field">
               <label>Status</label>
               <select
+                ref={el => fieldRefs.current[3] = el}
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
+                onKeyDown={handleKeyPress}
+                onFocus={() => handleFieldFocus(3)}
               >
                 <option value="to-do">To Do</option>
                 <option value="in-progress">In Progress</option>
@@ -559,9 +596,12 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
           <div className="form-field full-width">
             <label>Notes/Description</label>
             <textarea
+              ref={el => fieldRefs.current[4] = el}
               name="description"
               value={formData.description}
               onChange={handleChange}
+              onKeyDown={handleKeyPress}
+              onFocus={() => handleFieldFocus(4)}
               placeholder="Add details or context for this sub-task..."
               rows="3"
             />
@@ -584,6 +624,7 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
 function SubtaskSummary({ subtask, isExpanded, onExpand, onUpdate, onDelete, canEdit, canDelete, currentUser }) {
   const [editingField, setEditingField] = useState(null)
   const [editValue, setEditValue] = useState('')
+  const [isHovered, setIsHovered] = useState(false)
 
   const handleFieldEdit = (field, currentValue) => {
     if (!canEdit) return
@@ -627,8 +668,14 @@ function SubtaskSummary({ subtask, isExpanded, onExpand, onUpdate, onDelete, can
     return subtask.dueDate < today && subtask.status !== 'completed'
   }
 
+  const isCompleted = subtask.status === 'completed'
+
   return (
-    <div className={`subtask-summary ${isExpanded ? 'expanded' : ''} ${isOverdue() ? 'overdue' : ''}`}>
+    <div 
+      className={`subtask-summary ${isExpanded ? 'expanded' : ''} ${isOverdue() ? 'overdue' : ''} ${isCompleted ? 'completed-task' : ''}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="subtask-summary-main" onClick={onExpand}>
         <div className="subtask-info">
           <span className={`status-indicator ${subtask.status}`}>
@@ -650,14 +697,14 @@ function SubtaskSummary({ subtask, isExpanded, onExpand, onUpdate, onDelete, can
               />
             ) : (
               <h4 
-                className={`subtask-title ${subtask.status === 'completed' ? 'completed' : ''}`}
+                className={`subtask-title ${isCompleted ? 'completed' : ''} ${canEdit ? 'editable-field' : ''}`}
                 onClick={(e) => {
                   e.stopPropagation()
-                  handleFieldEdit('title', subtask.title)
+                  if (canEdit) handleFieldEdit('title', subtask.title)
                 }}
               >
                 {subtask.title}
-                {canEdit && <span className="edit-icon-small">✏️</span>}
+                {canEdit && isHovered && <span className="edit-icon-small">✏️</span>}
               </h4>
             )}
             
@@ -667,7 +714,7 @@ function SubtaskSummary({ subtask, isExpanded, onExpand, onUpdate, onDelete, can
                 <span className="assignee-name">{subtask.assignee}</span>
               </div>
               
-              <div className={`due-date ${isOverdue() ? 'overdue' : ''}`}>
+              <div className={`due-date ${isOverdue() ? 'overdue' : ''} ${canEdit ? 'editable-field' : ''}`}>
                 {editingField === 'dueDate' ? (
                   <input
                     type="date"
@@ -683,18 +730,42 @@ function SubtaskSummary({ subtask, isExpanded, onExpand, onUpdate, onDelete, can
                   <span 
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleFieldEdit('dueDate', subtask.dueDate)
+                      if (canEdit) handleFieldEdit('dueDate', subtask.dueDate)
                     }}
                   >
                     Due: {subtask.dueDate}
-                    {canEdit && <span className="edit-icon-small">✏️</span>}
+                    {canEdit && isHovered && <span className="edit-icon-small">✏️</span>}
                   </span>
                 )}
               </div>
 
-              <span className={`priority-indicator ${subtask.priority}`}>
-                {subtask.priority}
-              </span>
+              {editingField === 'priority' ? (
+                <select
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={handleFieldSave}
+                  onKeyDown={handleKeyPress}
+                  autoFocus
+                  className="inline-edit-select"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="critical">Critical</option>
+                </select>
+              ) : (
+                <span 
+                  className={`priority-indicator ${subtask.priority} ${canEdit ? 'editable-field' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (canEdit) handleFieldEdit('priority', subtask.priority)
+                  }}
+                >
+                  {subtask.priority}
+                  {canEdit && isHovered && <span className="edit-icon-small">✏️</span>}
+                </span>
+              )}
             </div>
           </div>
         </div>
