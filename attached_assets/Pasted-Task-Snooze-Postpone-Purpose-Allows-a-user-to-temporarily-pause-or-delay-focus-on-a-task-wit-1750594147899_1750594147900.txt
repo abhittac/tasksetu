@@ -1,0 +1,67 @@
+Task Snooze / Postpone
+🎯 Purpose:
+Allows a user to temporarily pause or delay focus on a task without rescheduling its due date. This is useful when the user wants to remove the task from immediate attention but doesn’t want to forget it.
+________________________________________
+🧩 Where This Feature Lives:
+•	Available on the task card (mini-menu or hover actions)
+•	Inside the task detail view
+•	Optionally, on calendar view or My Tasks
+
+⚙️ Field Logic & Behaviors:
+Field / Control	Type	Behavior
+Snooze Until	Date + Time Picker	Default: Next day 9 AM 
+Options: Today Eve, +1 day, +3 days, Next Monday, Pick a date
+Note/Reason (Optional)	Text field	To capture user's intent
+Restore on Wake-up	Auto	Task comes back to “My Tasks” dashboard / notification
+________________________________________
+🪄 What Happens Behind the Scenes:
+•	Task remains assigned, due date is unchanged
+•	Task becomes hidden from “My Tasks” dashboard until the snooze date
+•	Activity log shows snooze
+•	Email/app notification sent at “wake-up” time
+________________________________________
+🔒 Permissions:
+Only the assigned user can snooze the task.
+Admins can unsnooze or see snoozed tasks if needed.
+________________________________________
+________________________________________
+✅ Notifications & Reminders
+🎯 Purpose:
+Keeps users informed about their tasks, deadlines, updates, and collaboration. Ensures nothing slips through the cracks.
+________________________________________
+🔔 Types of Notifications:
+Type	Trigger Point	Sent To
+Task Assignment	Task created or reassigned	Assignee
+Due Date Reminder	Configurable (e.g., 3 days before, 1 day before)	Assignee, Collaborators
+Overdue Reminder	Daily or every 3 days after due date	Assignee
+Comment Mention	@mention in comment	Mentioned user
+Status Change	Task status updated	Assignee, Collaborators
+Custom Reminder	User-set reminders	Self or others
+Snooze Wake-up	Snoozed task is due to wake	Assigned user
+________________________________________
+📬 Delivery Channels:
+•	In-app notifications (top right bell icon with number badge)
+•	Email (for important actions, summarized daily/weekly if preferred)
+•	Push notification (if mobile app is integrated later)
+•	Integrations: Outlook / Google Calendar sync for reminders
+________________________________________
+⚙️ Reminder Settings (User Configurable):
+•	Go to: Settings > Notifications
+•	Options to:
+o	Turn on/off specific notification types
+o	Set custom reminder intervals
+o	Choose delivery method (email/app/both)
+
+🧠 UX Considerations:
+•	Default reminders should not overwhelm
+•	Users can mark “Do Not Disturb” windows
+•	Smart Reminder Suggestion: If user hasn't interacted with a task 2 days before due date, send a subtle nudge.
+________________________________________
+✨ Visual Cues on Task UI:
+Cue	Purpose
+🔕 Icon + Tooltip	Task is snoozed
+⏰ Clock Icon	Reminder is active
+🔴 Overdue Badge	Task past due date
+________________________________________
+📝 Audit & Activity Trail:
+•	Snooze actions, notifications triggered, and reminders sent all logged in task’s Activity Feed with timestamps.
