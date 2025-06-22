@@ -140,41 +140,41 @@ export default function AllTasks() {
       'completed': [],
       'cancelled': []
     }
-    
+
     let validTransitions = statusTransitions[currentStatus] || []
-    
+
     // Apply sub-task completion logic
     if (taskData && taskData.subtasks && taskData.subtasks.length > 0) {
       const hasIncompleteSubtasks = taskData.subtasks.some(subtask => 
         subtask.status !== 'completed' && subtask.status !== 'cancelled'
       )
-      
+
       if (hasIncompleteSubtasks) {
         validTransitions = validTransitions.filter(transition => transition !== 'completed')
       }
     }
-    
+
     return validTransitions
   }
 
   const validateBulkStatusChange = (taskIds, newStatus) => {
     const errors = []
     const tasksToUpdate = tasks.filter(task => taskIds.includes(task.id))
-    
+
     tasksToUpdate.forEach(task => {
       // Check edit permissions
       if (!canEditTaskStatus(task)) {
         errors.push(`No permission to edit task: ${task.title}`)
         return
       }
-      
+
       // Check valid transitions
       const validTransitions = getValidStatusTransitions(task.status, task)
       if (!validTransitions.includes(newStatus)) {
         errors.push(`Invalid status change for "${task.title}": ${task.status} → ${newStatus}`)
         return
       }
-      
+
       // Check sub-task completion logic
       if (newStatus === 'completed' && task.subtasks?.length > 0) {
         const incompleteSubtasks = task.subtasks.filter(st => 
@@ -185,18 +185,18 @@ export default function AllTasks() {
         }
       }
     })
-    
+
     return errors
   }
 
   const handleBulkStatusUpdate = (newStatus) => {
     const errors = validateBulkStatusChange(selectedTasks, newStatus)
-    
+
     if (errors.length > 0) {
       alert('Cannot update status:\n' + errors.join('\n'))
       return
     }
-    
+
     // Update tasks that passed validation
     const updatedTasks = tasks.map(task => {
       if (selectedTasks.includes(task.id)) {
@@ -209,11 +209,11 @@ export default function AllTasks() {
       }
       return task
     })
-    
+
     setTasks(updatedTasks)
     setSelectedTasks([])
     setBulkStatusModal(false)
-    
+
     // Log activity for audit trail
     console.log('Bulk status update:', {
       taskIds: selectedTasks,
@@ -257,7 +257,7 @@ export default function AllTasks() {
 
     // Remove from tasks list (simulating soft delete filter)
     setTasks(tasks.filter(task => task.id !== taskToDelete.id))
-    
+
     // Log deletion activity
     console.log('Task deleted:', {
       taskId: taskToDelete.id,
@@ -269,7 +269,7 @@ export default function AllTasks() {
 
     setShowDeleteModal(false)
     setTaskToDelete(null)
-    
+
     // Show success message
     alert('Task deleted successfully')
   }
@@ -1017,8 +1017,8 @@ function CreateTaskDrawer({ onClose }) {
                           onClick={() => handleWeeklyDayToggle(day.key)}
                         >
                           {day.label}
-                        </button>
-                      ))}
+                        </button<previous_generation>```python
+                        ))}
                     </div>
                   </div>
                 )}
@@ -1543,15 +1543,15 @@ function TaskDeleteModal({ task, onConfirm, onClose, currentUser }) {
 
   const getWarningMessages = () => {
     const warnings = []
-    
+
     if (hasSubtasks) {
       warnings.push(`This task has ${task.subtasks.length} subtask(s). Deleting it will delete all subtasks.`)
     }
-    
+
     if (hasDependencies) {
       warnings.push('This task is referenced in another task. Deleting it may affect task dependencies.')
     }
-    
+
     if (hasLinkedItems || hasAttachments) {
       warnings.push('All linked forms and files will also be deleted.')
     }
@@ -1673,7 +1673,7 @@ function BulkStatusModal({ selectedTasks, onSubmit, onClose, currentUser }) {
 
   const validateSelection = (status) => {
     const validationErrors = []
-    
+
     selectedTasks.forEach(task => {
       // Check permissions
       const canEdit = (
@@ -1681,7 +1681,7 @@ function BulkStatusModal({ selectedTasks, onSubmit, onClose, currentUser }) {
         task.collaborators?.includes(currentUser.id) ||
         currentUser.role === 'admin'
       )
-      
+
       if (!canEdit) {
         validationErrors.push(`No permission to edit: ${task.title}`)
         return
@@ -1697,7 +1697,7 @@ function BulkStatusModal({ selectedTasks, onSubmit, onClose, currentUser }) {
         }
       }
     })
-    
+
     setErrors(validationErrors)
     return validationErrors.length === 0
   }
