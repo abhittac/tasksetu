@@ -61,6 +61,9 @@ export default function AllTasks() {
   ])
 
   const [showSnoozed, setShowSnoozed] = useState(false)
+  const [selectedTasks, setSelectedTasks] = useState([])
+  const [showBulkActions, setShowBulkActions] = useState(false)
+  const [bulkStatusModal, setBulkStatusModal] = useState(false)
 
   // Filter tasks based on snooze status
   const filteredTasks = tasks.filter(task => {
@@ -105,6 +108,121 @@ export default function AllTasks() {
     ))
   }
 
+  const handleTaskSelection = (taskId, isSelected) => {
+    if (isSelected) {
+      setSelectedTasks([...selectedTasks, taskId])
+    } else {
+      setSelectedTasks(selectedTasks.filter(id => id !== taskId))
+    }
+  }
+
+  const handleSelectAll = () => {
+    if (selectedTasks.length === filteredTasks.length) {
+      setSelectedTasks([])
+    } else {
+      setSelectedTasks(filteredTasks.map(task => task.id))
+    }
+  }
+
+  const canEditTaskStatus = (task) => {
+    return (
+      task.assigneeId === currentUser.id ||
+      task.collaborators?.includes(currentUser.id) ||
+      currentUser.role === 'admin'
+    )
+  }
+
+  const getValidStatusTransitions = (currentStatus, taskData = null) => {
+    const statusTransitions = {
+      'pending': ['in-progress', 'on-hold', 'cancelled'],
+      'in-progress': ['on-hold', 'completed', 'cancelled'],
+      'on-hold': ['in-progress', 'cancelled'],
+      'completed': [],
+      'cancelled': []
+    }
+    
+    let validTransitions = statusTransitions[currentStatus] || []
+    
+    // Apply sub-task completion logic
+    if (taskData && taskData.subtasks && taskData.subtasks.length > 0) {
+      const hasIncompleteSubtasks = taskData.subtasks.some(subtask => 
+        subtask.status !== 'completed' && subtask.status !== 'cancelled'
+      )
+      
+      if (hasIncompleteSubtasks) {
+        validTransitions = validTransitions.filter(transition => transition !== 'completed')
+      }
+    }
+    
+    return validTransitions
+  }
+
+  const validateBulkStatusChange = (taskIds, newStatus) => {
+    const errors = []
+    const tasksToUpdate = tasks.filter(task => taskIds.includes(task.id))
+    
+    tasksToUpdate.forEach(task => {
+      // Check edit permissions
+      if (!canEditTaskStatus(task)) {
+        errors.push(`No permission to edit task: ${task.title}`)
+        return
+      }
+      
+      // Check valid transitions
+      const validTransitions = getValidStatusTransitions(task.status, task)
+      if (!validTransitions.includes(newStatus)) {
+        errors.push(`Invalid status change for "${task.title}": ${task.status} → ${newStatus}`)
+        return
+      }
+      
+      // Check sub-task completion logic
+      if (newStatus === 'completed' && task.subtasks?.length > 0) {
+        const incompleteSubtasks = task.subtasks.filter(st => 
+          st.status !== 'completed' && st.status !== 'cancelled'
+        )
+        if (incompleteSubtasks.length > 0) {
+          errors.push(`"${task.title}" has ${incompleteSubtasks.length} incomplete sub-tasks`)
+        }
+      }
+    })
+    
+    return errors
+  }
+
+  const handleBulkStatusUpdate = (newStatus) => {
+    const errors = validateBulkStatusChange(selectedTasks, newStatus)
+    
+    if (errors.length > 0) {
+      alert('Cannot update status:\n' + errors.join('\n'))
+      return
+    }
+    
+    // Update tasks that passed validation
+    const updatedTasks = tasks.map(task => {
+      if (selectedTasks.includes(task.id)) {
+        return {
+          ...task,
+          status: newStatus,
+          updatedAt: new Date().toISOString(),
+          updatedBy: currentUser.name
+        }
+      }
+      return task
+    })
+    
+    setTasks(updatedTasks)
+    setSelectedTasks([])
+    setBulkStatusModal(false)
+    
+    // Log activity for audit trail
+    console.log('Bulk status update:', {
+      taskIds: selectedTasks,
+      newStatus,
+      updatedBy: currentUser.name,
+      timestamp: new Date().toISOString()
+    })
+  }
+
   return (
     <div className="all-tasks">
       <div className="page-header">
@@ -120,6 +238,23 @@ export default function AllTasks() {
           >
             {showSnoozed ? 'Show Active Tasks' : 'Show Snoozed Tasks'}
           </button>
+          {selectedTasks.length > 0 && (
+            <div className="bulk-actions">
+              <span className="bulk-count">{selectedTasks.length} selected</span>
+              <button 
+                className="btn-secondary"
+                onClick={() => setBulkStatusModal(true)}
+              >
+                Update Status
+              </button>
+              <button 
+                className="btn-secondary"
+                onClick={() => setSelectedTasks([])}
+              >
+                Clear Selection
+              </button>
+            </div>
+          )}
           <select className="filter-select">
             <option>All Status</option>
             <option>Pending</option>
@@ -145,7 +280,17 @@ export default function AllTasks() {
 
       <div className="tasks-table">
         <div className="table-header">
-          <div className="th">Task</div>
+          <div className="th">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={selectedTasks.length === filteredTasks.length && filteredTasks.length > 0}
+                onChange={handleSelectAll}
+              />
+              <span className="checkmark"></span>
+            </label>
+            Task
+          </div>
           <div className="th">Status</div>
           <div className="th">Priority</div>
           <div className="th">Assignee</div>
@@ -165,13 +310,18 @@ export default function AllTasks() {
             task={task} 
             isSnoozed={isSnoozed}
             snoozedUntil={snoozedUntil}
+            isSelected={selectedTasks.includes(task.id)}
             onTaskClick={() => setSelectedTaskId(task.id)}
+            onTaskSelect={(isSelected) => handleTaskSelection(task.id, isSelected)}
             onSnooze={handleSnoozeTask}
             onUnsnooze={handleUnsnoozeTask}
             onTaskUpdate={(updatedTask) => {
               setTasks(tasks.map(t => t.id === updatedTask.id ? updatedTask : t))
             }}
             canSnoozeTask={canSnoozeTask}
+            canEditStatus={canEditTaskStatus}
+            getValidTransitions={getValidStatusTransitions}
+            currentUser={currentUser}
           />
         )
         })}
@@ -192,6 +342,16 @@ export default function AllTasks() {
             setShowSnoozeModal(false)
             setTaskToSnooze(null)
           }}
+        />
+      )}
+
+      {/* Bulk Status Update Modal */}
+      {bulkStatusModal && (
+        <BulkStatusModal
+          selectedTasks={tasks.filter(task => selectedTasks.includes(task.id))}
+          onSubmit={handleBulkStatusUpdate}
+          onClose={() => setBulkStatusModal(false)}
+          currentUser={currentUser}
         />
       )}
 
@@ -880,7 +1040,7 @@ function getValidStatusTransitions(currentStatus) {
   return [currentStatusObj, ...validTransitions]
 }
 
-function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsnooze, onTaskUpdate, canSnoozeTask }) {
+function TaskRow({ task, isSnoozed, snoozedUntil, isSelected, onTaskClick, onTaskSelect, onSnooze, onUnsnooze, onTaskUpdate, canSnoozeTask, canEditStatus, getValidTransitions, currentUser }) {
   const [editingField, setEditingField] = useState(null)
   const [editValue, setEditValue] = useState('')
 
@@ -923,23 +1083,33 @@ function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsno
 
   return (
     <div className="table-row">
-      <div className="td task-title" onClick={onTaskClick}>
+      <div className="td task-title">
+        <label className="checkbox-label" onClick={(e) => e.stopPropagation()}>
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={(e) => onTaskSelect(e.target.checked)}
+          />
+          <span className="checkmark"></span>
+        </label>
+        <div className="task-title-content" onClick={onTaskClick}></div>
         <span className="task-title-text">{task.title}</span>
-        {task.subtasks && task.subtasks.length > 0 && (
-          <span className="subtask-count" title={`${task.subtasks.length} sub-tasks`}>
-            {task.subtasks.length} sub-tasks
-          </span>
-        )}
-        {task.isRecurringInstance && (
-          <span className="recurring-indicator" title="This is a recurring task instance">
-            🔁
-          </span>
-        )}
-        {isSnoozed && (
-          <span className="snooze-indicator" title={`Snoozed until ${snoozedUntil.toLocaleString()}`}>
-            😴
-          </span>
-        )}
+          {task.subtasks && task.subtasks.length > 0 && (
+            <span className="subtask-count" title={`${task.subtasks.length} sub-tasks`}>
+              {task.subtasks.length} sub-tasks
+            </span>
+          )}
+          {task.isRecurringInstance && (
+            <span className="recurring-indicator" title="This is a recurring task instance">
+              🔁
+            </span>
+          )}
+          {isSnoozed && (
+            <span className="snooze-indicator" title={`Snoozed until ${snoozedUntil.toLocaleString()}`}>
+              😴
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="td editable-field" onMouseEnter={(e) => e.target.classList.add('hover')}>
@@ -952,18 +1122,28 @@ function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsno
             autoFocus
             className="inline-edit-select"
           >
-            {getValidStatusTransitions(task.status).map(status => (
-              <option key={status.code} value={status.code}>
-                {status.label}
+            <option value={task.status}>{getStatusLabel(task.status)} (Current)</option>
+            {getValidTransitions(task.status, task).map(status => (
+              <option key={status} value={status}>
+                {getStatusLabel(status)}
               </option>
             ))}
           </select>
         ) : (
-          <div className="editable-content" onClick={() => handleFieldEdit('status', task.status)}>
+          <div 
+            className={`editable-content ${canEditStatus(task) ? 'can-edit' : 'read-only'}`} 
+            onClick={() => {
+              if (canEditStatus(task)) {
+                handleFieldEdit('status', task.status)
+              }
+            }}
+            title={canEditStatus(task) ? 'Click to edit status' : 'No permission to edit status'}
+          >
             <span className={`status-badge ${task.status.toLowerCase()}`}>
               {getStatusLabel(task.status)}
             </span>
-            <span className="edit-icon">✏️</span>
+            {canEditStatus(task) && <span className="edit-icon">✏️</span>}
+            {!canEditStatus(task) && <span className="lock-icon">🔒</span>}
           </div>
         )}
       </div>
@@ -1260,6 +1440,150 @@ function StatusChangeConfirmModal({ task, newStatus, onConfirm, onCancel }) {
             </button>
             <button className="btn-primary" onClick={onConfirm}>
               Confirm Change
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function BulkStatusModal({ selectedTasks, onSubmit, onClose, currentUser }) {
+  const [selectedStatus, setSelectedStatus] = useState('')
+  const [errors, setErrors] = useState([])
+
+  const availableStatuses = [
+    { value: 'pending', label: 'Open' },
+    { value: 'in-progress', label: 'In Progress' },
+    { value: 'on-hold', label: 'On Hold' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'cancelled', label: 'Cancelled' }
+  ]
+
+  const validateSelection = (status) => {
+    const validationErrors = []
+    
+    selectedTasks.forEach(task => {
+      // Check permissions
+      const canEdit = (
+        task.assigneeId === currentUser.id ||
+        task.collaborators?.includes(currentUser.id) ||
+        currentUser.role === 'admin'
+      )
+      
+      if (!canEdit) {
+        validationErrors.push(`No permission to edit: ${task.title}`)
+        return
+      }
+
+      // Check sub-task completion for parent tasks
+      if (status === 'completed' && task.subtasks?.length > 0) {
+        const incompleteSubtasks = task.subtasks.filter(st => 
+          st.status !== 'completed' && st.status !== 'cancelled'
+        )
+        if (incompleteSubtasks.length > 0) {
+          validationErrors.push(`"${task.title}" has ${incompleteSubtasks.length} incomplete sub-tasks`)
+        }
+      }
+    })
+    
+    setErrors(validationErrors)
+    return validationErrors.length === 0
+  }
+
+  const handleStatusChange = (status) => {
+    setSelectedStatus(status)
+    validateSelection(status)
+  }
+
+  const handleSubmit = () => {
+    if (selectedStatus && validateSelection(selectedStatus)) {
+      onSubmit(selectedStatus)
+    }
+  }
+
+  const tasksWithIssues = selectedTasks.filter(task => {
+    if (selectedStatus === 'completed' && task.subtasks?.length > 0) {
+      return task.subtasks.some(st => st.status !== 'completed' && st.status !== 'cancelled')
+    }
+    return false
+  })
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-container">
+        <div className="modal-header">
+          <h3>Update Status for {selectedTasks.length} Tasks</h3>
+          <button className="close-button" onClick={onClose}>×</button>
+        </div>
+
+        <div className="modal-content">
+          <div className="bulk-status-info">
+            <h4>Selected Tasks:</h4>
+            <div className="selected-tasks-list">
+              {selectedTasks.map(task => (
+                <div key={task.id} className="selected-task-item">
+                  <span className="task-title">{task.title}</span>
+                  <span className={`current-status ${task.status}`}>
+                    {getStatusLabel(task.status)}
+                  </span>
+                  {task.subtasks?.length > 0 && (
+                    <span className="subtask-count">
+                      {task.subtasks.length} sub-tasks
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>New Status:</label>
+            <select
+              value={selectedStatus}
+              onChange={(e) => handleStatusChange(e.target.value)}
+              className="form-select"
+            >
+              <option value="">Select new status...</option>
+              {availableStatuses.map(status => (
+                <option key={status.value} value={status.value}>
+                  {status.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {errors.length > 0 && (
+            <div className="validation-errors">
+              <h4>⚠️ Issues Found:</h4>
+              <ul>
+                {errors.map((error, index) => (
+                  <li key={index} className="error-item">{error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {selectedStatus === 'completed' && tasksWithIssues.length > 0 && (
+            <div className="warning-message">
+              <span className="warning-icon">⚠️</span>
+              <p>
+                {tasksWithIssues.length} task(s) have incomplete sub-tasks. 
+                Parent tasks cannot be completed until all sub-tasks are done or cancelled.
+              </p>
+            </div>
+          )}
+
+          <div className="modal-actions">
+            <button className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button 
+              className="btn-primary" 
+              onClick={handleSubmit}
+              disabled={!selectedStatus || errors.length > 0}
+            >
+              Update {selectedTasks.length} Task{selectedTasks.length !== 1 ? 's' : ''}
             </button>
           </div>
         </div>

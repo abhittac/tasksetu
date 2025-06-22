@@ -154,12 +154,28 @@ export default function StatusManager() {
   }
 
   const handleDeleteStatus = (statusId, mappingStatusId) => {
-    // Update tasks that use this status to the mapping status
+    const statusToDelete = companyStatuses.find(s => s.id === statusId)
+    const mappingStatus = companyStatuses.find(s => s.id === mappingStatusId)
+    
+    // Mark status as inactive and create mapping entry
     setCompanyStatuses(companyStatuses.map(status => 
-      status.id === statusId ? { ...status, active: false } : status
+      status.id === statusId ? { 
+        ...status, 
+        active: false,
+        retiredAt: new Date().toISOString(),
+        mappedTo: mappingStatusId
+      } : status
     ))
+    
+    // Log the status change for audit trail
+    console.log('Status deleted and mapped:', {
+      deletedStatus: statusToDelete.label,
+      mappedTo: mappingStatus.label,
+      timestamp: new Date().toISOString(),
+      affectedTasks: getTaskCount(statusToDelete.code) // In real app, this would update actual tasks
+    })
+    
     setDeleteModal(null)
-    // In real implementation, would update all tasks with this status
   }
 
   const handleSetDefault = (statusId) => {
@@ -177,9 +193,65 @@ export default function StatusManager() {
     setCompanyStatuses(updatedStatuses)
   }
 
-  const getValidTransitions = (currentStatusCode) => {
+  const getValidTransitions = (currentStatusCode, taskData = null) => {
     const currentStatus = companyStatuses.find(s => s.code === currentStatusCode)
-    return currentStatus ? currentStatus.allowedTransitions : []
+    if (!currentStatus) return []
+    
+    let validTransitions = currentStatus.allowedTransitions
+    
+    // Apply sub-task completion logic
+    if (taskData && taskData.subtasks && taskData.subtasks.length > 0) {
+      const hasIncompleteSubtasks = taskData.subtasks.some(subtask => 
+        subtask.status !== 'DONE' && subtask.status !== 'CANCELLED'
+      )
+      
+      // Prevent parent task from being marked as completed if sub-tasks are incomplete
+      if (hasIncompleteSubtasks) {
+        validTransitions = validTransitions.filter(transition => transition !== 'DONE')
+      }
+    }
+    
+    return validTransitions
+  }
+
+  const canEditTaskStatus = (task, currentUser) => {
+    // Edit permissions: Only task assignee, collaborators, or admins
+    return (
+      task.assigneeId === currentUser.id ||
+      task.collaborators?.includes(currentUser.id) ||
+      currentUser.role === 'admin'
+    )
+  }
+
+  const validateBulkStatusChange = (selectedTasks, newStatusCode, currentUser) => {
+    const errors = []
+    
+    selectedTasks.forEach(task => {
+      // Check edit permissions
+      if (!canEditTaskStatus(task, currentUser)) {
+        errors.push(`No permission to edit task: ${task.title}`)
+        return
+      }
+      
+      // Check valid transitions
+      const validTransitions = getValidTransitions(task.status, task)
+      if (!validTransitions.includes(newStatusCode)) {
+        errors.push(`Invalid status transition for task: ${task.title}`)
+        return
+      }
+      
+      // Check sub-task completion logic
+      if (newStatusCode === 'DONE' && task.subtasks?.length > 0) {
+        const incompleteSubtasks = task.subtasks.filter(st => 
+          st.status !== 'DONE' && st.status !== 'CANCELLED'
+        )
+        if (incompleteSubtasks.length > 0) {
+          errors.push(`Task "${task.title}" has ${incompleteSubtasks.length} incomplete sub-tasks`)
+        }
+      }
+    })
+    
+    return errors
   }
 
   const getSystemStatusLabel = (systemCode) => {

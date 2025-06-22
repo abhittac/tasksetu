@@ -220,7 +220,6 @@ export default function TaskComments({ taskId }) {
     </div>
   )
 }
-import { useState } from 'react'
 
 export default function TaskComments({ taskId }) {
   const [comments, setComments] = useState([

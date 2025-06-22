@@ -182,7 +182,6 @@ export default function ActivityFeed({ taskId }) {
     </div>
   )
 }
-import { useState } from 'react'
 
 export default function ActivityFeed({ taskId }) {
   const [activities] = useState([

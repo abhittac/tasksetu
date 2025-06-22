@@ -281,7 +281,6 @@ export default function TaskAttachments({ taskId }) {
     </div>
   )
 }
-import { useState } from 'react'
 
 export default function TaskAttachments({ taskId }) {
   const [attachments, setAttachments] = useState([
