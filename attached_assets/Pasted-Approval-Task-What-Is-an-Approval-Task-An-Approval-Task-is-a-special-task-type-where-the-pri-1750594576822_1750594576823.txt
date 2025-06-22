@@ -1,0 +1,41 @@
+Approval Task
+
+🧩 What Is an Approval Task?
+An Approval Task is a special task type where the primary goal is to obtain a decision (approval or rejection) from designated approver(s). It also supports auto-approval logic if no action is taken within a timeline.
+________________________________________
+🔧 Creation Flow & Fields
+Field Name	Type	Default / Behavior
+Task Name	Short text	Mandatory
+Approval Task?	Toggle/Checkbox	Mandatory toggle
+Approver	Dropdown	Default = Creator, but can be changed
+Approval Mode	Dropdown	Options: “Any One”, “All Must Approve”, “Sequential”
+Due Date	Date	Mandatory
+Auto-Approve After	Numeric Input	Optional (Disabled by default). Format: Due Date + X Days
+Description	Long Text	Optional (for justification, background, etc.)
+Attachments	File Upload	Optional. Users can upload documents or evidence for approval
+Collaborators	Dropdown	Optional. For notification only
+Visibility	Private/Public	Same logic as regular tasks
+________________________________________
+✅ Approval Flow
+Action Point	System Behavior
+Approver opens task	Sees “Approve” / “Reject” buttons + comments + file preview if uploaded
+Approval is given	Status becomes “Approved”, timestamp + user name stored in history
+Rejected	Status becomes “Rejected”, comments optional but encouraged
+Auto-Approval enabled, time elapsed	Status marked “Auto-Approved (No Response)”
+In sequential approval mode	Only current approver sees action buttons; next is notified post action
+________________________________________
+🎯 UI/UX Enhancements
+•	Approval tasks have a checkmark or decision icon.
+•	Inline approval buttons (email or app).
+•	Optional approval summary popup for long chains.
+________________________________________
+📋 Use Cases
+•	Legal contract approvals
+•	Budget & cost approvals
+•	Hiring panel decisions
+•	Policy change approvals
+________________________________________
+🛡️ Permissions
+•	Only assigned approver can act.
+•	Task creator can edit due dates and change approver if needed.
+•	Admin can override in special cases (with comment trail).
