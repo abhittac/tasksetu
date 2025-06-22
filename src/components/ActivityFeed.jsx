@@ -61,6 +61,23 @@ export default function ActivityFeed({ taskId }) {
         milestone: 'Database Setup Complete',
         status: 'completed'
       }
+    },
+    {
+      id: 7,
+      type: 'task_snoozed',
+      user: 'Mike Johnson',
+      timestamp: '2024-01-15 17:30',
+      details: {
+        snoozeUntil: '2024-01-23T09:00',
+        note: 'Waiting for API changes to be finalized'
+      }
+    },
+    {
+      id: 8,
+      type: 'task_unsnoozed',
+      user: 'Emily Davis',
+      timestamp: '2024-01-16 08:15',
+      details: {}
     }
   ])
 
@@ -74,7 +91,9 @@ export default function ActivityFeed({ taskId }) {
       file_deleted: '🗑️',
       milestone_updated: '🎯',
       approval_requested: '⏳',
-      approval_granted: '✅'
+      approval_granted: '✅',
+      task_snoozed: '😴',
+      task_unsnoozed: '⏰'
     }
     return icons[type] || '📝'
   }
@@ -101,6 +120,12 @@ export default function ActivityFeed({ taskId }) {
         return `${user} requested approval from ${details.approver}`
       case 'approval_granted':
         return `${user} approved the task`
+      case 'task_snoozed':
+        const snoozeDate = new Date(details.snoozeUntil).toLocaleString()
+        const noteText = details.note ? ` with note: "${details.note}"` : ''
+        return `${user} snoozed task until ${snoozeDate}${noteText}`
+      case 'task_unsnoozed':
+        return `${user} unsnoozed the task`
       default:
         return `${user} performed an action`
     }
