@@ -1,0 +1,54 @@
+🔁 Dynamic Behavior (System-Controlled)
+🎯 Priority-to-Due-Date Logic (Managed by Backend Table – both priority & priority vs due date configuration)
+Instead of hardcoding the number of days between creation and default due date, this is stored in a master table, allowing admins to later adjust the logic without code changes.
+Priority	Default Days to Due Date (T+x)
+Low	T + 30 days
+Medium	T + 14 days
+High	T + 7 days
+Critical	T + 2 days
+•	T = Today's date (date of task creation)
+•	If the user selects a Due Date manually, it overrides the default logic.
+🎯 If Task Type is selected as “Recurring”
+
+•	Due Date should become blank and un-editable.
+•	Somewhere near task type, a pop-up/ modal/card should open.
+•	Showing Calendar – multi select dates.
+•	Drop Down showing Dates “Every – DDL” of month.
+•	Drop Down showing days “Every – DDL” of week.
+•	Only one of the above three should be selectable. 
+•	System captures this information which will be used further in the system.
+
+Priority	Default Days to Due Date (T+x)
+Low	T + 30 days
+Medium	T + 14 days
+High	T + 7 days
+Critical	T + 2 days
+•	T = Today's date (date of task creation)
+•	If the user selects a Due Date manually, it overrides the default logic.
+
+
+🧠 User Experience Design Considerations
+UX Feature	Description
+Inline Task Name Edit	Like Asana — user clicks on task name and directly edits it. Auto-saves when clicked outside.
+Live Feedback & Validation	Real-time alerts if required fields are missed or input formats are invalid.
+Searchable Drop-downs	All user-selection fields are searchable with live filtering.
+Default Autofill	Smart pre-fills (e.g., Priority = Low, Due Date = +30 days) to save time.
+Context-Aware Visibility	Only relevant fields are shown depending on whether the user is in an organization or a single-user environment.
+
+🧪 Example User Flow (Task Creation)
+Scenario: Solo User creates a task
+1.	Clicks "Create Task"
+2.	Enters Task Name: “Follow up on client feedback”
+3.	Assigned To: Auto-selected as self
+4.	Leaves Priority as “Low” → Due Date set to T + 30 days
+5.	Leaves Visibility as “Private”
+6.	Clicks Save
+Scenario: Org User creates a structured task
+1.	Clicks "Create Task"
+2.	Enters Task Name, selects another user in Assigned To
+3.	Sets Priority = High → Due Date defaults to T + 7 days
+4.	Opens More Options
+5.	Links to Reference Process: “Onboarding”
+6.	Attaches Form Template: “New Hire Details”
+7.	Selects Dependency: “HR Interview” task
+8.	Clicks Save

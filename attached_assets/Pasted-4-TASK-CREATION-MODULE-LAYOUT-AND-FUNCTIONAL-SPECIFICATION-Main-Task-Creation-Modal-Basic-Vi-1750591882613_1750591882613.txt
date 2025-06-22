@@ -1,0 +1,21 @@
+4.	TASK CREATION MODULE – LAYOUT AND FUNCTIONAL SPECIFICATION
+🔹 Main Task Creation Modal (Basic View – Always Visible)
+This is the primary popup/modal shown when a user clicks “Create Task”.
+Field Name	Type	Required	Behavior & Description
+Task Name	Text (Single line, max 20 characters)	✅ Yes	Short, clear title. Editable directly in-place. Character limit shown live.
+Description	Multiline Rich Text (Rich)	❌ No	Add details, context, or notes. Supports formatting: bullet points, bold text, etc.
+Assigned To	Searchable Dropdown (Single Select)	✅ Yes	Default = Self. User can select another if desired. For solo users, field is fixed.
+Priority	Dropdown (Low, Medium, High, Critical)	✅ Yes	Default = Low. Selecting a priority dynamically sets Due Date based on system rules.
+Due Date	Date Picker (Auto/Manual)	✅ Yes*	Auto-filled based on Priority unless user chooses a different date.
+Visibility	Toggle (Private, Public)	✅ Yes	Default = Private. For single users, only Private is shown. For organizations, both shown.
+Labels / Tags	Multiselect (Chips)	❌ No	Helps categorize or filter tasks. User can create or choose from existing tags.
+Attachments	File Upload (multi-file)	❌ No	Attach any file up to 5 MB all inclusive. All standard document types supported. (Post MVP – Can have a admin panel to decide the file limit)
+🟨 At the bottom / or somewhere else of this modal, there is a [More Options] button / icon. Clicking this opens the Advanced Fields modal.
+
+🔹 "More Options" Modal (Advanced Fields)
+These are less frequently used fields but important for teams working in structured environments.
+Field Name	Type	Required	Behavior & Description
+Reference Process	Dropdown (Searchable)	❌ No	Link this task to a predefined process (like a standard operating procedure).
+Custom Form	Dropdown (Searchable)	❌ No	Select a form template to collect specific data with the task. Cannot create forms here.
+Dependencies	Multiselect Dropdown	❌ No	Choose existing tasks that must be completed before this one starts.
+Task Type	Dropdown (Simple, Recurring, Approval)	✅ Yes	Default = Simple. Defines the kind of task being created.

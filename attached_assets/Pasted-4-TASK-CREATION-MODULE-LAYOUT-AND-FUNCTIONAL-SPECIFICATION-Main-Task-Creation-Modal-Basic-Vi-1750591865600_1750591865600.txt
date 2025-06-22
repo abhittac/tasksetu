@@ -1,0 +1,76 @@
+4.	TASK CREATION MODULE – LAYOUT AND FUNCTIONAL SPECIFICATION
+🔹 Main Task Creation Modal (Basic View – Always Visible)
+This is the primary popup/modal shown when a user clicks “Create Task”.
+Field Name	Type	Required	Behavior & Description
+Task Name	Text (Single line, max 20 characters)	✅ Yes	Short, clear title. Editable directly in-place. Character limit shown live.
+Description	Multiline Rich Text (Rich)	❌ No	Add details, context, or notes. Supports formatting: bullet points, bold text, etc.
+Assigned To	Searchable Dropdown (Single Select)	✅ Yes	Default = Self. User can select another if desired. For solo users, field is fixed.
+Priority	Dropdown (Low, Medium, High, Critical)	✅ Yes	Default = Low. Selecting a priority dynamically sets Due Date based on system rules.
+Due Date	Date Picker (Auto/Manual)	✅ Yes*	Auto-filled based on Priority unless user chooses a different date.
+Visibility	Toggle (Private, Public)	✅ Yes	Default = Private. For single users, only Private is shown. For organizations, both shown.
+Labels / Tags	Multiselect (Chips)	❌ No	Helps categorize or filter tasks. User can create or choose from existing tags.
+Attachments	File Upload (multi-file)	❌ No	Attach any file up to 5 MB all inclusive. All standard document types supported. (Post MVP – Can have a admin panel to decide the file limit)
+🟨 At the bottom / or somewhere else of this modal, there is a [More Options] button / icon. Clicking this opens the Advanced Fields modal.
+
+🔹 "More Options" Modal (Advanced Fields)
+These are less frequently used fields but important for teams working in structured environments.
+Field Name	Type	Required	Behavior & Description
+Reference Process	Dropdown (Searchable)	❌ No	Link this task to a predefined process (like a standard operating procedure).
+Custom Form	Dropdown (Searchable)	❌ No	Select a form template to collect specific data with the task. Cannot create forms here.
+Dependencies	Multiselect Dropdown	❌ No	Choose existing tasks that must be completed before this one starts.
+Task Type	Dropdown (Simple, Recurring, Approval)	✅ Yes	Default = Simple. Defines the kind of task being created.
+
+🔁 Dynamic Behavior (System-Controlled)
+🎯 Priority-to-Due-Date Logic (Managed by Backend Table – both priority & priority vs due date configuration)
+Instead of hardcoding the number of days between creation and default due date, this is stored in a master table, allowing admins to later adjust the logic without code changes.
+Priority	Default Days to Due Date (T+x)
+Low	T + 30 days
+Medium	T + 14 days
+High	T + 7 days
+Critical	T + 2 days
+•	T = Today's date (date of task creation)
+•	If the user selects a Due Date manually, it overrides the default logic.
+🎯 If Task Type is selected as “Recurring”
+
+•	Due Date should become blank and un-editable.
+•	Somewhere near task type, a pop-up/ modal/card should open.
+•	Showing Calendar – multi select dates.
+•	Drop Down showing Dates “Every – DDL” of month.
+•	Drop Down showing days “Every – DDL” of week.
+•	Only one of the above three should be selectable. 
+•	System captures this information which will be used further in the system.
+
+Priority	Default Days to Due Date (T+x)
+Low	T + 30 days
+Medium	T + 14 days
+High	T + 7 days
+Critical	T + 2 days
+•	T = Today's date (date of task creation)
+•	If the user selects a Due Date manually, it overrides the default logic.
+
+
+🧠 User Experience Design Considerations
+UX Feature	Description
+Inline Task Name Edit	Like Asana — user clicks on task name and directly edits it. Auto-saves when clicked outside.
+Live Feedback & Validation	Real-time alerts if required fields are missed or input formats are invalid.
+Searchable Drop-downs	All user-selection fields are searchable with live filtering.
+Default Autofill	Smart pre-fills (e.g., Priority = Low, Due Date = +30 days) to save time.
+Context-Aware Visibility	Only relevant fields are shown depending on whether the user is in an organization or a single-user environment.
+
+🧪 Example User Flow (Task Creation)
+Scenario: Solo User creates a task
+1.	Clicks "Create Task"
+2.	Enters Task Name: “Follow up on client feedback”
+3.	Assigned To: Auto-selected as self
+4.	Leaves Priority as “Low” → Due Date set to T + 30 days
+5.	Leaves Visibility as “Private”
+6.	Clicks Save
+Scenario: Org User creates a structured task
+1.	Clicks "Create Task"
+2.	Enters Task Name, selects another user in Assigned To
+3.	Sets Priority = High → Due Date defaults to T + 7 days
+4.	Opens More Options
+5.	Links to Reference Process: “Onboarding”
+6.	Attaches Form Template: “New Hire Details”
+7.	Selects Dependency: “HR Interview” task
+8.	Clicks Save
