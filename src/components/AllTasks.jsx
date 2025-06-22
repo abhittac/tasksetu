@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react'
 import TaskDetail from './TaskDetail'
 import CreateTask from './CreateTask'
@@ -9,7 +8,7 @@ export default function AllTasks() {
   const [taskToSnooze, setTaskToSnooze] = useState(null)
   const [showCreateDrawer, setShowCreateDrawer] = useState(false)
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'assignee' }) // Mock user
-  
+
   const [tasks, setTasks] = useState([
     {
       id: 1,
@@ -68,7 +67,7 @@ export default function AllTasks() {
     const now = new Date()
     const snoozedUntil = task.snoozedUntil ? new Date(task.snoozedUntil) : null
     const isSnoozed = snoozedUntil && snoozedUntil > now
-    
+
     return showSnoozed ? isSnoozed : !isSnoozed
   })
 
@@ -154,12 +153,12 @@ export default function AllTasks() {
           <div className="th">Category</div>
           <div className="th">Actions</div>
         </div>
-        
+
         {filteredTasks.map(task => {
           const now = new Date()
           const snoozedUntil = task.snoozedUntil ? new Date(task.snoozedUntil) : null
           const isSnoozed = snoozedUntil && snoozedUntil > now
-          
+
           return (
           <TaskRow 
             key={task.id} 
@@ -177,7 +176,7 @@ export default function AllTasks() {
         )
         })}
       </div>
-      
+
       {selectedTaskId && (
         <TaskDetail 
           taskId={selectedTaskId} 
@@ -231,7 +230,7 @@ function CreateTaskDrawer({ onClose }) {
   const [dragOver, setDragOver] = useState(false)
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'assignee' })
   const [isOrgUser] = useState(false) // Toggle this based on your app's context
-  
+
   // Priority to due date mapping
   const priorityDueDays = {
     low: 30,
@@ -242,7 +241,7 @@ function CreateTaskDrawer({ onClose }) {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
-    
+
     if (name === 'isRecurring') {
       setFormData({
         ...formData,
@@ -350,7 +349,7 @@ function CreateTaskDrawer({ onClose }) {
     const updatedDates = dates.includes(date)
       ? dates.filter(d => d !== date)
       : [...dates, date]
-    
+
     setFormData({
       ...formData,
       recurrence: {
@@ -365,7 +364,7 @@ function CreateTaskDrawer({ onClose }) {
     const updatedDays = days.includes(day)
       ? days.filter(d => d !== day)
       : [...days, day]
-    
+
     setFormData({
       ...formData,
       recurrence: {
@@ -377,17 +376,17 @@ function CreateTaskDrawer({ onClose }) {
 
   const getRecurrencePreview = (recurrence) => {
     if (!recurrence.frequency) return ''
-    
+
     let preview = `Repeats every ${recurrence.repeatEvery} ${recurrence.frequency}`
-    
+
     if (recurrence.frequency === 'weekly' && recurrence.repeatOnDays.length > 0) {
       preview += ` on ${recurrence.repeatOnDays.join(', ')}`
     }
-    
+
     if (recurrence.time) {
       preview += ` at ${recurrence.time}`
     }
-    
+
     if (recurrence.endConditionType === 'after' && recurrence.endValue) {
       preview += `. Ends after ${recurrence.endValue} occurrences.`
     } else if (recurrence.endConditionType === 'on' && recurrence.endValue) {
@@ -395,13 +394,13 @@ function CreateTaskDrawer({ onClose }) {
     } else {
       preview += '. Never ends.'
     }
-    
+
     return preview
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    
+
     const taskData = {
       ...formData,
       id: Date.now(), // Simple ID generation
@@ -409,9 +408,9 @@ function CreateTaskDrawer({ onClose }) {
       isRecurringInstance: false,
       recurringMasterId: formData.isRecurring ? `recurring_${Date.now()}` : null
     }
-    
+
     console.log('Task created:', taskData)
-    
+
     if (formData.isRecurring) {
       console.log('Recurring pattern will be stored:', {
         id: taskData.recurringMasterId,
@@ -427,7 +426,7 @@ function CreateTaskDrawer({ onClose }) {
         active: true
       })
     }
-    
+
     // Add task creation logic here
     onClose() // Close drawer after submit
   }
@@ -615,7 +614,7 @@ function CreateTaskDrawer({ onClose }) {
                   />
                 </div>
               </div>
-              
+
               {formData.attachments.length > 0 && (
                 <div className="attachments-list">
                   {formData.attachments.map(attachment => (
@@ -671,7 +670,7 @@ function CreateTaskDrawer({ onClose }) {
             <p className="recurring-note">
               Select how often this task should repeat. Only one option can be selected.
             </p>
-            
+
             <div className="recurrence-type-selector">
               <div className="recurrence-option">
                 <label className="radio-label">
@@ -685,7 +684,7 @@ function CreateTaskDrawer({ onClose }) {
                   <span className="radio-custom"></span>
                   Specific Dates (Calendar Multi-Select)
                 </label>
-                
+
                 {formData.recurrence.type === 'dates' && (
                   <div className="calendar-multiselect">
                     <p className="option-description">Select multiple dates from the calendar</p>
@@ -732,7 +731,7 @@ function CreateTaskDrawer({ onClose }) {
                   <span className="radio-custom"></span>
                   Monthly (Every X day of month)
                 </label>
-                
+
                 {formData.recurrence.type === 'monthly' && (
                   <div className="monthly-options">
                     <p className="option-description">Select which day of each month</p>
@@ -771,7 +770,7 @@ function CreateTaskDrawer({ onClose }) {
                   <span className="radio-custom"></span>
                   Weekly (Every X day of week)
                 </label>
-                
+
                 {formData.recurrence.type === 'weekly' && (
                   <div className="weekly-options">
                     <p className="option-description">Select which days of the week</p>
@@ -861,23 +860,23 @@ function getValidStatusTransitions(currentStatus) {
     { code: 'DONE', label: 'Completed', transitions: [] },
     { code: 'CANCELLED', label: 'Cancelled', transitions: [] }
   ]
-  
+
   // Legacy status mapping
   const legacyMap = {
     'pending': 'OPEN',
     'in-progress': 'INPROGRESS', 
     'completed': 'DONE'
   }
-  
+
   const mappedStatus = legacyMap[currentStatus] || currentStatus
   const currentStatusObj = statuses.find(s => s.code === mappedStatus)
-  
+
   if (!currentStatusObj) return [{ code: currentStatus, label: getStatusLabel(currentStatus) }]
-  
+
   const validTransitions = currentStatusObj.transitions.map(transitionCode => 
     statuses.find(s => s.code === transitionCode)
   ).filter(Boolean)
-  
+
   return [currentStatusObj, ...validTransitions]
 }
 
@@ -942,7 +941,7 @@ function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsno
           </span>
         )}
       </div>
-      
+
       <div className="td editable-field" onMouseEnter={(e) => e.target.classList.add('hover')}>
         {editingField === 'status' ? (
           <select 
@@ -968,7 +967,7 @@ function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsno
           </div>
         )}
       </div>
-      
+
       <div className="td editable-field" onMouseEnter={(e) => e.target.classList.add('hover')}>
         {editingField === 'priority' ? (
           <select 
@@ -994,7 +993,7 @@ function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsno
           </div>
         )}
       </div>
-      
+
       <div className="td editable-field" onMouseEnter={(e) => e.target.classList.add('hover')}>
         {editingField === 'assignee' ? (
           <select 
@@ -1018,7 +1017,7 @@ function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsno
           </div>
         )}
       </div>
-      
+
       <div className="td editable-field" onMouseEnter={(e) => e.target.classList.add('hover')}>
         {editingField === 'dueDate' ? (
           <input 
@@ -1037,7 +1036,7 @@ function TaskRow({ task, isSnoozed, snoozedUntil, onTaskClick, onSnooze, onUnsno
           </div>
         )}
       </div>
-      
+
       <div className="td">{task.category}</div>
       <div className="td">
         <div className="action-buttons">
@@ -1082,7 +1081,7 @@ function SnoozeModal({ task, onSubmit, onClose }) {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
     tomorrow.setHours(9, 0, 0, 0)
-    
+
     setSnoozeData({
       snoozeUntil: tomorrow.toISOString().slice(0, 16), // Format for datetime-local input
       note: ''
@@ -1101,7 +1100,7 @@ function SnoozeModal({ task, onSubmit, onClose }) {
           <h3>Snooze Task: {task?.title}</h3>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="modal-content">
           <div className="form-group">
             <label>Snooze until:</label>
@@ -1113,7 +1112,7 @@ function SnoozeModal({ task, onSubmit, onClose }) {
               className="form-input"
             />
           </div>
-          
+
           <div className="form-group">
             <label>Optional note:</label>
             <textarea
@@ -1124,7 +1123,7 @@ function SnoozeModal({ task, onSubmit, onClose }) {
               rows="3"
             />
           </div>
-          
+
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cancel
@@ -1134,6 +1133,136 @@ function SnoozeModal({ task, onSubmit, onClose }) {
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  )
+}
+
+function TaskCard({ task, onTaskClick, currentUser, onTaskUpdate }) {
+  const [isEditing, setIsEditing] = useState(null)
+  const [editValue, setEditValue] = useState('')
+  const [showStatusConfirm, setShowStatusConfirm] = useState(false)
+
+  const handleEdit = (field, currentValue) => {
+    setIsEditing(field)
+    setEditValue(currentValue)
+  }
+
+  const handleSave = () => {
+    if (editValue !== task[isEditing]) {
+      // Check if changing to a final status
+      if (isEditing === 'status' && ['DONE', 'CANCELLED'].includes(editValue)) {
+        setShowStatusConfirm(true)
+        return
+      }
+
+      const updatedTask = { ...task, [isEditing]: editValue }
+      onTaskUpdate(updatedTask)
+    }
+    setIsEditing(null)
+    setEditValue('')
+  }
+
+  const handleStatusConfirm = () => {
+    const updatedTask = { ...task, [isEditing]: editValue }
+    onTaskUpdate(updatedTask)
+    setShowStatusConfirm(false)
+    setIsEditing(null)
+    setEditValue('')
+  }
+
+  const handleCancel = () => {
+    setIsEditing(null)
+    setEditValue('')
+    setShowStatusConfirm(false)
+  }
+
+  const canEdit = task.assigneeId === currentUser.id || currentUser.role === 'admin'
+
+  return (
+    <div className="task-card">
+      <h3 className="task-title" onClick={onTaskClick}>{task.title}</h3>
+
+      {/* Status Pill with Edit Dropdown */}
+      {canEdit ? (
+        <div className="status-edit-container">
+          {isEditing === 'status' ? (
+            <select
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={handleSave}
+              autoFocus
+              className="status-edit-select"
+            >
+              <option value="OPEN">Open</option>
+              <option value="INPROGRESS">In Progress</option>
+              <option value="ONHOLD">On Hold</option>
+              <option value="DONE">Completed</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+          ) : (
+            <div className="status-pill" onClick={() => handleEdit('status', task.status)}>
+              {getStatusLabel(task.status)}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="status-pill">{getStatusLabel(task.status)}</div>
+      )}
+
+      <p className="task-details">Priority: {task.priority}</p>
+      <p className="task-details">Due Date: {task.dueDate}</p>
+
+      {showStatusConfirm && (
+        <StatusChangeConfirmModal
+          task={task}
+          newStatus={editValue}
+          onConfirm={handleStatusConfirm}
+          onCancel={handleCancel}
+        />
+      )}
+    </div>
+  )
+}
+
+function StatusChangeConfirmModal({ task, newStatus, onConfirm, onCancel }) {
+  const statusLabel = getStatusLabel(newStatus)
+  const isFinalStatus = ['DONE', 'CANCELLED'].includes(newStatus)
+
+  return (
+    <div className="modal-overlay-small">
+      <div className="status-confirm-modal">
+        <div className="modal-header">
+          <h3>Confirm Status Change</h3>
+          <button className="close-button" onClick={onCancel}>×</button>
+        </div>
+
+        <div className="modal-content">
+          <div className="status-change-info">
+            <p>
+              Change task status from <strong>{getStatusLabel(task.status)}</strong> to{' '}
+              <strong className={`status-badge ${newStatus.toLowerCase()}`}>
+                {statusLabel}
+              </strong>
+            </p>
+
+            {isFinalStatus && (
+              <div className="warning-message">
+                <span className="warning-icon">⚠️</span>
+                <p>This is a final status. The task will be marked as complete and may affect project metrics.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="modal-actions">
+            <button className="btn-secondary" onClick={onCancel}>
+              Cancel
+            </button>
+            <button className="btn-primary" onClick={onConfirm}>
+              Confirm Change
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   )

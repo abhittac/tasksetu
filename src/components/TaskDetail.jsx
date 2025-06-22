@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react'
 import TaskComments from './TaskComments'
 import ActivityFeed from './ActivityFeed'
@@ -23,7 +22,7 @@ export default function TaskDetail({ taskId, onClose }) {
   const [activeTab, setActiveTab] = useState('details')
   const [showSnoozeModal, setShowSnoozeModal] = useState(false)
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'assignee' })
-  
+
   // Mock task data - in real app this would come from props or API
   const [task, setTask] = useState({
     id: taskId,
@@ -137,7 +136,7 @@ export default function TaskDetail({ taskId, onClose }) {
                 )}
               </div>
             </div>
-            
+
             {/* Quick Actions */}
             <div className="quick-actions">
               <button className="btn-action" onClick={handleCreateSubtask}>
@@ -195,7 +194,7 @@ export default function TaskDetail({ taskId, onClose }) {
                 <span>{task.createdBy}</span>
               </div>
             </div>
-            
+
             {task.reminders.length > 0 && (
               <div className="reminders-section">
                 <h4>Reminders</h4>
@@ -233,7 +232,7 @@ export default function TaskDetail({ taskId, onClose }) {
                 <h3>Description</h3>
                 <p>{task.description}</p>
               </div>
-              
+
               {/* Milestone/Approval Visual Cues */}
               {task.milestones.length > 0 && (
                 <div className="milestones-section">
@@ -254,7 +253,7 @@ export default function TaskDetail({ taskId, onClose }) {
                   </div>
                 </div>
               )}
-              
+
               {isSnoozed && (
                 <div className="snooze-info">
                   <h4>Snooze Information</h4>
@@ -294,7 +293,7 @@ export default function TaskDetail({ taskId, onClose }) {
           {activeTab === 'comments' && <TaskComments taskId={taskId} />}
           {activeTab === 'activity' && <ActivityFeed taskId={taskId} />}
           {activeTab === 'attachments' && <TaskAttachments taskId={taskId} />}
-          
+
           {activeTab === 'linked' && (
             <LinkedItemsPanel linkedItems={task.linkedItems} />
           )}
@@ -403,7 +402,7 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
               canDelete={canDeleteSubtask(subtask)}
               currentUser={currentUser}
             />
-            
+
             {expandedSubtask?.id === subtask.id && (
               <SubtaskDetailView 
                 subtask={subtask}
@@ -458,7 +457,7 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    
+
     if (name === 'priority') {
       setFormData({
         ...formData,
@@ -504,7 +503,7 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
       // Handle tab navigation
       const isShift = e.shiftKey
       const nextIndex = isShift ? currentFieldIndex - 1 : currentFieldIndex + 1
-      
+
       if (nextIndex >= 0 && nextIndex < fieldRefs.current.length) {
         e.preventDefault()
         setCurrentFieldIndex(nextIndex)
@@ -696,7 +695,7 @@ function SubtaskSummary({ subtask, isExpanded, onExpand, onUpdate, onDelete, can
           <span className={`status-indicator ${subtask.status}`}>
             {getStatusIcon(subtask.status)}
           </span>
-          
+
           <div className="subtask-details">
             {editingField === 'title' ? (
               <input
@@ -722,13 +721,13 @@ function SubtaskSummary({ subtask, isExpanded, onExpand, onUpdate, onDelete, can
                 {canEdit && isHovered && <span className="edit-icon-small">✏️</span>}
               </h4>
             )}
-            
+
             <div className="subtask-meta">
               <div className="assignee-info">
                 <span className="assignee-avatar">{subtask.assignee.charAt(0)}</span>
                 <span className="assignee-name">{subtask.assignee}</span>
               </div>
-              
+
               <div className={`due-date ${isOverdue() ? 'overdue' : ''} ${canEdit ? 'editable-field' : ''}`}>
                 {editingField === 'dueDate' ? (
                   <input
@@ -868,74 +867,6 @@ function SubtaskDetailView({ subtask, onUpdate, onClose, canEdit, currentUser })
             </div>
 
             <div className="form-field">
-              <label>Due Date</label>
-              <input
-                type="date"
-                name="dueDate"
-                value={formData.dueDate}
-                onChange={handleChange}
-                disabled={!canEdit}
-              />
-            </div>
-          </div>
-
-          <div className="form-field full-width">
-            <label>Description</label>
-            <textarea
-              name="description"
-              value={formData.description || ''}
-              onChange={handleChange}
-              disabled={!canEdit}
-              rows="4"
-            />
-          </div>
-        </div>
-
-        <div className="subtask-meta-info">
-          <div className="meta-item">
-            <strong>Created:</strong> {new Date(subtask.createdAt).toLocaleString()}
-          </div>
-          <div className="meta-item">
-            <strong>Created by:</strong> {subtask.createdBy}
-          </div>
-          <div className="meta-item">
-            <strong>Visibility:</strong> {subtask.visibility}
-          </div>
-        </div>
-
-        {canEdit && (
-          <div className="subtask-detail-actions">
-            <button className="btn-secondary" onClick={onClose}>
-              Cancel
-            </button>
-            <button className="btn-primary" onClick={handleSave}>
-              Save Changes
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}</old_str>ed">Completed</option>
-              </select>
-            </div>
-
-            <div className="form-field">
-              <label>Priority</label>
-              <select
-                name="priority"
-                value={formData.priority}
-                onChange={handleChange}
-                disabled={!canEdit}
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="critical">Critical</option>
-              </select>
-            </div>
-
-            <div className="form-field">
               <label>Assignee</label>
               <select
                 name="assignee"
@@ -955,11 +886,10 @@ function SubtaskDetailView({ subtask, onUpdate, onClose, canEdit, currentUser })
             <label>Description</label>
             <textarea
               name="description"
-              value={formData.description}
+              value={formData.description || ''}
               onChange={handleChange}
-              placeholder="Add notes or detailed description..."
-              rows="4"
               disabled={!canEdit}
+              rows="4"
             />
           </div>
         </div>
@@ -1148,7 +1078,7 @@ function SnoozeModal({ task, onSubmit, onClose }) {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
     tomorrow.setHours(9, 0, 0, 0)
-    
+
     setSnoozeData({
       snoozeUntil: tomorrow.toISOString().slice(0, 16), // Format for datetime-local input
       note: ''
@@ -1167,7 +1097,7 @@ function SnoozeModal({ task, onSubmit, onClose }) {
           <h3>Snooze Task: {task?.title}</h3>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="modal-content">
           <div className="form-group">
             <label>Snooze until:</label>
@@ -1179,7 +1109,7 @@ function SnoozeModal({ task, onSubmit, onClose }) {
               className="form-input"
             />
           </div>
-          
+
           <div className="form-group">
             <label>Optional note:</label>
             <textarea
@@ -1190,7 +1120,7 @@ function SnoozeModal({ task, onSubmit, onClose }) {
               rows="3"
             />
           </div>
-          
+
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cancel

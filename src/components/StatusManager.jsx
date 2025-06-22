@@ -132,6 +132,7 @@ export default function StatusManager() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingStatus, setEditingStatus] = useState(null)
   const [deleteModal, setDeleteModal] = useState(null)
+  const [statusChangeModal, setStatusChangeModal] = useState(null)
 
   const handleAddStatus = (statusData) => {
     const newStatus = {
@@ -268,6 +269,7 @@ export default function StatusManager() {
               <div className="th">Code</div>
               <div className="th">System Mapping</div>
               <div className="th">Type</div>
+              <div className="th">Tasks Using</div>
               <div className="th">Actions</div>
             </div>
             
@@ -348,6 +350,20 @@ function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefau
     return systemStatus ? systemStatus.label : systemCode
   }
 
+  // Mock task count - in real app this would come from API
+  const getTaskCount = (statusCode) => {
+    const mockCounts = {
+      'OPEN': 142,
+      'INPROGRESS': 87,
+      'ONHOLD': 23,
+      'DONE': 452,
+      'CANCELLED': 18
+    }
+    return mockCounts[statusCode] || 0
+  }
+
+  const taskCount = getTaskCount(status.code)
+
   return (
     <div className="table-row">
       <div className="td">
@@ -383,6 +399,12 @@ function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefau
         </span>
       </div>
       <div className="td">
+        <div className="task-count-display">
+          <span className="task-count-number">{taskCount}</span>
+          <span className="task-count-label">tasks</span>
+        </div>
+      </div>
+      <div className="td">
         <div className="action-buttons">
           {canEdit && (
             <>
@@ -394,7 +416,12 @@ function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefau
                   Set Default
                 </button>
               )}
-              <button className="btn-action danger" onClick={onDelete}>
+              <button 
+                className="btn-action danger" 
+                onClick={onDelete}
+                disabled={taskCount > 0}
+                title={taskCount > 0 ? `Cannot delete: ${taskCount} tasks using this status` : 'Delete status'}
+              >
                 Delete
               </button>
             </>
@@ -546,6 +573,26 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
   const handleSubmit = (e) => {
     e.preventDefault()
     if (validateForm()) {
+      // Check for system status mapping coverage
+      if (!isEdit) {
+        const existingMappings = existingStatuses.map(s => s.systemMapping)
+        const allSystemStatuses = systemStatuses.map(s => s.code)
+        const uncoveredStatuses = allSystemStatuses.filter(sysCode => 
+          !existingMappings.includes(sysCode) && sysCode !== formData.systemMapping
+        )
+        
+        if (uncoveredStatuses.length > 0) {
+          alert(`Warning: System statuses ${uncoveredStatuses.join(', ')} will have no company mapping.`)
+        }
+      }
+      
+      // Show warning for changes affecting existing tasks
+      if (isEdit && (formData.label !== status.label || formData.systemMapping !== status.systemMapping)) {
+        if (!window.confirm('Changing this status will affect how existing tasks are displayed. Continue?')) {
+          return
+        }
+      }
+      
       onSubmit(isEdit ? { ...status, ...formData } : formData)
     }
   }
@@ -616,6 +663,28 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
                   placeholder="#3498db"
                 />
               </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="systemMapping">System Mapping*</label>
+              <select
+                id="systemMapping"
+                name="systemMapping"
+                value={formData.systemMapping}
+                onChange={handleChange}
+                required
+                className="form-select"
+              >
+                <option value="">Select system status...</option>
+                {systemStatuses.map(sysStatus => (
+                  <option key={sysStatus.code} value={sysStatus.code}>
+                    {sysStatus.label} ({sysStatus.code})
+                  </option>
+                ))}
+              </select>
+              <small className="form-hint">
+                Map this custom status to a system status for internal processing
+              </small>
             </div>
 
             <div className="form-group">
