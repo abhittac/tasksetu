@@ -1,0 +1,65 @@
+Comprehensive Task Management System Specification
+________________________________________
+1. Status Management & Retroactive Handling
+1.1 Status Handling Behavior
+Scenario	Behavior
+A status is renamed	Tasks auto-update the label (no data loss)
+A status is deleted	Admin prompted to map to a new status
+A new default is set	Affects only future tasks
+1.2 Data Integrity
+•	Historical logs retain retired statuses
+•	Legacy mapping table ensures reports don’t break
+1.3 User Experience
+•	Status pills are color-coded (configurable)
+•	Dropdown shows only valid next statuses
+•	Autosave enabled on blur
+•	Tooltips explain each status
+1.4 Backend Schema
+status_master
+•	status_id, label, description, color, is_final, is_default, company_id, active_flag
+task_status_history
+•	task_id, previous_status_id, new_status_id, changed_by, changed_at
+________________________________________
+2. Task Deletion
+2.1 Deletion Logic
+Scenario	Action
+No dependencies	Delete with confirmation
+Has subtasks	Prompt about cascading delete
+Is a subtask	Treated like normal delete
+Has dependencies	Warn user about reference
+Has attachments/forms	Alert about deletion of linked data
+2.2 Role-Based Permissions
+Role	Rights
+Individual	Own or assigned tasks only
+Organization Admin	Full company rights
+Super Admin	Full access across all companies
+2.3 UI Flow
+•	Delete icon in task card, detail view, subtask list
+•	Modal confirmation: optional checkbox to delete subtasks/forms
+•	Toast: "Task deleted successfully"
+2.4 DB & Integrity
+•	Soft delete via is_deleted, deleted_by, deleted_at
+•	Background cleanup for orphaned data
+2.5 Module Impact
+•	Subtasks: Recursive handling
+•	Notifications: Suppressed
+•	Analytics: Exclude deleted unless admin view
+•	Activity Feed: Logs deletion event
+________________________________________
+3. Recurring Tasks
+3.1 Setup
+•	From task creation modal: checkbox to enable recurrence
+•	Fields: frequency, repeat interval, start/end date, time
+3.2 Behavior
+•	New instance per cycle
+•	Copies original task details
+•	Auto-adjusts due date
+•	Notifications sent to assignee and collaborators
+3.3 Permissions
+Role	Control
+Creator	Create, edit, stop recurrence
+Assignee	Edit individual instance only
+Admin	View all recurring patterns
+3.4 Backend Model
+RecurringTaskMaster
+•	id, creator_user_id, base_task_id, frequency, repeat_every, repeat_on_days, start_date, end_condition_type, end_value, active
