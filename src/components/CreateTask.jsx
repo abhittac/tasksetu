@@ -12,6 +12,10 @@ export default function CreateTask() {
     category: '',
     tags: '',
     isRecurring: false,
+    isApprovalTask: false,
+    approvalMode: 'any',
+    approvers: [],
+    autoApproveAfter: '',
     recurrence: {
       frequency: 'daily',
       repeatEvery: 1,
@@ -201,6 +205,74 @@ export default function CreateTask() {
             </label>
           </div>
         </div>
+
+        <div className="form-group full-width">
+          <div className="approval-task-section">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                name="isApprovalTask"
+                checked={formData.isApprovalTask}
+                onChange={handleChange}
+              />
+              <span className="checkmark"></span>
+              Make this an approval task
+            </label>
+          </div>
+        </div>
+
+        {formData.isApprovalTask && (
+          <div className="approval-options">
+            <div className="form-grid">
+              <div className="form-group">
+                <label htmlFor="approvalMode">Approval Mode</label>
+                <select
+                  id="approvalMode"
+                  name="approvalMode"
+                  value={formData.approvalMode}
+                  onChange={handleChange}
+                >
+                  <option value="any">Any One Approver</option>
+                  <option value="all">All Must Approve</option>
+                  <option value="sequential">Sequential Approval</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="autoApproveAfter">Auto-Approve After (days)</label>
+                <input
+                  type="number"
+                  id="autoApproveAfter"
+                  name="autoApproveAfter"
+                  value={formData.autoApproveAfter}
+                  onChange={handleChange}
+                  min="1"
+                  max="30"
+                  placeholder="Optional"
+                />
+              </div>
+            </div>
+
+            <div className="form-group full-width">
+              <label htmlFor="approvers">Select Approvers</label>
+              <select
+                id="approvers"
+                name="approvers"
+                value={formData.approvers}
+                onChange={handleChange}
+                multiple
+                className="multi-select"
+                required={formData.isApprovalTask}
+              >
+                <option value="john-smith">John Smith (Manager)</option>
+                <option value="sarah-wilson">Sarah Wilson (Director)</option>
+                <option value="mike-johnson">Mike Johnson (CFO)</option>
+                <option value="emily-davis">Emily Davis (Admin)</option>
+              </select>
+              <small className="help-text">Hold Ctrl/Cmd to select multiple approvers</small>
+            </div>
+          </div>
+        )}
 
         {formData.isRecurring && (
           <div className="recurring-options">

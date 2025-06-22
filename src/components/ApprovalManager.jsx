@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react'
+import ApprovalTaskCreator from './ApprovalTaskCreator'
 
 export default function ApprovalManager() {
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'manager' })
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const [approvalTasks, setApprovalTasks] = useState([
     {
       id: 1,
@@ -111,6 +113,11 @@ export default function ApprovalManager() {
     }))
   }
 
+  const handleCreateApprovalTask = (taskData) => {
+    setApprovalTasks([...approvalTasks, taskData])
+    setShowCreateModal(false)
+  }
+
   return (
     <div className="approval-manager">
       <div className="page-header">
@@ -131,7 +138,12 @@ export default function ApprovalManager() {
           <option>All Approvers</option>
           <option>Sequential</option>
         </select>
-        <button className="btn-primary">+ Create Approval Task</button>
+        <button 
+          className="btn-primary"
+          onClick={() => setShowCreateModal(true)}
+        >
+          + Create Approval Task
+        </button>
       </div>
 
       <div className="approval-tasks-grid">
@@ -144,6 +156,13 @@ export default function ApprovalManager() {
           />
         ))}
       </div>
+
+      {showCreateModal && (
+        <ApprovalTaskCreator
+          onClose={() => setShowCreateModal(false)}
+          onSubmit={handleCreateApprovalTask}
+        />
+      )}
     </div>
   )
 }
