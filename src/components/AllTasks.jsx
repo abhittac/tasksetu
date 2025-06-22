@@ -1017,7 +1017,7 @@ function CreateTaskDrawer({ onClose }) {
                           onClick={() => handleWeeklyDayToggle(day.key)}
                         >
                           {day.label}
-                        </button<previous_generation>```python
+                        </button>
                         ))}
                     </div>
                   </div>
