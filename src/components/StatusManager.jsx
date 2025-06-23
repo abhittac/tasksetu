@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react'
 
 export default function StatusManager() {
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' })
-  
+
   // System-defined statuses (Core Layer - cannot be deleted)
   const [systemStatuses] = useState([
     {
@@ -156,7 +155,7 @@ export default function StatusManager() {
   const handleDeleteStatus = (statusId, mappingStatusId) => {
     const statusToDelete = companyStatuses.find(s => s.id === statusId)
     const mappingStatus = companyStatuses.find(s => s.id === mappingStatusId)
-    
+
     // Mark status as inactive and create mapping entry
     setCompanyStatuses(companyStatuses.map(status => 
       status.id === statusId ? { 
@@ -166,7 +165,7 @@ export default function StatusManager() {
         mappedTo: mappingStatusId
       } : status
     ))
-    
+
     // Log the status change for audit trail
     console.log('Status deleted and mapped:', {
       deletedStatus: statusToDelete.label,
@@ -174,7 +173,7 @@ export default function StatusManager() {
       timestamp: new Date().toISOString(),
       affectedTasks: getTaskCount(statusToDelete.code) // In real app, this would update actual tasks
     })
-    
+
     setDeleteModal(null)
   }
 
@@ -196,21 +195,21 @@ export default function StatusManager() {
   const getValidTransitions = (currentStatusCode, taskData = null) => {
     const currentStatus = companyStatuses.find(s => s.code === currentStatusCode)
     if (!currentStatus) return []
-    
+
     let validTransitions = currentStatus.allowedTransitions
-    
+
     // Apply sub-task completion logic
     if (taskData && taskData.subtasks && taskData.subtasks.length > 0) {
       const hasIncompleteSubtasks = taskData.subtasks.some(subtask => 
         subtask.status !== 'DONE' && subtask.status !== 'CANCELLED'
       )
-      
+
       // Prevent parent task from being marked as completed if sub-tasks are incomplete
       if (hasIncompleteSubtasks) {
         validTransitions = validTransitions.filter(transition => transition !== 'DONE')
       }
     }
-    
+
     return validTransitions
   }
 
@@ -225,21 +224,21 @@ export default function StatusManager() {
 
   const validateBulkStatusChange = (selectedTasks, newStatusCode, currentUser) => {
     const errors = []
-    
+
     selectedTasks.forEach(task => {
       // Check edit permissions
       if (!canEditTaskStatus(task, currentUser)) {
         errors.push(`No permission to edit task: ${task.title}`)
         return
       }
-      
+
       // Check valid transitions
       const validTransitions = getValidTransitions(task.status, task)
       if (!validTransitions.includes(newStatusCode)) {
         errors.push(`Invalid status transition for task: ${task.title}`)
         return
       }
-      
+
       // Check sub-task completion logic
       if (newStatusCode === 'DONE' && task.subtasks?.length > 0) {
         const incompleteSubtasks = task.subtasks.filter(st => 
@@ -250,7 +249,7 @@ export default function StatusManager() {
         }
       }
     })
-    
+
     return errors
   }
 
@@ -348,7 +347,7 @@ export default function StatusManager() {
               <div className="th">Tasks Using</div>
               <div className="th">Actions</div>
             </div>
-            
+
             {companyStatuses.filter(s => s.active).sort((a, b) => a.order - b.order).map(status => (
               <CompanyStatusRow
                 key={status.id}
@@ -376,7 +375,7 @@ export default function StatusManager() {
                 <div className="th">Description</div>
                 <div className="th">Type</div>
               </div>
-              
+
               {systemStatuses.map(status => (
                 <SystemStatusRow
                   key={status.id}
@@ -603,7 +602,7 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
       ...formData,
       [name]: type === 'checkbox' ? checked : value
     })
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors({ ...errors, [name]: null })
@@ -615,7 +614,7 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
     const updatedTransitions = transitions.includes(statusCode)
       ? transitions.filter(code => code !== statusCode)
       : [...transitions, statusCode]
-    
+
     setFormData({
       ...formData,
       allowedTransitions: updatedTransitions
@@ -624,7 +623,7 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
 
   const validateForm = () => {
     const newErrors = {}
-    
+
     if (!formData.code.trim()) {
       newErrors.code = 'Status code is required'
     } else if (!/^[A-Z_]+$/.test(formData.code)) {
@@ -632,15 +631,15 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
     } else if (!isEdit && existingStatuses.some(s => s.code === formData.code)) {
       newErrors.code = 'Status code already exists'
     }
-    
+
     if (!formData.label.trim()) {
       newErrors.label = 'Status label is required'
     }
-    
+
     if (!formData.description.trim()) {
       newErrors.description = 'Status description is required'
     }
-    
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -655,19 +654,19 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
         const uncoveredStatuses = allSystemStatuses.filter(sysCode => 
           !existingMappings.includes(sysCode) && sysCode !== formData.systemMapping
         )
-        
+
         if (uncoveredStatuses.length > 0) {
           alert(`Warning: System statuses ${uncoveredStatuses.join(', ')} will have no company mapping.`)
         }
       }
-      
+
       // Show warning for changes affecting existing tasks
       if (isEdit && (formData.label !== status.label || formData.systemMapping !== status.systemMapping)) {
         if (!window.confirm('Changing this status will affect how existing tasks are displayed. Continue?')) {
           return
         }
       }
-      
+
       onSubmit(isEdit ? { ...status, ...formData } : formData)
     }
   }
@@ -683,7 +682,7 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
           <h3>{isEdit ? 'Edit Status' : 'Add New Status'}</h3>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="modal-content">
           <div className="form-grid">
             <div className="form-group">
@@ -814,7 +813,7 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
               </div>
             </div>
           )}
-          
+
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cancel
@@ -845,7 +844,7 @@ function DeleteStatusModal({ status, statuses, onConfirm, onClose }) {
           <h3>Delete Status: {status.label}</h3>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
-        
+
         <div className="modal-content">
           <div className="warning-message">
             <span className="warning-icon">⚠️</span>
@@ -876,7 +875,7 @@ function DeleteStatusModal({ status, statuses, onConfirm, onClose }) {
               All tasks with "{status.label}" status will be changed to the selected status.
             </small>
           </div>
-          
+
           <div className="modal-actions">
             <button type="button" className="btn-secondary" onClick={onClose}>
               Cancel
