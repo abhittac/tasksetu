@@ -421,12 +421,6 @@ export default function StatusManager() {
 }
 
 function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefault, canEdit }) {
-  const getSystemStatusLabel = (systemCode) => {
-    const systemStatus = systemStatuses.find(s => s.code === systemCode)
-    return systemStatus ? systemStatus.label : systemCode
-  }
-
-  // Mock task count - in real app this would come from API
   const getTaskCount = (statusCode) => {
     const mockCounts = {
       'OPEN': 142,
@@ -436,6 +430,11 @@ function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefau
       'CANCELLED': 18
     }
     return mockCounts[statusCode] || 0
+  }
+
+  const getSystemStatusLabel = (systemCode) => {
+    const systemStatus = systemStatuses.find(s => s.code === systemCode)
+    return systemStatus ? systemStatus.label : systemCode
   }
 
   const taskCount = getTaskCount(status.code)
