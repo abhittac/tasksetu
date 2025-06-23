@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react'
 import './App.css'
 import Sidebar from './components/Sidebar'
@@ -7,10 +8,12 @@ import CreateTask from './components/CreateTask'
 import RecurringTaskManager from './components/RecurringTaskManager'
 import StatusManager from './components/StatusManager'
 import PriorityManager from './components/PriorityManager'
-import MilestoneManager from './components/MilestoneManager'
-import ApprovalManager from './components/ApprovalManager'
 import TaskAnalytics from './components/TaskAnalytics'
+import ApprovalManager from './components/ApprovalManager'
+import MilestoneManager from './components/MilestoneManager'
 import NotificationCenter from './components/NotificationCenter'
+import ActivityFeed from './components/ActivityFeed'
+import Deadlines from './components/Deadlines'
 
 export default function App() {
   const [currentView, setCurrentView] = useState('dashboard')
@@ -29,35 +32,28 @@ export default function App() {
         return <StatusManager />
       case 'priority-manager':
         return <PriorityManager />
-      case 'milestone-manager':
-        return <MilestoneManager />
-      case 'approval-manager':
-        return <ApprovalManager />
       case 'analytics':
         return <TaskAnalytics />
+      case 'approvals':
+        return <ApprovalManager />
+      case 'milestones':
+        return <MilestoneManager />
       case 'notifications':
         return <NotificationCenter />
+      case 'activity':
+        return <ActivityFeed />
+      case 'deadlines':
+        return <Deadlines />
       default:
         return <Dashboard />
     }
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', backgroundColor: '#f9fafb' }}>
-      <Sidebar currentView={currentView} setCurrentView={setCurrentView} />
-      <main style={{ 
-        flex: 1, 
-        display: 'flex', 
-        flexDirection: 'column', 
-        overflow: 'hidden',
-        backgroundColor: '#f9fafb'
-      }}>
-        <div style={{ 
-          flex: 1, 
-          overflow: 'auto', 
-          padding: '24px',
-          backgroundColor: '#f9fafb'
-        }}>
+    <div className="app-layout">
+      <Sidebar currentView={currentView} onViewChange={setCurrentView} />
+      <main className="main-content">
+        <div className="page-content">
           {renderContent()}
         </div>
       </main>
