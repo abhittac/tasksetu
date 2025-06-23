@@ -5,6 +5,9 @@ const getSystemPriorityLabel = (systemCode, systemPriorities) => {
 }
 
 function CompanyPriorityRow({ priority, systemPriorities, onEdit, onDelete, onSetDefault, canEdit }) {
+  if (!priority) {
+    return null;
+  }
 
   return (
     <tr>

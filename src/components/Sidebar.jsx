@@ -86,4 +86,3 @@ export default function Sidebar({ currentView, onViewChange, onCreateTask }) {
     </aside>
   )
 }
-```Here's the updated `Sidebar` component that passes the `onCreateTask` prop to the "Create Task" button.
