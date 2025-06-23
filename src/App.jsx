@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 import './App.css'
 import Sidebar from './components/Sidebar'
@@ -56,7 +55,7 @@ export default function App() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
-      
+
       <main className="flex-1 lg:ml-64">
         <div className="lg:hidden">
           <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
@@ -73,12 +72,12 @@ export default function App() {
             <div className="w-10"></div>
           </div>
         </div>
-        
+
         <div className="p-4 lg:p-8">
           {renderCurrentPage()}
         </div>
       </main>
-      
+
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
