@@ -253,7 +253,7 @@ export default function StatusManager() {
     return errors
   }
 
-  const getSystemStatusLabel = (systemCode) => {
+  const getSystemStatusLabelMain = (systemCode) => {
     const systemStatus = systemStatuses.find(s => s.code === systemCode)
     return systemStatus ? systemStatus.label : systemCode
   }
@@ -311,7 +311,7 @@ export default function StatusManager() {
                 <span className="status-label">{status.label}</span>
                 {status.isDefault && <span className="default-indicator">DEFAULT</span>}
                 <span className="system-mapping">
-                  → {getSystemStatusLabel(status.systemMapping)}
+                  → {getSystemStatusLabelMain(status.systemMapping)}
                 </span>
               </div>
               {status.allowedTransitions.length > 0 && (
@@ -419,22 +419,24 @@ export default function StatusManager() {
   )
 }
 
-function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefault, canEdit }) {
-  const getTaskCount = (statusCode) => {
-    const mockCounts = {
-      'OPEN': 142,
-      'INPROGRESS': 87,
-      'ONHOLD': 23,
-      'DONE': 452,
-      'CANCELLED': 18
-    }
-    return mockCounts[statusCode] || 0
+// Helper functions moved outside component
+const getTaskCount = (statusCode) => {
+  const mockCounts = {
+    'OPEN': 142,
+    'INPROGRESS': 87,
+    'ONHOLD': 23,
+    'DONE': 452,
+    'CANCELLED': 18
   }
+  return mockCounts[statusCode] || 0
+}
 
-  const getSystemStatusLabel = (systemCode) => {
-    const systemStatus = systemStatuses.find(s => s.code === systemCode)
-    return systemStatus ? systemStatus.label : systemCode
-  }
+const getSystemStatusLabel = (systemCode, systemStatuses) => {
+  const systemStatus = systemStatuses.find(s => s.code === systemCode)
+  return systemStatus ? systemStatus.label : systemCode
+}
+
+function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefault, canEdit }) {
 
   const taskCount = getTaskCount(status.code)
 
@@ -462,7 +464,7 @@ function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefau
       <div className="td">
         <div className="system-mapping-display">
           <span className="system-status-label">
-            {getSystemStatusLabel(status.systemMapping)}
+            {getSystemStatusLabel(status.systemMapping, systemStatuses)}
           </span>
           <code className="system-status-code">({status.systemMapping})</code>
         </div>
