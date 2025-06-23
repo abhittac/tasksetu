@@ -14,6 +14,7 @@ import PriorityManager from './components/PriorityManager'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('dashboard')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const renderCurrentPage = () => {
     switch (currentPage) {
@@ -48,10 +49,28 @@ export default function App() {
 
   return (
     <div className="admin-panel">
-      <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      <Sidebar 
+        currentPage={currentPage} 
+        setCurrentPage={setCurrentPage}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
       <main className="main-content">
+        <button 
+          className="mobile-menu-toggle"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          aria-label="Toggle navigation menu"
+        >
+          ☰
+        </button>
         {renderCurrentPage()}
       </main>
+      {sidebarOpen && (
+        <div 
+          className="mobile-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
     </div>
   )
 }

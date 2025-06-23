@@ -31,6 +31,10 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
     { id: 'priority-management', label: 'Priority Management', icon: '🔥', section: 'task'}
   ]
 
+  const handleNavClick = (itemId) => {
+    setCurrentPage(itemId);
+  };
+
   return (
     <div className="sidebar">
       <div className="sidebar-header">
@@ -51,7 +55,7 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
               <li
                 key={item.id}
                 className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
-                onClick={() => setCurrentPage(item.id)}
+                onClick={() => handleNavClick(item.id)}
               >
                 <span className="nav-icon">{item.icon}</span>
                 {item.label}
@@ -67,7 +71,7 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
               <li
                 key={item.id}
                 className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
-                onClick={() => setCurrentPage(item.id)}
+                onClick={() => handleNavClick(item.id)}
               >
                 <span className="nav-icon">{item.icon}</span>
                 {item.label}
@@ -83,7 +87,7 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
               <li
                 key={item.id}
                 className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
-                onClick={() => setCurrentPage(item.id)}
+                onClick={() => handleNavClick(item.id)}
               >
                 <span className="nav-icon">{item.icon}</span>
                 {item.label}
@@ -97,7 +101,7 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
           <li
             key="status-management"
             className={`nav-item ${currentPage === 'status-management' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('status-management')}
+            onClick={() => handleNavClick('status-management')}
           >
             <span className="nav-icon">🔄</span>
             Status Management
@@ -105,7 +109,7 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
           <li
             key="priority-management"
             className={`nav-item ${currentPage === 'priority-management' ? 'active' : ''}`}
-            onClick={() => setCurrentPage('priority-management')}
+            onClick={() => handleNavClick('priority-management')}
           >
             <span className="nav-icon">🔥</span>
             Priority Management
