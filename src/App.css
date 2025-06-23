@@ -202,35 +202,33 @@
 
   /* Task Drawer */
   .task-drawer {
-    @apply fixed inset-y-0 right-0 w-1/2 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50;
+    @apply fixed inset-0 z-50 overflow-hidden;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
   }
 
   .task-drawer.open {
-    @apply translate-x-0;
+    transform: translateX(0);
   }
 
-  .task-drawer.closed {
-    @apply translate-x-full;
+  .drawer-overlay {
+    @apply absolute inset-0 bg-black bg-opacity-50;
   }
 
-  .task-drawer-overlay {
-    @apply fixed inset-0 bg-black transition-opacity duration-300 ease-in-out z-40;
-    background-color: rgba(0, 0, 0, 0.5);
+  .drawer-content {
+    @apply absolute right-0 top-0 h-full w-1/2 bg-white shadow-xl flex flex-col;
+    min-width: 500px;
   }
 
-  .task-drawer-overlay.open {
-    @apply opacity-100;
+  .drawer-header {
+    @apply flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white;
   }
 
-  .task-drawer-overlay.closed {
-    @apply opacity-0 pointer-events-none;
-  }
-
-  .task-drawer-header {
-    @apply flex items-center justify-between px-6 py-4 border-b border-gray-200;
-  }
-
-  .task-drawer-content {
+  .drawer-body {
     @apply flex-1 overflow-y-auto p-6;
+  }
+
+  .close-btn {
+    @apply p-2 hover:bg-gray-100 rounded-full transition-colors;
   }
 }

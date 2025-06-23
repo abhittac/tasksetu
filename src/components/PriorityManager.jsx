@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react'
 
 // Helper function moved outside component
@@ -8,8 +7,20 @@ const getSystemPriorityLabel = (systemCode, systemPriorities) => {
 }
 
 function CompanyPriorityRow({ priority, systemPriorities, onEdit, onDelete, onSetDefault, canEdit }) {
+  // Guard against undefined priority
   if (!priority) {
-    return null;
+    return null
+  }
+
+  const getTaskCount = (priorityCode) => {
+    const mockCounts = {
+      'LOW': 45,
+      'MEDIUM': 78,
+      'HIGH': 23,
+      'URGENT': 12,
+      'CRITICAL': 5
+    }
+    return mockCounts[priorityCode] || 0
   }
 
   return (

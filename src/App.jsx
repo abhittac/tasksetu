@@ -62,25 +62,27 @@ export default function App() {
       </main>
       
       {/* Slide-in Drawer */}
-      <div className={`task-drawer ${showCreateTaskDrawer ? 'open' : ''}`}>
-        <div className="drawer-overlay" onClick={() => setShowCreateTaskDrawer(false)}></div>
-        <div className="drawer-content">
-          <div className="drawer-header">
-            <h2 className="text-2xl font-bold text-gray-900">Create New Task</h2>
-            <button 
-              onClick={() => setShowCreateTaskDrawer(false)}
-              className="close-btn"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="drawer-body">
-            <CreateTask onClose={() => setShowCreateTaskDrawer(false)} />
+      {showCreateTaskDrawer && (
+        <div className={`task-drawer ${showCreateTaskDrawer ? 'open' : ''}`}>
+          <div className="drawer-overlay" onClick={() => setShowCreateTaskDrawer(false)}></div>
+          <div className="drawer-content">
+            <div className="drawer-header">
+              <h2 className="text-2xl font-bold text-gray-900">Create New Task</h2>
+              <button 
+                onClick={() => setShowCreateTaskDrawer(false)}
+                className="close-btn"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="drawer-body">
+              <CreateTask onClose={() => setShowCreateTaskDrawer(false)} />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
