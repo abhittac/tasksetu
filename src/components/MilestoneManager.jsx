@@ -353,6 +353,7 @@ export default function MilestoneManager() {
       )}
     </div>
   )
+  )
 }
 
 function CreateMilestoneModal({ availableTasks, onSubmit, onClose, currentUser }) {

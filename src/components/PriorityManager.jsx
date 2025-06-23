@@ -294,6 +294,7 @@ export default function PriorityManager() {
       )}
     </div>
   )
+  )
 }
 
 function CompanyPriorityRow({ priority, systemPriorities, onEdit, onDelete, onSetDefault, canEdit }) {
