@@ -17,15 +17,18 @@ import Deadlines from './components/Deadlines'
 
 export default function App() {
   const [currentView, setCurrentView] = useState('dashboard')
+  const [showCreateTaskDrawer, setShowCreateTaskDrawer] = useState(false)
 
   const renderContent = () => {
     switch (currentView) {
       case 'dashboard':
-        return <Dashboard />
+        return <Dashboard onCreateTask={() => setShowCreateTaskDrawer(true)} />
       case 'all-tasks':
-        return <AllTasks />
+        return <AllTasks onCreateTask={() => setShowCreateTaskDrawer(true)} />
       case 'create-task':
-        return <CreateTask />
+        setShowCreateTaskDrawer(true)
+        setCurrentView('dashboard')
+        return <Dashboard onCreateTask={() => setShowCreateTaskDrawer(true)} />
       case 'recurring-tasks':
         return <RecurringTaskManager />
       case 'status-manager':
@@ -45,18 +48,39 @@ export default function App() {
       case 'deadlines':
         return <Deadlines />
       default:
-        return <Dashboard />
+        return <Dashboard onCreateTask={() => setShowCreateTaskDrawer(true)} />
     }
   }
 
   return (
     <div className="app-layout">
-      <Sidebar currentView={currentView} onViewChange={setCurrentView} />
+      <Sidebar currentView={currentView} onViewChange={setCurrentView} onCreateTask={() => setShowCreateTaskDrawer(true)} />
       <main className="main-content">
         <div className="page-content">
           {renderContent()}
         </div>
       </main>
+      
+      {/* Slide-in Drawer */}
+      <div className={`task-drawer ${showCreateTaskDrawer ? 'open' : ''}`}>
+        <div className="drawer-overlay" onClick={() => setShowCreateTaskDrawer(false)}></div>
+        <div className="drawer-content">
+          <div className="drawer-header">
+            <h2 className="text-2xl font-bold text-gray-900">Create New Task</h2>
+            <button 
+              onClick={() => setShowCreateTaskDrawer(false)}
+              className="close-btn"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="drawer-body">
+            <CreateTask onClose={() => setShowCreateTaskDrawer(false)} />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

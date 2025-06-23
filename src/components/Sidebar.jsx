@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Sidebar({ currentView, onViewChange }) {
+export default function Sidebar({ currentView, onViewChange, onCreateTask }) {
   const menuItems = [
     {
       section: 'Main',
@@ -59,6 +59,17 @@ export default function Sidebar({ currentView, onViewChange }) {
             </ul>
           </div>
         ))}
+              <li key="create-task">
+                  <button
+                    onClick={() => onCreateTask('create-task')}
+                    className={`nav-item w-full text-left ${
+                      false ? 'active' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
+                  >
+                    <span className="nav-icon">➕</span>
+                    Create Task
+                  </button>
+                </li>
       </nav>
 
       <div className="p-4 border-t border-gray-200">
@@ -75,3 +86,4 @@ export default function Sidebar({ currentView, onViewChange }) {
     </aside>
   )
 }
+```Here's the updated `Sidebar` component that passes the `onCreateTask` prop to the "Create Task" button.

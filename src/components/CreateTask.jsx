@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-export default function CreateTask() {
+export default function CreateTask({ onClose }) {
   const [taskType, setTaskType] = useState('regular')
   const [formData, setFormData] = useState({
     title: '',
@@ -18,6 +18,7 @@ export default function CreateTask() {
     e.preventDefault()
     console.log('Creating task:', formData)
     // Handle task creation
+    if (onClose) onClose()
   }
 
   const handleInputChange = (field, value) => {
@@ -28,12 +29,7 @@ export default function CreateTask() {
   }
 
   return (
-    <div className="max-w-4xl space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Create New Task</h1>
-        <p className="mt-2 text-lg text-gray-600">Add a new task to your workflow</p>
-      </div>
+    <div className="space-y-6">
 
       {/* Task Type Selector */}
       <div className="card">
@@ -309,6 +305,9 @@ export default function CreateTask() {
 
         {/* Form Actions */}
         <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+          <button type="button" className="btn btn-secondary" onClick={onClose}>
+            Cancel
+          </button>
           <button type="button" className="btn btn-secondary">
             Save as Draft
           </button>
