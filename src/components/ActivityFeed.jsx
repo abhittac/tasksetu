@@ -187,12 +187,15 @@ export default function ActivityFeed({ taskId }) {
   }
 
   return (
-    <div className="activity-feed">
-      <div className="activity-header">
-        <h3>Activity Feed</h3>
-        <div className="activity-filters">
+    <div className="space-y-6">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Activity Feed</h1>
+          <p className="mt-2 text-lg text-gray-600">Track all task activities and changes</p>
+        </div>
+        <div className="mt-4 lg:mt-0">
           <select 
-            className="filter-select small"
+            className="form-select"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           >
@@ -207,29 +210,33 @@ export default function ActivityFeed({ taskId }) {
         </div>
       </div>
 
-      <div className="activity-timeline">
-        {filteredActivities.map(activity => (
-          <div key={activity.id} className="activity-item">
-            <div className="activity-icon">
-              {getActivityIcon(activity.type)}
-            </div>
-            <div className="activity-content">
-              <div className="activity-message">
-                {getActivityMessage(activity)}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="space-y-4">
+          {filteredActivities.map(activity => (
+            <div key={activity.id} className="flex items-start space-x-3 p-4 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+              <div className="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                <span className="text-sm">{getActivityIcon(activity.type)}</span>
               </div>
-              <div className="activity-timestamp">
-                {formatTimestamp(activity.timestamp)}
+              <div className="flex-1 min-w-0">
+                <div className="text-sm text-gray-900">
+                  {getActivityMessage(activity)}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {formatTimestamp(activity.timestamp)}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {filteredActivities.length === 0 && (
-        <div className="empty-activity">
-          <p>No activities found for the selected filter.</p>
+          ))}
         </div>
-      )}
+
+        {filteredActivities.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">📝</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No activities found</h3>
+            <p className="text-gray-500">No activities found for the selected filter.</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

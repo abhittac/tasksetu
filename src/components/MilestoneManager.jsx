@@ -162,54 +162,60 @@ export default function MilestoneManager() {
   })
 
   return (
-    <div className="milestone-manager">
-      <div className="page-header">
-        <h1>⭐ Milestone Tasks</h1>
-        <p>Track and manage project milestones and significant checkpoints</p>
-      </div>
-
-      <div className="milestone-filters">
-        <div className="filter-group">
-          <select className="filter-select" value={filter} onChange={(e) => setFilter(e.target.value)}>
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="in_progress">In Progress</option>
-            <option value="ready_for_confirmation">Ready for Confirmation</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="achieved">Achieved</option>
-          </select>
-          <select className="filter-select" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
-            <option value="all">All Types</option>
-            <option value="standalone">Standalone</option>
-            <option value="linked">Linked to Tasks</option>
-          </select>
+    <div className="space-y-6">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">⭐ Milestone Tasks</h1>
+          <p className="mt-2 text-lg text-gray-600">Track and manage project milestones and significant checkpoints</p>
         </div>
-        <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
-          ⭐ Create Milestone
-        </button>
       </div>
 
-      <div className="milestones-grid">
-        {filteredMilestones.map(milestone => {
-          const status = getMilestoneStatus(milestone)
-          const completionPercentage = getCompletionPercentage(milestone)
-          
-          return (
-            <div key={milestone.id} className={`milestone-card ${status}`}>
-              <div className="milestone-header">
-                <div className="milestone-title">
-                  <span className="milestone-icon">
-                    {milestone.isAchieved ? '🏆' : '⭐'}
-                  </span>
-                  <h3>{milestone.title}</h3>
-                  <span className={`priority-indicator ${milestone.priority}`}>
-                    {milestone.priority}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <select className="form-select" value={filter} onChange={(e) => setFilter(e.target.value)}>
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="ready_for_confirmation">Ready for Confirmation</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="achieved">Achieved</option>
+            </select>
+            <select className="form-select" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+              <option value="all">All Types</option>
+              <option value="standalone">Standalone</option>
+              <option value="linked">Linked to Tasks</option>
+            </select>
+          </div>
+          <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+            <span className="mr-2">⭐</span>
+            Create Milestone
+          </button>
+        </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredMilestones.map(milestone => {
+            const status = getMilestoneStatus(milestone)
+            const completionPercentage = getCompletionPercentage(milestone)
+            
+            return (
+              <div key={milestone.id} className="card hover:shadow-lg transition-shadow duration-200">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-2xl">
+                      {milestone.isAchieved ? '🏆' : '⭐'}
+                    </span>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">{milestone.title}</h3>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${milestone.priority === 'critical' ? 'bg-red-100 text-red-800' : milestone.priority === 'high' ? 'bg-orange-100 text-orange-800' : milestone.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>
+                        {milestone.priority}
+                      </span>
+                    </div>
+                  </div>
+                  <span className={`status-badge ${status === 'achieved' ? 'status-completed' : status === 'confirmed' ? 'bg-blue-100 text-blue-800' : status === 'ready_for_confirmation' ? 'bg-green-100 text-green-800' : status === 'in_progress' ? 'status-progress' : 'status-todo'}`}>
+                    {status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                   </span>
                 </div>
-                <span className={getStatusBadge(status)}>
-                  {status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                </span>
-              </div>
 
               <div className="milestone-body">
                 <div className="milestone-meta">

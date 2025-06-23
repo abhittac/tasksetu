@@ -13,65 +13,111 @@ export default function TaskAnalytics() {
   const completionRate = Math.round((analyticsData.completedTasks / analyticsData.totalTasks) * 100)
 
   return (
-    <div className="task-analytics">
-      <div className="page-header">
-        <h1>Task Analytics</h1>
-        <p>Insights and performance metrics for your tasks</p>
+    <div className="space-y-6">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Task Analytics</h1>
+          <p className="mt-2 text-lg text-gray-600">Insights and performance metrics for your tasks</p>
+        </div>
       </div>
 
-      <div className="analytics-grid">
-        <div className="analytics-card">
-          <div className="analytics-icon">📊</div>
-          <div className="analytics-content">
-            <h3>Total Tasks</h3>
-            <div className="analytics-value">{analyticsData.totalTasks}</div>
-            <div className="analytics-trend">+12% from last month</div>
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <div className="analytics-icon">✅</div>
-          <div className="analytics-content">
-            <h3>Completed</h3>
-            <div className="analytics-value">{analyticsData.completedTasks}</div>
-            <div className="analytics-trend">+8% completion rate</div>
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <div className="analytics-icon">🔄</div>
-          <div className="analytics-content">
-            <h3>In Progress</h3>
-            <div className="analytics-value">{analyticsData.inProgressTasks}</div>
-            <div className="analytics-trend">28% of total tasks</div>
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <div className="analytics-icon">⏳</div>
-          <div className="analytics-content">
-            <h3>Pending</h3>
-            <div className="analytics-value">{analyticsData.pendingTasks}</div>
-            <div className="analytics-trend">14% of total tasks</div>
-          </div>
-        </div>
-
-        <div className="analytics-card">
-          <div className="analytics-icon">⚠️</div>
-          <div className="analytics-content">
-            <h3>Overdue</h3>
-            <div className="analytics-value">{analyticsData.overdueTasks}</div>
-            <div className="analytics-trend">Needs attention</div>
-          </div>
-        </div>
-
-        <div className="analytics-card completion-rate">
-          <div className="analytics-content">
-            <h3>Completion Rate</h3>
-            <div className="completion-circle">
-              <div className="completion-percentage">{completionRate}%</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="card hover:shadow-md transition-shadow duration-200">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">📊</span>
             </div>
-            <div className="analytics-trend">Great progress!</div>
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-gray-600">Total Tasks</h3>
+              <div className="text-2xl font-bold text-gray-900">{analyticsData.totalTasks}</div>
+              <div className="text-sm text-green-600">+12% from last month</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card hover:shadow-md transition-shadow duration-200">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">✅</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-gray-600">Completed</h3>
+              <div className="text-2xl font-bold text-gray-900">{analyticsData.completedTasks}</div>
+              <div className="text-sm text-green-600">+8% completion rate</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card hover:shadow-md transition-shadow duration-200">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">🔄</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-gray-600">In Progress</h3>
+              <div className="text-2xl font-bold text-gray-900">{analyticsData.inProgressTasks}</div>
+              <div className="text-sm text-gray-600">28% of total tasks</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card hover:shadow-md transition-shadow duration-200">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">⏳</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-gray-600">Pending</h3>
+              <div className="text-2xl font-bold text-gray-900">{analyticsData.pendingTasks}</div>
+              <div className="text-sm text-gray-600">14% of total tasks</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card hover:shadow-md transition-shadow duration-200">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">⚠️</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-medium text-gray-600">Overdue</h3>
+              <div className="text-2xl font-bold text-gray-900">{analyticsData.overdueTasks}</div>
+              <div className="text-sm text-red-600">Needs attention</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card hover:shadow-md transition-shadow duration-200">
+          <div className="flex items-center justify-center">
+            <div className="text-center">
+              <h3 className="text-sm font-medium text-gray-600 mb-4">Completion Rate</h3>
+              <div className="relative w-24 h-24 mx-auto">
+                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="#f3f4f6"
+                    strokeWidth="8"
+                    fill="none"
+                  />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="#10b981"
+                    strokeWidth="8"
+                    fill="none"
+                    strokeDasharray={`${completionRate * 2.51} 251`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-lg font-bold text-gray-900">{completionRate}%</span>
+                </div>
+              </div>
+              <div className="text-sm text-green-600 mt-2">Great progress!</div>
+            </div>
           </div>
         </div>
       </div>

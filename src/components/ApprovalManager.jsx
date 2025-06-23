@@ -119,42 +119,51 @@ export default function ApprovalManager() {
   }
 
   return (
-    <div className="approval-manager">
-      <div className="page-header">
-        <h1>Approval Tasks</h1>
-        <p>Manage approval workflows and tasks</p>
+    <div className="space-y-6">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Approval Tasks</h1>
+          <p className="mt-2 text-lg text-gray-600">Manage approval workflows and tasks</p>
+        </div>
       </div>
 
-      <div className="approval-filters">
-        <select className="filter-select">
-          <option>All Status</option>
-          <option>Pending</option>
-          <option>Approved</option>
-          <option>Rejected</option>
-        </select>
-        <select className="filter-select">
-          <option>All Modes</option>
-          <option>Any Approver</option>
-          <option>All Approvers</option>
-          <option>Sequential</option>
-        </select>
-        <button 
-          className="btn-primary"
-          onClick={() => setShowCreateModal(true)}
-        >
-          + Create Approval Task
-        </button>
-      </div>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <select className="form-select">
+              <option>All Status</option>
+              <option>Pending</option>
+              <option>Approved</option>
+              <option>Rejected</option>
+            </select>
+            <select className="form-select">
+              <option>All Modes</option>
+              <option>Any Approver</option>
+              <option>All Approvers</option>
+              <option>Sequential</option>
+            </select>
+          </div>
+          <button 
+            className="btn btn-primary"
+            onClick={() => setShowCreateModal(true)}
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Create Approval Task
+          </button>
+        </div>
 
-      <div className="approval-tasks-grid">
-        {approvalTasks.map(task => (
-          <ApprovalTaskCard 
-            key={task.id} 
-            task={task} 
-            currentUser={currentUser}
-            onApproval={handleApproval}
-          />
-        ))}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {approvalTasks.map(task => (
+            <ApprovalTaskCard 
+              key={task.id} 
+              task={task} 
+              currentUser={currentUser}
+              onApproval={handleApproval}
+            />
+          ))}
+        </div>
       </div>
 
       {showCreateModal && (
@@ -182,64 +191,60 @@ function ApprovalTaskCard({ task, currentUser, onApproval }) {
 
   return (
     <>
-      <div className="approval-task-card">
-        <div className="task-card-header">
-          <h3>{task.title}</h3>
-          <span className={`status-badge ${overallStatus}`}>
-            {overallStatus}
+      <div className="card hover:shadow-lg transition-shadow duration-200">
+        <div className="flex items-start justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">{task.title}</h3>
+          <span className={`status-badge ${overallStatus === 'approved' ? 'status-completed' : overallStatus === 'rejected' ? 'bg-red-100 text-red-800' : overallStatus === 'pending' ? 'status-progress' : 'status-todo'}`}>
+            {overallStatus.charAt(0).toUpperCase() + overallStatus.slice(1)}
           </span>
         </div>
 
-        <div className="task-card-body">
-          <p className="task-description">{task.description}</p>
+        <div className="space-y-4">
+          <p className="text-gray-600 text-sm">{task.description}</p>
           
-          <div className="approval-info">
-            <div className="info-row">
-              <span className="label">Mode:</span>
-              <span className="value">{task.mode}</span>
+          <div className="grid grid-cols-1 gap-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-500">Mode:</span>
+              <span className="font-medium text-gray-900">{task.mode}</span>
             </div>
-            <div className="info-row">
-              <span className="label">Due Date:</span>
-              <span className="value">{task.dueDate}</span>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Due Date:</span>
+              <span className="font-medium text-gray-900">{task.dueDate}</span>
             </div>
-            <div className="info-row">
-              <span className="label">Creator:</span>
-              <span className="value">{task.creator}</span>
+            <div className="flex justify-between">
+              <span className="text-gray-500">Creator:</span>
+              <span className="font-medium text-gray-900">{task.creator}</span>
             </div>
           </div>
 
-          <div className="approval-chain">
-            <h4>Approval Chain</h4>
-            {task.approvers.map((approver, index) => (
-              <div key={approver.id} className="approver-item">
-                <div className="approver-info">
-                  <span className="approver-icon">
-                    {approver.status === 'approved' ? '✅' : 
-                     approver.status === 'rejected' ? '❌' : 
-                     approver.status === 'pending' ? '⏳' : '⏸️'}
-                  </span>
-                  <span className="approver-name">{approver.name}</span>
-                  <span className="approver-role">({approver.role})</span>
-                </div>
-                
-                {approver.status === 'pending' && canUserApprove(task, approver) && approver.id === currentUser.id && (
-                  <div className="approval-actions">
+          <div className="border-t border-gray-200 pt-4">
+            <h4 className="text-sm font-medium text-gray-900 mb-3">Approval Chain</h4>
+            <div className="space-y-2">
+              {task.approvers.map((approver, index) => (
+                <div key={approver.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-lg">
+                      {approver.status === 'approved' ? '✅' : 
+                       approver.status === 'rejected' ? '❌' : 
+                       approver.status === 'pending' ? '⏳' : '⏸️'}
+                    </span>
+                    <div>
+                      <span className="text-sm font-medium text-gray-900">{approver.name}</span>
+                      <span className="text-xs text-gray-500 ml-1">({approver.role})</span>
+                    </div>
+                  </div>
+                  
+                  {approver.status === 'pending' && canUserApprove(task, approver) && approver.id === currentUser.id && (
                     <button 
-                      className="btn-approve"
+                      className="btn btn-sm btn-primary"
                       onClick={() => handleApproveClick(approver)}
                     >
                       Review
                     </button>
-                  </div>
-                )}
-                
-                {approver.comment && (
-                  <div className="approver-comment">
-                    <small>"{approver.comment}"</small>
-                  </div>
-                )}
-              </div>
-            ))}
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

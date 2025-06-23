@@ -436,97 +436,108 @@ export default function NotificationCenter() {
   }
 
   return (
-    <div className="notification-center">
-      <div className="notification-header">
-        <h2>
-          Notifications 
-          {unreadCount > 0 && <span className="unread-badge">{unreadCount}</span>}
-        </h2>
-        <div className="notification-actions">
+    <div className="space-y-6">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-center space-x-3">
+          <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
+          {unreadCount > 0 && (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              {unreadCount} unread
+            </span>
+          )}
+        </div>
+        <div className="flex items-center space-x-3 mt-4 lg:mt-0">
           {unreadCount > 0 && (
             <button 
-              className="btn-secondary"
+              className="btn btn-secondary"
               onClick={markAllAsRead}
             >
               Mark All Read
             </button>
           )}
           <button 
-            className="btn-secondary"
+            className="btn btn-secondary"
             onClick={() => setShowSettings(true)}
           >
-            ⚙️ Settings
+            <span className="mr-2">⚙️</span>
+            Settings
           </button>
         </div>
       </div>
 
-      <div className="notification-filters">
-        <select 
-          value={filter} 
-          onChange={(e) => setFilter(e.target.value)}
-          className="filter-select"
-        >
-          <option value="all">All Notifications</option>
-          <option value="unread">Unread Only</option>
-          <option value="assignment">Assignments</option>
-          <option value="due_date">Due Date Reminders</option>
-          <option value="overdue">Overdue Alerts</option>
-          <option value="mention">Mentions</option>
-          <option value="status_change">Status Changes</option>
-          <option value="snooze_wakeup">Snooze Wake-ups</option>
-        </select>
-      </div>
-
-      <div className="notifications-list">
-        {filteredNotifications.map(notification => (
-          <div 
-            key={notification.id} 
-            className={`notification-item ${!notification.read ? 'unread' : ''}`}
-            onClick={() => markAsRead(notification.id)}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="mb-6">
+          <select 
+            value={filter} 
+            onChange={(e) => setFilter(e.target.value)}
+            className="form-select"
           >
-            <div className="notification-icon">
-              {getNotificationIcon(notification.type)}
-            </div>
-            <div className="notification-content">
-              <div className="notification-title">{notification.title}</div>
-              <div className="notification-message">{notification.message}</div>
-              <div className="notification-meta">
-                <span className="notification-time">{formatTimestamp(notification.timestamp)}</span>
-                <span 
-                  className="notification-priority"
-                  style={{ color: getPriorityColor(notification.priority) }}
-                >
-                  {notification.priority}
-                </span>
+            <option value="all">All Notifications</option>
+            <option value="unread">Unread Only</option>
+            <option value="assignment">Assignments</option>
+            <option value="due_date">Due Date Reminders</option>
+            <option value="overdue">Overdue Alerts</option>
+            <option value="mention">Mentions</option>
+            <option value="status_change">Status Changes</option>
+            <option value="snooze_wakeup">Snooze Wake-ups</option>
+          </select>
+        </div>
+
+        <div className="space-y-3">
+          {filteredNotifications.map(notification => (
+            <div 
+              key={notification.id} 
+              className={`flex items-start space-x-3 p-4 rounded-lg border cursor-pointer transition-all duration-200 ${!notification.read ? 'bg-blue-50 border-blue-200 hover:bg-blue-100' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}`}
+              onClick={() => markAsRead(notification.id)}
+            >
+              <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center border">
+                <span className="text-sm">{getNotificationIcon(notification.type)}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h4 className="text-sm font-medium text-gray-900">{notification.title}</h4>
+                    <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <span className="text-xs text-gray-500">{formatTimestamp(notification.timestamp)}</span>
+                      <span 
+                        className="text-xs font-medium"
+                        style={{ color: getPriorityColor(notification.priority) }}
+                      >
+                        {notification.priority}
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    className="text-gray-400 hover:text-gray-600 ml-4"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      deleteNotification(notification.id)
+                    }}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="notification-actions">
-              <button 
-                className="btn-action"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  deleteNotification(notification.id)
-                }}
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {filteredNotifications.length === 0 && (
-        <div className="empty-notifications">
-          <div className="empty-icon">🔔</div>
-          <h3>No notifications</h3>
-          <p>
-            {filter === 'unread' 
-              ? "All caught up! No unread notifications."
-              : "You're all set! No notifications to show."
-            }
-          </p>
+          ))}
         </div>
-      )}
+
+        {filteredNotifications.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">🔔</div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications</h3>
+            <p className="text-gray-500">
+              {filter === 'unread' 
+                ? "All caught up! No unread notifications."
+                : "You're all set! No notifications to show."
+              }
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

@@ -152,37 +152,41 @@ export default function PriorityManager() {
   }
 
   return (
-    <div className="priority-manager">
-      <div className="page-header">
-        <h1>Company Priority Configuration</h1>
-        <p>Configure custom task priorities and due date automation</p>
+    <div className="space-y-6">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Company Priority Configuration</h1>
+          <p className="mt-2 text-lg text-gray-600">Configure custom task priorities and due date automation</p>
+        </div>
       </div>
 
-      <div className="priority-manager-actions">
-        <div className="left-actions">
-          <button 
-            className="btn-primary"
-            onClick={() => setShowAddForm(true)}
-          >
-            + Add Custom Priority
-          </button>
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={showSystemPriorities}
-              onChange={(e) => setShowSystemPriorities(e.target.checked)}
-            />
-            <span className="checkmark"></span>
-            Show System Priorities
-          </label>
-        </div>
-        <div className="priority-info">
-          <span className="info-text">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <button 
+              className="btn btn-primary"
+              onClick={() => setShowAddForm(true)}
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Custom Priority
+            </button>
+            <label className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                checked={showSystemPriorities}
+                onChange={(e) => setShowSystemPriorities(e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700">Show System Priorities</span>
+            </label>
+          </div>
+          <div className="text-sm text-gray-500">
             Company Priorities: {companyPriorities.filter(p => p.active).length} | 
             System Priorities: {systemPriorities.length}
-          </span>
+          </div>
         </div>
-      </div>
 
       <div className="priority-workflow-diagram">
         <h3>Priority & Due Date Mapping</h3>
