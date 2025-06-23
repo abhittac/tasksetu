@@ -23,6 +23,11 @@
     @apply flex h-screen bg-gray-50;
   }
 
+  /* Stats Grid */
+  .stats-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8;
+  }
+
   .sidebar {
     @apply w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm;
   }
@@ -65,7 +70,8 @@
   }
 
   .nav-item.active {
-    @apply bg-blue-100 text-blue-700 border-r-2 border-blue-600;
+    @apply bg-blue-100 text-blue-700;
+    border-right: 2px solid #2563eb;
   }
 
   .nav-icon {
@@ -165,6 +171,10 @@
     @apply bg-red-100 text-red-800;
   }
 
+  .priority-badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+
   /* Tables */
   .table {
     @apply w-full divide-y divide-gray-200;
@@ -204,7 +214,8 @@
   }
 
   .task-drawer-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out z-40;
+    @apply fixed inset-0 bg-black transition-opacity duration-300 ease-in-out z-40;
+    background-color: rgba(0, 0, 0, 0.5);
   }
 
   .task-drawer-overlay.open {

@@ -1,3 +1,4 @@
+
 import React from 'react'
 
 export default function Sidebar({ currentView, onViewChange, onCreateTask }) {
@@ -31,6 +32,14 @@ export default function Sidebar({ currentView, onViewChange, onCreateTask }) {
     }
   ]
 
+  const handleItemClick = (itemId) => {
+    if (itemId === 'create-task') {
+      onCreateTask()
+    } else {
+      onViewChange(itemId)
+    }
+  }
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -46,7 +55,7 @@ export default function Sidebar({ currentView, onViewChange, onCreateTask }) {
               {section.items.map((item) => (
                 <li key={item.id}>
                   <button
-                    onClick={() => onViewChange(item.id)}
+                    onClick={() => handleItemClick(item.id)}
                     className={`nav-item w-full text-left ${
                       currentView === item.id ? 'active' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                     }`}
@@ -59,17 +68,6 @@ export default function Sidebar({ currentView, onViewChange, onCreateTask }) {
             </ul>
           </div>
         ))}
-              <li key="create-task">
-                  <button
-                    onClick={() => onCreateTask('create-task')}
-                    className={`nav-item w-full text-left ${
-                      false ? 'active' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                  >
-                    <span className="nav-icon">➕</span>
-                    Create Task
-                  </button>
-                </li>
       </nav>
 
       <div className="p-4 border-t border-gray-200">
