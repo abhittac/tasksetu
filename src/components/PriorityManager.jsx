@@ -207,7 +207,7 @@ export default function PriorityManager() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {priorities.map((priority) => (
+              {priorities.filter(priority => priority && priority.id).map((priority) => (
                 <CompanyPriorityRow
                   key={priority.id}
                   priority={priority}

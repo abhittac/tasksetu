@@ -1,21 +1,5 @@
 import React, { useState } from 'react'
-
-// Helper functions moved outside component
-const getTaskCount = (statusCode) => {
-  const mockCounts = {
-    'OPEN': 142,
-    'INPROGRESS': 87,
-    'ONHOLD': 23,
-    'DONE': 452,
-    'CANCELLED': 18
-  }
-  return mockCounts[statusCode] || 0
-}
-
-const getSystemStatusLabel = (systemCode, systemStatuses) => {
-  const systemStatus = systemStatuses.find(s => s.code === systemCode)
-  return systemStatus ? systemStatus.label : systemCode
-}
+import StatusFormModal from './StatusFormModal'
 
 export default function StatusManager() {
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' })
@@ -145,6 +129,7 @@ export default function StatusManager() {
 
   const [showSystemStatuses, setShowSystemStatuses] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [showFormDrawer, setShowFormDrawer] = useState(false)
   const [editingStatus, setEditingStatus] = useState(null)
   const [deleteModal, setDeleteModal] = useState(null)
   const [statusChangeModal, setStatusChangeModal] = useState(null)
@@ -432,6 +417,35 @@ export default function StatusManager() {
           />
         )}
       </div>
+
+      {/* Slide-in Drawer */}
+      {showFormDrawer && (
+        <div className={`task-drawer ${showFormDrawer ? 'open' : ''}`}>
+          <div className="drawer-overlay" onClick={() => setShowFormDrawer(false)}></div>
+          <div className="drawer-content">
+            <div className="drawer-header">
+              <h2 className="text-2xl font-bold text-gray-900">Create New Status</h2>
+              <button 
+                onClick={() => setShowFormDrawer(false)}
+                className="close-btn"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="drawer-body">
+              <StatusFormModal 
+                editingStatus={editingStatus}
+                onClose={() => setShowFormDrawer(false)}
+                onSave={handleAddStatus}
+                existingStatuses={companyStatuses}
+                systemStatuses={systemStatuses}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
