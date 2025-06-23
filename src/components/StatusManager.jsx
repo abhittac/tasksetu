@@ -1,5 +1,22 @@
 import React, { useState } from 'react'
 
+// Helper functions moved outside component
+const getTaskCount = (statusCode) => {
+  const mockCounts = {
+    'OPEN': 142,
+    'INPROGRESS': 87,
+    'ONHOLD': 23,
+    'DONE': 452,
+    'CANCELLED': 18
+  }
+  return mockCounts[statusCode] || 0
+}
+
+const getSystemStatusLabel = (systemCode, systemStatuses) => {
+  const systemStatus = systemStatuses.find(s => s.code === systemCode)
+  return systemStatus ? systemStatus.label : systemCode
+}
+
 export default function StatusManager() {
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' })
 
@@ -127,7 +144,6 @@ export default function StatusManager() {
   ])
 
   const [showSystemStatuses, setShowSystemStatuses] = useState(true)
-
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingStatus, setEditingStatus] = useState(null)
   const [deleteModal, setDeleteModal] = useState(null)
@@ -171,7 +187,7 @@ export default function StatusManager() {
       deletedStatus: statusToDelete.label,
       mappedTo: mappingStatus.label,
       timestamp: new Date().toISOString(),
-      affectedTasks: getTaskCount(statusToDelete.code) // In real app, this would update actual tasks
+      affectedTasks: getTaskCount(statusToDelete.code)
     })
 
     setDeleteModal(null)
@@ -299,145 +315,128 @@ export default function StatusManager() {
           </div>
         </div>
 
-      <div className="status-workflow-diagram">
-        <h3>Company Status Workflow</h3>
-        <div className="workflow-visualization">
-          {companyStatuses.filter(s => s.active).sort((a, b) => a.order - b.order).map(status => (
-            <div key={status.id} className="workflow-node">
-              <div 
-                className="status-node company-status"
-                style={{ backgroundColor: status.color }}
-              >
-                <span className="status-label">{status.label}</span>
-                {status.isDefault && <span className="default-indicator">DEFAULT</span>}
-                <span className="system-mapping">
-                  → {getSystemStatusLabelMain(status.systemMapping)}
-                </span>
-              </div>
-              {status.allowedTransitions.length > 0 && (
-                <div className="transitions">
-                  {status.allowedTransitions.map(transitionCode => {
-                    const targetStatus = companyStatuses.find(s => s.code === transitionCode)
-                    return targetStatus ? (
-                      <div key={transitionCode} className="transition-arrow">
-                        → {targetStatus.label}
-                      </div>
-                    ) : null
-                  })}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="status-sections">
-        <div className="status-list company-statuses">
-          <div className="section-header">
-            <h3>Company Statuses</h3>
-            <p>Custom statuses configured for your organization</p>
-          </div>
-          <div className="status-table">
-            <div className="table-header">
-              <div className="th">Order</div>
-              <div className="th">Status</div>
-              <div className="th">Code</div>
-              <div className="th">System Mapping</div>
-              <div className="th">Type</div>
-              <div className="th">Tasks Using</div>
-              <div className="th">Actions</div>
-            </div>
-
+        <div className="status-workflow-diagram">
+          <h3>Company Status Workflow</h3>
+          <div className="workflow-visualization">
             {companyStatuses.filter(s => s.active).sort((a, b) => a.order - b.order).map(status => (
-              <CompanyStatusRow
-                key={status.id}
-                status={status}
-                systemStatuses={systemStatuses}
-                onEdit={() => setEditingStatus(status)}
-                onDelete={() => setDeleteModal(status)}
-                onSetDefault={() => handleSetDefault(status.id)}
-                canEdit={currentUser.role === 'admin'}
-              />
+              <div key={status.id} className="workflow-node">
+                <div 
+                  className="status-node company-status"
+                  style={{ backgroundColor: status.color }}
+                >
+                  <span className="status-label">{status.label}</span>
+                  {status.isDefault && <span className="default-indicator">DEFAULT</span>}
+                  <span className="system-mapping">
+                    → {getSystemStatusLabelMain(status.systemMapping)}
+                  </span>
+                </div>
+                {status.allowedTransitions.length > 0 && (
+                  <div className="transitions">
+                    {status.allowedTransitions.map(transitionCode => {
+                      const targetStatus = companyStatuses.find(s => s.code === transitionCode)
+                      return targetStatus ? (
+                        <div key={transitionCode} className="transition-arrow">
+                          → {targetStatus.label}
+                        </div>
+                      ) : null
+                    })}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>
 
-        {showSystemStatuses && (
-          <div className="status-list system-statuses">
+        <div className="status-sections">
+          <div className="status-list company-statuses">
             <div className="section-header">
-              <h3>System Statuses (Read-Only)</h3>
-              <p>Core statuses used for internal logic and analytics</p>
+              <h3>Company Statuses</h3>
+              <p>Custom statuses configured for your organization</p>
             </div>
             <div className="status-table">
               <div className="table-header">
+                <div className="th">Order</div>
                 <div className="th">Status</div>
                 <div className="th">Code</div>
-                <div className="th">Description</div>
+                <div className="th">System Mapping</div>
                 <div className="th">Type</div>
+                <div className="th">Tasks Using</div>
+                <div className="th">Actions</div>
               </div>
 
-              {systemStatuses.map(status => (
-                <SystemStatusRow
+              {companyStatuses.filter(s => s.active).sort((a, b) => a.order - b.order).map(status => (
+                <CompanyStatusRow
                   key={status.id}
                   status={status}
+                  systemStatuses={systemStatuses}
+                  onEdit={() => setEditingStatus(status)}
+                  onDelete={() => setDeleteModal(status)}
+                  onSetDefault={() => handleSetDefault(status.id)}
+                  canEdit={currentUser.role === 'admin'}
                 />
               ))}
             </div>
           </div>
+
+          {showSystemStatuses && (
+            <div className="status-list system-statuses">
+              <div className="section-header">
+                <h3>System Statuses (Read-Only)</h3>
+                <p>Core statuses used for internal logic and analytics</p>
+              </div>
+              <div className="status-table">
+                <div className="table-header">
+                  <div className="th">Status</div>
+                  <div className="th">Code</div>
+                  <div className="th">Description</div>
+                  <div className="th">Type</div>
+                </div>
+
+                {systemStatuses.map(status => (
+                  <SystemStatusRow
+                    key={status.id}
+                    status={status}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {showAddForm && (
+          <StatusFormModal
+            onSubmit={handleAddStatus}
+            onClose={() => setShowAddForm(false)}
+            existingStatuses={companyStatuses}
+            systemStatuses={systemStatuses}
+          />
+        )}
+
+        {editingStatus && (
+          <StatusFormModal
+            status={editingStatus}
+            onSubmit={handleUpdateStatus}
+            onClose={() => setEditingStatus(null)}
+            existingStatuses={companyStatuses}
+            systemStatuses={systemStatuses}
+            isEdit={true}
+          />
+        )}
+
+        {deleteModal && (
+          <DeleteStatusModal
+            status={deleteModal}
+            statuses={companyStatuses.filter(s => s.active && s.id !== deleteModal.id)}
+            onConfirm={handleDeleteStatus}
+            onClose={() => setDeleteModal(null)}
+          />
         )}
       </div>
-
-      {showAddForm && (
-        <StatusFormModal
-          onSubmit={handleAddStatus}
-          onClose={() => setShowAddForm(false)}
-          existingStatuses={companyStatuses}
-          systemStatuses={systemStatuses}
-        />
-      )}
-
-      {editingStatus && (
-        <StatusFormModal
-          status={editingStatus}
-          onSubmit={handleUpdateStatus}
-          onClose={() => setEditingStatus(null)}
-          existingStatuses={companyStatuses}
-          systemStatuses={systemStatuses}
-          isEdit={true}
-        />
-      )}
-
-      {deleteModal && (
-        <DeleteStatusModal
-          status={deleteModal}
-          statuses={companyStatuses.filter(s => s.active && s.id !== deleteModal.id)}
-          onConfirm={handleDeleteStatus}
-          onClose={() => setDeleteModal(null)}
-        />
-      )}
     </div>
   )
 }
 
-// Helper functions moved outside component
-const getTaskCount = (statusCode) => {
-  const mockCounts = {
-    'OPEN': 142,
-    'INPROGRESS': 87,
-    'ONHOLD': 23,
-    'DONE': 452,
-    'CANCELLED': 18
-  }
-  return mockCounts[statusCode] || 0
-}
-
-const getSystemStatusLabel = (systemCode, systemStatuses) => {
-  const systemStatus = systemStatuses.find(s => s.code === systemCode)
-  return systemStatus ? systemStatus.label : systemCode
-}
-
 function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefault, canEdit }) {
-
   const taskCount = getTaskCount(status.code)
 
   return (
@@ -536,55 +535,6 @@ function SystemStatusRow({ status }) {
   )
 }
 
-function StatusRow({ status, onEdit, onDelete, onSetDefault, canEdit }) {
-  return (
-    <div className="table-row">
-      <div className="td">
-        <div className="status-display">
-          <span 
-            className="status-color-indicator"
-            style={{ backgroundColor: status.color }}
-          ></span>
-          <span className="status-name">{status.label}</span>
-          {status.isDefault && (
-            <span className="badge badge-primary">DEFAULT</span>
-          )}
-        </div>
-      </div>
-      <div className="td">
-        <code className="status-code">{status.code}</code>
-      </div>
-      <div className="td">
-        <span className="status-description">{status.description}</span>
-      </div>
-      <div className="td">
-        <span className={`status-type ${status.isFinal ? 'final' : 'active'}`}>
-          {status.isFinal ? 'Final' : 'Active'}
-        </span>
-      </div>
-      <div className="td">
-        <div className="action-buttons">
-          {canEdit && (
-            <>
-              <button className="btn-action" onClick={onEdit}>
-                Edit
-              </button>
-              {!status.isDefault && (
-                <button className="btn-action" onClick={onSetDefault}>
-                  Set Default
-                </button>
-              )}
-              <button className="btn-action danger" onClick={onDelete}>
-                Delete
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
 function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemStatuses, isEdit = false }) {
   const [formData, setFormData] = useState({
     code: status?.code || '',
@@ -649,26 +599,6 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
   const handleSubmit = (e) => {
     e.preventDefault()
     if (validateForm()) {
-      // Check for system status mapping coverage
-      if (!isEdit) {
-        const existingMappings = existingStatuses.map(s => s.systemMapping)
-        const allSystemStatuses = systemStatuses.map(s => s.code)
-        const uncoveredStatuses = allSystemStatuses.filter(sysCode => 
-          !existingMappings.includes(sysCode) && sysCode !== formData.systemMapping
-        )
-
-        if (uncoveredStatuses.length > 0) {
-          alert(`Warning: System statuses ${uncoveredStatuses.join(', ')} will have no company mapping.`)
-        }
-      }
-
-      // Show warning for changes affecting existing tasks
-      if (isEdit && (formData.label !== status.label || formData.systemMapping !== status.systemMapping)) {
-        if (!window.confirm('Changing this status will affect how existing tasks are displayed. Continue?')) {
-          return
-        }
-      }
-
       onSubmit(isEdit ? { ...status, ...formData } : formData)
     }
   }
@@ -700,9 +630,6 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
                 disabled={isEdit}
               />
               {errors.code && <span className="error-text">{errors.code}</span>}
-              <small className="form-hint">
-                Use uppercase letters and underscores only. Cannot be changed after creation.
-              </small>
             </div>
 
             <div className="form-group">
