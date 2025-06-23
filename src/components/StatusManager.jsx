@@ -1,6 +1,23 @@
 import React, { useState } from 'react'
 import StatusFormModal from './StatusFormModal'
 
+// Helper functions moved outside component
+const getTaskCount = (statusCode) => {
+  const mockCounts = {
+    'OPEN': 142,
+    'INPROGRESS': 87,
+    'ONHOLD': 23,
+    'DONE': 452,
+    'CANCELLED': 18
+  }
+  return mockCounts[statusCode] || 0
+}
+
+const getSystemStatusLabel = (systemCode, systemStatuses) => {
+  const systemStatus = systemStatuses.find(s => s.code === systemCode)
+  return systemStatus ? systemStatus.label : systemCode
+}
+
 export default function StatusManager() {
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' })
 
@@ -544,228 +561,6 @@ function SystemStatusRow({ status }) {
         <span className={`status-type ${status.isFinal ? 'final' : 'active'}`}>
           {status.isFinal ? 'Final' : 'Active'}
         </span>
-      </div>
-    </div>
-  )
-}
-
-function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemStatuses, isEdit = false }) {
-  const [formData, setFormData] = useState({
-    code: status?.code || '',
-    label: status?.label || '',
-    description: status?.description || '',
-    color: status?.color || '#3498db',
-    isFinal: status?.isFinal || false,
-    systemMapping: status?.systemMapping || systemStatuses[0]?.code || '',
-    allowedTransitions: status?.allowedTransitions || []
-  })
-
-  const [errors, setErrors] = useState({})
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    })
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: null })
-    }
-  }
-
-  const handleTransitionToggle = (statusCode) => {
-    const transitions = formData.allowedTransitions
-    const updatedTransitions = transitions.includes(statusCode)
-      ? transitions.filter(code => code !== statusCode)
-      : [...transitions, statusCode]
-
-    setFormData({
-      ...formData,
-      allowedTransitions: updatedTransitions
-    })
-  }
-
-  const validateForm = () => {
-    const newErrors = {}
-
-    if (!formData.code.trim()) {
-      newErrors.code = 'Status code is required'
-    } else if (!/^[A-Z_]+$/.test(formData.code)) {
-      newErrors.code = 'Status code must contain only uppercase letters and underscores'
-    } else if (!isEdit && existingStatuses.some(s => s.code === formData.code)) {
-      newErrors.code = 'Status code already exists'
-    }
-
-    if (!formData.label.trim()) {
-      newErrors.label = 'Status label is required'
-    }
-
-    if (!formData.description.trim()) {
-      newErrors.description = 'Status description is required'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (validateForm()) {
-      onSubmit(isEdit ? { ...status, ...formData } : formData)
-    }
-  }
-
-  const availableTransitions = existingStatuses.filter(s => 
-    s.active && s.code !== formData.code
-  )
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal-container large">
-        <div className="modal-header">
-          <h3>{isEdit ? 'Edit Status' : 'Add New Status'}</h3>
-          <button className="close-button" onClick={onClose}>×</button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="modal-content">
-          <div className="form-grid">
-            <div className="form-group">
-              <label htmlFor="code">Status Code*</label>
-              <input
-                type="text"
-                id="code"
-                name="code"
-                value={formData.code}
-                onChange={handleChange}
-                placeholder="e.g., TESTING, REVIEW"
-                className={errors.code ? 'error' : ''}
-                disabled={isEdit}
-              />
-              {errors.code && <span className="error-text">{errors.code}</span>}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="label">Display Label*</label>
-              <input
-                type="text"
-                id="label"
-                name="label"
-                value={formData.label}
-                onChange={handleChange}
-                placeholder="e.g., Testing, Under Review"
-                className={errors.label ? 'error' : ''}
-              />
-              {errors.label && <span className="error-text">{errors.label}</span>}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="color">Status Color</label>
-              <div className="color-input-group">
-                <input
-                  type="color"
-                  id="color"
-                  name="color"
-                  value={formData.color}
-                  onChange={handleChange}
-                  className="color-picker"
-                />
-                <input
-                  type="text"
-                  value={formData.color}
-                  onChange={handleChange}
-                  name="color"
-                  className="color-hex"
-                  placeholder="#3498db"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="systemMapping">System Mapping*</label>
-              <select
-                id="systemMapping"
-                name="systemMapping"
-                value={formData.systemMapping}
-                onChange={handleChange}
-                required
-                className="form-select"
-              >
-                <option value="">Select system status...</option>
-                {systemStatuses.map(sysStatus => (
-                  <option key={sysStatus.code} value={sysStatus.code}>
-                    {sysStatus.label} ({sysStatus.code})
-                  </option>
-                ))}
-              </select>
-              <small className="form-hint">
-                Map this custom status to a system status for internal processing
-              </small>
-            </div>
-
-            <div className="form-group">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  name="isFinal"
-                  checked={formData.isFinal}
-                  onChange={handleChange}
-                />
-                <span className="checkmark"></span>
-                Final Status (No further transitions allowed)
-              </label>
-            </div>
-          </div>
-
-          <div className="form-group full-width">
-            <label htmlFor="description">Description*</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Describe when this status should be used..."
-              rows="3"
-              className={errors.description ? 'error' : ''}
-            />
-            {errors.description && <span className="error-text">{errors.description}</span>}
-          </div>
-
-          {!formData.isFinal && (
-            <div className="form-group full-width">
-              <label>Allowed Transitions</label>
-              <p className="form-hint">Select which statuses this status can transition to:</p>
-              <div className="transitions-grid">
-                {availableTransitions.map(transitionStatus => (
-                  <label key={transitionStatus.code} className="transition-option">
-                    <input
-                      type="checkbox"
-                      checked={formData.allowedTransitions.includes(transitionStatus.code)}
-                      onChange={() => handleTransitionToggle(transitionStatus.code)}
-                    />
-                    <span className="transition-label">
-                      <span 
-                        className="transition-color"
-                        style={{ backgroundColor: transitionStatus.color }}
-                      ></span>
-                      {transitionStatus.label}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="modal-actions">
-            <button type="button" className="btn-secondary" onClick={onClose}>
-              Cancel
-            </button>
-            <button type="submit" className="btn-primary">
-              {isEdit ? 'Update Status' : 'Create Status'}
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   )
