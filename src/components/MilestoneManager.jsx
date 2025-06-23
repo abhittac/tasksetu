@@ -354,7 +354,7 @@ export default function MilestoneManager() {
     </div>
   )
   )
-}
+
 
 function CreateMilestoneModal({ availableTasks, onSubmit, onClose, currentUser }) {
   const [formData, setFormData] = useState({
@@ -368,7 +368,7 @@ function CreateMilestoneModal({ availableTasks, onSubmit, onClose, currentUser }
     visibility: 'private',
     priority: 'medium',
     collaborators: []
-  })
+  });
 
   const [errors, setErrors] = useState({})
   const [availableCollaborators] = useState([
