@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react'
 import './App.css'
 import Sidebar from './components/Sidebar'
@@ -56,11 +55,19 @@ export default function App() {
     <div className="app-layout">
       <Sidebar currentView={currentView} onViewChange={setCurrentView} onCreateTask={() => setShowCreateTaskDrawer(true)} />
       <main className="main-content">
-        <div className="page-content">
-          {renderContent()}
-        </div>
+        {currentView === 'dashboard' && <Dashboard key="dashboard" />}
+        {currentView === 'all-tasks' && <AllTasks key="all-tasks" />}
+        {currentView === 'deadlines' && <Deadlines key="deadlines" />}
+        {currentView === 'recurring-tasks' && <RecurringTaskManager key="recurring-tasks" />}
+        {currentView === 'approvals' && <ApprovalManager key="approvals" />}
+        {currentView === 'milestones' && <MilestoneManager key="milestones" />}
+        {currentView === 'status-manager' && <StatusManager key="status-manager" />}
+        {currentView === 'priority-manager' && <PriorityManager key="priority-manager" />}
+        {currentView === 'analytics' && <TaskAnalytics key="analytics" />}
+        {currentView === 'activity' && <ActivityFeed key="activity" />}
+        {currentView === 'notifications' && <NotificationCenter key="notifications" />}
       </main>
-      
+
       {/* Slide-in Drawer */}
       {showCreateTaskDrawer && (
         <div className={`task-drawer ${showCreateTaskDrawer ? 'open' : ''}`}>
