@@ -5,7 +5,7 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
   const [formData, setFormData] = useState({
     code: status?.code || '',
     label: status?.label || '',
-    color: status?.color || '#3B82F6',
+    color: status?.color || '#667eea',
     systemMapping: status?.systemMapping || '',
     isFinal: status?.isFinal || false,
     allowedTransitions: status?.allowedTransitions || []
@@ -66,23 +66,33 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
 
           <div className="form-group">
             <label htmlFor="color">Status Color</label>
-            <div className="flex items-center space-x-3">
-              <input
-                type="color"
-                id="color"
-                name="color"
-                value={formData.color}
-                onChange={handleChange}
-                className="w-12 h-10 rounded border border-gray-300"
-              />
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <input
+                  type="color"
+                  id="color"
+                  name="color"
+                  value={formData.color}
+                  onChange={handleChange}
+                  className="w-16 h-16 rounded-2xl border-4 border-white shadow-lg cursor-pointer transition-transform duration-300 hover:scale-110"
+                />
+                <div className="absolute inset-0 rounded-2xl border-2 border-gray-200 pointer-events-none"></div>
+              </div>
               <input
                 type="text"
                 value={formData.color}
                 onChange={(e) => setFormData({...formData, color: e.target.value})}
                 className="form-input flex-1"
-                placeholder="#3B82F6"
+                placeholder="#667eea"
               />
+              <div 
+                className="w-8 h-8 rounded-full border-2 border-gray-200 shadow-sm"
+                style={{ backgroundColor: formData.color }}
+              ></div>
             </div>
+            <small className="form-hint">
+              Choose a color that represents this status visually
+            </small>
           </div>
 
           <div className="form-group">

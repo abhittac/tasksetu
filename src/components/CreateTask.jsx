@@ -33,61 +33,76 @@ export default function CreateTask({ onClose }) {
 
       {/* Task Type Selector */}
       <div className="card">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Task Type</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="card-header">
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Task Type</h3>
+          <p className="text-gray-600">Choose the type of task you want to create</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <button
             onClick={() => setTaskType('regular')}
-            className={`p-4 border-2 rounded-lg text-left transition-all ${
+            className={`p-6 border-2 rounded-2xl text-left transition-all duration-300 group ${
               taskType === 'regular' 
-                ? 'border-primary-500 bg-primary-50' 
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg transform scale-105' 
+                : 'border-gray-200 hover:border-blue-300 hover:shadow-md hover:transform hover:scale-102'
             }`}
           >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <span className="text-blue-600 text-lg">📋</span>
+            <div className="flex items-center space-x-4">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                taskType === 'regular' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'bg-blue-100 text-blue-600 group-hover:bg-blue-200'
+              }`}>
+                <span className="text-xl">📋</span>
               </div>
               <div>
-                <h4 className="font-medium text-gray-900">Regular Task</h4>
-                <p className="text-sm text-gray-500">Standard one-time task</p>
+                <h4 className="font-semibold text-gray-900 group-hover:text-blue-700">Regular Task</h4>
+                <p className="text-sm text-gray-500 group-hover:text-gray-600">Standard one-time task</p>
               </div>
             </div>
           </button>
 
           <button
             onClick={() => setTaskType('recurring')}
-            className={`p-4 border-2 rounded-lg text-left transition-all ${
+            className={`p-6 border-2 rounded-2xl text-left transition-all duration-300 group ${
               taskType === 'recurring' 
-                ? 'border-primary-500 bg-primary-50' 
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 shadow-lg transform scale-105' 
+                : 'border-gray-200 hover:border-green-300 hover:shadow-md hover:transform hover:scale-102'
             }`}
           >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <span className="text-green-600 text-lg">🔄</span>
+            <div className="flex items-center space-x-4">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                taskType === 'recurring' 
+                  ? 'bg-green-500 text-white' 
+                  : 'bg-green-100 text-green-600 group-hover:bg-green-200'
+              }`}>
+                <span className="text-xl">🔄</span>
               </div>
               <div>
-                <h4 className="font-medium text-gray-900">Recurring Task</h4>
-                <p className="text-sm text-gray-500">Repeats on schedule</p>
+                <h4 className="font-semibold text-gray-900 group-hover:text-green-700">Recurring Task</h4>
+                <p className="text-sm text-gray-500 group-hover:text-gray-600">Repeats on schedule</p>
               </div>
             </div>
           </button>
 
           <button
             onClick={() => setTaskType('milestone')}
-            className={`p-4 border-2 rounded-lg text-left transition-all ${
+            className={`p-6 border-2 rounded-2xl text-left transition-all duration-300 group ${
               taskType === 'milestone' 
-                ? 'border-primary-500 bg-primary-50' 
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-purple-500 bg-gradient-to-br from-purple-50 to-violet-50 shadow-lg transform scale-105' 
+                : 'border-gray-200 hover:border-purple-300 hover:shadow-md hover:transform hover:scale-102'
             }`}
           >
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <span className="text-purple-600 text-lg">🎯</span>
+            <div className="flex items-center space-x-4">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                taskType === 'milestone' 
+                  ? 'bg-purple-500 text-white' 
+                  : 'bg-purple-100 text-purple-600 group-hover:bg-purple-200'
+              }`}>
+                <span className="text-xl">🎯</span>
               </div>
               <div>
-                <h4 className="font-medium text-gray-900">Milestone</h4>
-                <p className="text-sm text-gray-500">Project checkpoint</p>
+                <h4 className="font-semibold text-gray-900 group-hover:text-purple-700">Milestone</h4>
+                <p className="text-sm text-gray-500 group-hover:text-gray-600">Project checkpoint</p>
               </div>
             </div>
           </button>
@@ -97,7 +112,10 @@ export default function CreateTask({ onClose }) {
       {/* Task Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Task Details</h3>
+          <div className="card-header">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Task Details</h3>
+            <p className="text-gray-600">Fill in the basic information for your task</p>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Title */}

@@ -281,22 +281,25 @@ export default function StatusManager() {
     : companyStatuses.filter(s => s.active)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Company Status Configuration</h1>
-          <p className="mt-2 text-lg text-gray-600">Configure custom task statuses for your organization</p>
+        <div className="relative">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Company Status Configuration
+          </h1>
+          <p className="mt-3 text-xl text-gray-600">Configure custom task statuses for your organization</p>
+          <div className="absolute -top-2 -left-2 w-20 h-20 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-20 animate-pulse"></div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6">
             <button 
-              className="btn btn-primary"
+              className="btn btn-primary relative overflow-hidden group"
               onClick={() => setShowAddForm(true)}
             >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 mr-2 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Add Custom Status
