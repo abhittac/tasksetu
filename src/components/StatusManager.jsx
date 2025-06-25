@@ -406,23 +406,33 @@ export default function StatusManager() {
         </div>
 
         {showAddForm && (
-          <StatusFormModal
-            onSubmit={handleAddStatus}
-            onClose={() => setShowAddForm(false)}
-            existingStatuses={companyStatuses}
-            systemStatuses={systemStatuses}
-          />
+          <div className="status-form-modal-overlay">
+            <div className="status-form-modal">
+              <h2>Create New Status</h2>
+              <StatusFormModal
+                onSubmit={handleAddStatus}
+                onClose={() => setShowAddForm(false)}
+                existingStatuses={companyStatuses}
+                systemStatuses={systemStatuses}
+              />
+            </div>
+          </div>
         )}
 
         {editingStatus && (
-          <StatusFormModal
-            status={editingStatus}
-            onSubmit={handleUpdateStatus}
-            onClose={() => setEditingStatus(null)}
-            existingStatuses={companyStatuses}
-            systemStatuses={systemStatuses}
-            isEdit={true}
-          />
+          <div className="status-form-modal-overlay">
+            <div className="status-form-modal">
+              <h2>Edit Status</h2>
+              <StatusFormModal
+                status={editingStatus}
+                onSubmit={handleUpdateStatus}
+                onClose={() => setEditingStatus(null)}
+                existingStatuses={companyStatuses}
+                systemStatuses={systemStatuses}
+                isEdit={true}
+              />
+            </div>
+          </div>
         )}
 
         {deleteModal && (

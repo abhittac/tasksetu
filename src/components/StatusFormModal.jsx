@@ -22,6 +22,7 @@ function StatusFormModal({ status, onSubmit, onClose, existingStatuses, systemSt
   const handleSubmit = (e) => {
     e.preventDefault()
     onSubmit(formData)
+    onClose()
   }
 
   return (
