@@ -462,7 +462,8 @@ function RecurringTaskForm({ onClose }) {
               <option value="design">Design</option>
               <option value="research">Research</option>
               <option value="marketing">Marketing</option>
-              <option value="support">Support</select>
+              <option value="support">Support</option>
+            </select>
           </div>
         </div>
       </div>
