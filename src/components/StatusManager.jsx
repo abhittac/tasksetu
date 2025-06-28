@@ -24,37 +24,37 @@ export default function StatusManager() {
   // System-defined statuses (Core Layer - cannot be deleted)
   const [systemStatuses] = useState([
     {
-      id: 'SYS_NOT_STARTED',
-      code: 'SYS_NOT_STARTED',
-      label: 'Not Started',
-      description: 'System status for tasks not yet started',
+      id: 'SYS_OPEN',
+      code: 'SYS_OPEN',
+      label: 'Open',
+      description: 'Task is created but not yet started',
       color: '#6c757d',
       isFinal: false,
       isSystem: true
     },
     {
-      id: 'SYS_IN_PROGRESS',
-      code: 'SYS_IN_PROGRESS',
+      id: 'SYS_INPROGRESS',
+      code: 'SYS_INPROGRESS',
       label: 'In Progress',
-      description: 'System status for active tasks',
+      description: 'Task is being worked on',
       color: '#3498db',
       isFinal: false,
       isSystem: true
     },
     {
-      id: 'SYS_ON_HOLD',
-      code: 'SYS_ON_HOLD',
+      id: 'SYS_ONHOLD',
+      code: 'SYS_ONHOLD',
       label: 'On Hold',
-      description: 'System status for paused tasks',
+      description: 'Task is paused',
       color: '#f39c12',
       isFinal: false,
       isSystem: true
     },
     {
-      id: 'SYS_COMPLETED',
-      code: 'SYS_COMPLETED',
+      id: 'SYS_DONE',
+      code: 'SYS_DONE',
       label: 'Completed',
-      description: 'System status for finished tasks',
+      description: 'Task has been completed',
       color: '#28a745',
       isFinal: true,
       isSystem: true
@@ -63,14 +63,14 @@ export default function StatusManager() {
       id: 'SYS_CANCELLED',
       code: 'SYS_CANCELLED',
       label: 'Cancelled',
-      description: 'System status for terminated tasks',
+      description: 'Task was terminated intentionally',
       color: '#dc3545',
       isFinal: true,
       isSystem: true
     }
   ])
 
-  // Company-defined statuses (Custom Layer)
+  // Company-defined statuses (Custom Layer) - Default Status Flow
   const [companyStatuses, setCompanyStatuses] = useState([
     {
       id: 1,
@@ -82,7 +82,7 @@ export default function StatusManager() {
       isDefault: true,
       active: true,
       order: 1,
-      systemMapping: 'SYS_NOT_STARTED',
+      systemMapping: 'SYS_OPEN',
       allowedTransitions: ['INPROGRESS', 'ONHOLD', 'CANCELLED'],
       isSystem: false
     },
@@ -96,7 +96,7 @@ export default function StatusManager() {
       isDefault: false,
       active: true,
       order: 2,
-      systemMapping: 'SYS_IN_PROGRESS',
+      systemMapping: 'SYS_INPROGRESS',
       allowedTransitions: ['ONHOLD', 'DONE', 'CANCELLED'],
       isSystem: false
     },
@@ -110,7 +110,7 @@ export default function StatusManager() {
       isDefault: false,
       active: true,
       order: 3,
-      systemMapping: 'SYS_ON_HOLD',
+      systemMapping: 'SYS_ONHOLD',
       allowedTransitions: ['INPROGRESS', 'CANCELLED'],
       isSystem: false
     },
@@ -124,7 +124,7 @@ export default function StatusManager() {
       isDefault: false,
       active: true,
       order: 4,
-      systemMapping: 'SYS_COMPLETED',
+      systemMapping: 'SYS_DONE',
       allowedTransitions: [],
       isSystem: false
     },
