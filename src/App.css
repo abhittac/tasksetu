@@ -1100,6 +1100,122 @@
       position: relative;
     }
 
+    /* Subtask Drawer Styles */
+    .subtask-drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      z-index: 40;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    .subtask-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100%;
+      background: white;
+      box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
+      z-index: 50;
+      transform: translateX(0);
+      transition: transform 0.3s ease-in-out;
+      overflow-y: auto;
+    }
+
+    .subtask-drawer.entering {
+      transform: translateX(100%);
+    }
+
+    .subtask-drawer.exiting {
+      transform: translateX(100%);
+    }
+
+    /* Subtask List Collapsed State */
+    .subtask-list-item.collapsed {
+      max-height: 60px;
+      overflow: hidden;
+    }
+
+    .subtask-list-item.expanded {
+      max-height: none;
+    }
+
+    .subtask-expand-toggle {
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .subtask-expand-toggle.expanded {
+      transform: rotate(90deg);
+    }
+
+    /* Keyboard shortcuts styling */
+    kbd {
+      background-color: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    /* User dropdown styles */
+    .user-dropdown {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .user-dropdown-item {
+      transition: background-color 0.15s ease-in-out;
+    }
+
+    .user-dropdown-item:hover {
+      background-color: #f9fafb;
+    }
+
+    .user-dropdown-item.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .user-dropdown-item.disabled:hover {
+      background-color: transparent;
+    }
+
+    /* Form validation styles */
+    .form-input:invalid {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+
+    .form-input:valid {
+      border-color: #10b981;
+    }
+
+    /* Notification styles for sub-task creation */
+    .notification-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      z-index: 60;
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .notification-toast.show {
+      transform: translateX(0);
+    }
+
     .subtask-indent::before {
       content: '';
       position: absolute;

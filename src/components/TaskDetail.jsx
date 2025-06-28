@@ -23,6 +23,7 @@ export default function TaskDetail({ taskId, onClose }) {
   const [showSnoozeModal, setShowSnoozeModal] = useState(false)
   const [showReassignModal, setShowReassignModal] = useState(false)
   const [showRiskModal, setShowRiskModal] = useState(false)
+  const [showCreateSubtaskDrawer, setShowCreateSubtaskDrawer] = useState(false)
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'assignee' })
 
   // Mock task data - in real app this would come from props or API
@@ -151,6 +152,23 @@ export default function TaskDetail({ taskId, onClose }) {
     }
   }
 
+  const handleCreateSubtask = (subtaskData) => {
+    const newSubtask = {
+      id: Date.now(),
+      ...subtaskData,
+      parentTaskId: task.id,
+      createdBy: currentUser.name,
+      createdAt: new Date().toISOString()
+    }
+    
+    const updatedSubtasks = [...(task.subtasks || []), newSubtask]
+    setTask({ ...task, subtasks: updatedSubtasks })
+    setShowCreateSubtaskDrawer(false)
+    
+    // Simulate notification to assignee
+    console.log(`Notification sent to ${subtaskData.assignee}: New sub-task "${subtaskData.title}" assigned to you`)
+  }
+
   const handleExportTask = () => {
     console.log('Exporting task:', task)
   }
@@ -246,7 +264,7 @@ export default function TaskDetail({ taskId, onClose }) {
       <div className="quick-actions-bar">
         <button 
           className="action-btn primary"
-          onClick={() => console.log('Create subtask')}
+          onClick={() => setShowCreateSubtaskDrawer(true)}
           disabled={!permissions.canEdit}
         >
           🟢 Create Subtask
@@ -348,7 +366,7 @@ export default function TaskDetail({ taskId, onClose }) {
           {activeTab === 'subtasks' && (
             <SubtasksPanel 
               subtasks={task.subtasks} 
-              onCreateSubtask={() => console.log('Create subtask')}
+              onCreateSubtask={() => setShowCreateSubtaskDrawer(true)}
               parentTask={task}
               currentUser={currentUser}
             />
@@ -390,6 +408,15 @@ export default function TaskDetail({ taskId, onClose }) {
           task={task}
           onSubmit={handleMarkRisk}
           onClose={() => setShowRiskModal(false)}
+        />
+      )}
+
+      {showCreateSubtaskDrawer && (
+        <SubtaskDrawer
+          parentTask={task}
+          currentUser={currentUser}
+          onSubmit={handleCreateSubtask}
+          onClose={() => setShowCreateSubtaskDrawer(false)}
         />
       )}
     </div>
@@ -2246,6 +2273,312 @@ function ReassignModal({ task, onSubmit, onClose }) {
         </form>
       </div>
     </div>
+  )
+}
+
+function SubtaskDrawer({ parentTask, currentUser, onSubmit, onClose }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    assignee: currentUser.name,
+    assigneeId: currentUser.id,
+    priority: 'medium',
+    dueDate: '',
+    status: 'pending',
+    visibility: parentTask.visibility || 'private',
+    description: ''
+  })
+  
+  const [searchTerm, setSearchTerm] = useState('')
+  const [showUserDropdown, setShowUserDropdown] = useState(false)
+
+  // Calculate due date based on priority
+  const calculateDueDate = (priority) => {
+    const today = new Date()
+    const priorityDays = {
+      'low': 30,
+      'medium': 14,
+      'high': 7,
+      'critical': 2,
+      'urgent': 2
+    }
+    const daysToAdd = priorityDays[priority] || 14
+    const dueDate = new Date(today.getTime() + (daysToAdd * 24 * 60 * 60 * 1000))
+    return dueDate.toISOString().split('T')[0]
+  }
+
+  // Auto-suggest due date when priority changes
+  React.useEffect(() => {
+    if (formData.priority) {
+      setFormData(prev => ({
+        ...prev,
+        dueDate: calculateDueDate(formData.priority)
+      }))
+    }
+  }, [formData.priority])
+
+  // Team members for assignment
+  const teamMembers = [
+    { id: 1, name: 'Current User', avatar: 'CU', role: 'assignee' },
+    { id: 2, name: 'John Smith', avatar: 'JS', role: 'team' },
+    { id: 3, name: 'Sarah Wilson', avatar: 'SW', role: 'team' },
+    { id: 4, name: 'Mike Johnson', avatar: 'MJ', role: 'team' },
+    { id: 5, name: 'Emily Davis', avatar: 'ED', role: 'team' }
+  ]
+
+  const filteredMembers = teamMembers.filter(member =>
+    member.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (formData.title.trim()) {
+      onSubmit(formData)
+    }
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      if (formData.title.trim()) {
+        handleSubmit(e)
+      }
+    } else if (e.key === 'Escape') {
+      onClose()
+    } else if (e.key === 'Tab' && e.target.name === 'title') {
+      // Move to assignee field
+      e.preventDefault()
+      setShowUserDropdown(true)
+    }
+  }
+
+  const canAssignToOthers = currentUser.role === 'admin' || currentUser.role === 'team'
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-30 z-40 transition-opacity duration-300"
+        onClick={onClose}
+      />
+      
+      {/* Drawer */}
+      <div className="fixed top-0 right-0 h-full w-1/2 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto">
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                <span className="text-white text-lg">📝</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Add Sub-task</h2>
+                <p className="text-sm text-gray-600">Parent: {parentTask.title}</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Form Content */}
+          <div className="flex-1 p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Sub-task Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sub-task Name *
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  onKeyDown={handleKeyPress}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Enter sub-task name..."
+                  maxLength={100}
+                  autoFocus
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">{formData.title.length}/100 characters</p>
+              </div>
+
+              {/* Assignee Search Dropdown */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Assign to *
+                </label>
+                <div className="relative">
+                  <div 
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg cursor-pointer flex items-center justify-between hover:border-blue-400 transition-colors"
+                    onClick={() => setShowUserDropdown(!showUserDropdown)}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-medium text-gray-600">
+                          {teamMembers.find(m => m.id === formData.assigneeId)?.avatar || 'U'}
+                        </span>
+                      </div>
+                      <span className="text-gray-900">{formData.assignee}</span>
+                    </div>
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+
+                  {showUserDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                      <div className="p-3 border-b border-gray-200">
+                        <input
+                          type="text"
+                          placeholder="Search users..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+                      <div className="py-1">
+                        {filteredMembers.map(member => (
+                          <button
+                            key={member.id}
+                            type="button"
+                            disabled={!canAssignToOthers && member.id !== currentUser.id}
+                            className={`w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center space-x-3 transition-colors ${
+                              !canAssignToOthers && member.id !== currentUser.id ? 'opacity-50 cursor-not-allowed' : ''
+                            } ${formData.assigneeId === member.id ? 'bg-blue-50 text-blue-700' : ''}`}
+                            onClick={() => {
+                              if (canAssignToOthers || member.id === currentUser.id) {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  assignee: member.name,
+                                  assigneeId: member.id
+                                }))
+                                setShowUserDropdown(false)
+                                setSearchTerm('')
+                              }
+                            }}
+                          >
+                            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                              <span className="text-xs font-medium text-gray-600">{member.avatar}</span>
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-medium">{member.name}</div>
+                              {member.id === currentUser.id && (
+                                <div className="text-xs text-gray-500">You</div>
+                              )}
+                            </div>
+                            {!canAssignToOthers && member.id !== currentUser.id && (
+                              <span className="text-xs text-gray-400">No permission</span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {!canAssignToOthers && (
+                  <p className="text-xs text-orange-600 mt-1">
+                    You can only assign sub-tasks to yourself. Contact admin for team assignment permissions.
+                  </p>
+                )}
+              </div>
+
+              {/* Priority */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Priority (optional)
+                </label>
+                <select
+                  value={formData.priority}
+                  onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                >
+                  <option value="low">Low (30 days)</option>
+                  <option value="medium">Medium (14 days)</option>
+                  <option value="high">High (7 days)</option>
+                  <option value="critical">Critical (2 days)</option>
+                  <option value="urgent">Urgent (2 days)</option>
+                </select>
+              </div>
+
+              {/* Due Date */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Due Date
+                  <span className="text-xs text-blue-600 ml-2">(Auto-suggested from priority)</span>
+                </label>
+                <input
+                  type="date"
+                  value={formData.dueDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Due date automatically calculated based on priority. You can override this date.
+                </p>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description (optional)
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  onKeyDown={handleKeyPress}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  placeholder="Add additional details..."
+                  rows="3"
+                  maxLength={500}
+                />
+                <p className="text-xs text-gray-500 mt-1">{formData.description.length}/500 characters</p>
+              </div>
+
+              {/* Inheritance Info */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h4 className="text-sm font-medium text-blue-800 mb-2">Inherited from Parent Task</h4>
+                <div className="text-xs text-blue-700 space-y-1">
+                  <div>• Visibility: {parentTask.visibility || 'Private'}</div>
+                  <div>• Parent Due Date: {parentTask.dueDate}</div>
+                  <div>• Category: {parentTask.category || 'None'}</div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          {/* Footer Actions */}
+          <div className="border-t border-gray-200 p-6 bg-gray-50">
+            <div className="flex space-x-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={!formData.title.trim()}
+                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium"
+              >
+                Create Sub-task
+              </button>
+            </div>
+            <div className="mt-3 text-center">
+              <p className="text-xs text-gray-500">
+                Press <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Enter</kbd> to create • <kbd className="px-1 py-0.5 bg-gray-200 rounded text-xs">Esc</kbd> to cancel
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
 
