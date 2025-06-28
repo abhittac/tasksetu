@@ -267,7 +267,7 @@ export default function TaskDetail({ taskId, onClose }) {
           onClick={() => setShowCreateSubtaskDrawer(true)}
           disabled={!permissions.canEdit}
         >
-          🟢 Create Subtask
+          ➕ Add Sub-task
         </button>
 
         <button 
