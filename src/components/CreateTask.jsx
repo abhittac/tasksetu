@@ -1,32 +1,89 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export default function CreateTask({ onClose }) {
-  const [taskType, setTaskType] = useState('regular')
+  // Simulate user context - in real app this would come from auth/context
+  const [userType] = useState('org') // Change to 'solo' to test solo user behavior
+  const [currentUser] = useState({ id: 'user1', name: 'John Doe' })
+
   const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    assignee: '',
+    taskName: '',
+    assignedTo: userType === 'solo' ? currentUser.id : '',
     priority: 'medium',
-    status: 'todo',
     dueDate: '',
-    category: '',
-    tags: '',
-    attachments: []
-  })
-  const [moreOptionsData, setMoreOptionsData] = useState({
-    referenceProcess: '',
-    customForm: '',
-    dependencies: [],
-    taskTypeAdvanced: 'simple'
+    visibility: userType === 'solo' ? 'private' : 'public'
   })
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log('Creating task:', formData)
-    // Handle task creation
-    if (onClose) onClose()
+  // More options (only for org users)
+  const [moreOptionsData, setMoreOptionsData] = useState({
+    referenceProcess: '',
+    formTemplate: '',
+    dependency: ''
+  })
+
+  // Sample data - in real app this would come from API
+  const orgUsers = [
+    { id: 'user1', name: 'John Doe' },
+    { id: 'user2', name: 'Jane Smith' },
+    { id: 'user3', name: 'Mike Johnson' },
+    { id: 'user4', name: 'Sarah Wilson' }
+  ]
+
+  const referenceProcesses = [
+    { id: 'proc1', name: 'Employee Onboarding' },
+    { id: 'proc2', name: 'Customer Support Workflow' },
+    { id: 'proc3', name: 'Bug Report Process' },
+    { id: 'proc4', name: 'Feature Request Process' }
+  ]
+
+  const formTemplates = [
+    { id: 'form1', name: 'New Hire Details' },
+    { id: 'form2', name: 'Bug Report Template' },
+    { id: 'form3', name: 'Customer Feedback Form' },
+    { id: 'form4', name: 'Project Requirements' }
+  ]
+
+  const existingTasks = [
+    { id: 'task1', name: 'Setup Development Environment' },
+    { id: 'task2', name: 'Design Database Schema' },
+    { id: 'task3', name: 'Create API Endpoints' },
+    { id: 'task4', name: 'Write Documentation' }
+  ]
+
+  // Calculate due date based on priority
+  const calculateDueDate = (priority) => {
+    const today = new Date()
+    let daysToAdd = 30 // default
+
+    if (userType === 'solo') {
+      // Solo user: Low priority or unchanged = +30 days
+      if (priority === 'low' || priority === 'medium') {
+        daysToAdd = 30
+      } else if (priority === 'high') {
+        daysToAdd = 7
+      }
+    } else {
+      // Org user: High priority = +7 days
+      if (priority === 'high') {
+        daysToAdd = 7
+      } else {
+        daysToAdd = 30
+      }
+    }
+
+    const dueDate = new Date(today)
+    dueDate.setDate(today.getDate() + daysToAdd)
+    return dueDate.toISOString().split('T')[0]
   }
+
+  // Auto-fill due date when priority changes
+  useEffect(() => {
+    const newDueDate = calculateDueDate(formData.priority)
+    setFormData(prev => ({
+      ...prev,
+      dueDate: newDueDate
+    }))
+  }, [formData.priority, userType])
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -42,88 +99,45 @@ export default function CreateTask({ onClose }) {
     }))
   }
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    const taskData = {
+      ...formData,
+      ...(userType === 'org' && showMoreOptions ? moreOptionsData : {}),
+      userType,
+      createdAt: new Date().toISOString(),
+      createdBy: currentUser.name
+    }
+
+    console.log('Task Creation Data:', taskData)
+
+    // Handle task creation logic here
+    if (onClose) onClose()
+  }
+
   return (
     <div className="space-y-6">
-
-      {/* Task Type Selector */}
+      {/* User Type Indicator */}
       <div className="card">
-        <div className="card-header">
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Task Type</h3>
-          <p className="text-gray-600">Choose the type of task you want to create</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <button
-            onClick={() => setTaskType('regular')}
-            className={`p-3 border-2 rounded-xl text-left transition-all duration-300 group ${
-              taskType === 'regular' 
-                ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-md transform scale-102' 
-                : 'border-gray-200 hover:border-blue-300 hover:shadow-sm hover:transform hover:scale-101'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                taskType === 'regular' 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-blue-100 text-blue-600 group-hover:bg-blue-200'
-              }`}>
-                <span className="text-sm">📋</span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-semibold text-gray-900 group-hover:text-blue-700">Regular Task</h4>
-                <p className="text-xs text-gray-500 group-hover:text-gray-600 truncate">Standard one-time task</p>
-              </div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => setTaskType('recurring')}
-            className={`p-3 border-2 rounded-xl text-left transition-all duration-300 group ${
-              taskType === 'recurring' 
-                ? 'border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 shadow-md transform scale-102' 
-                : 'border-gray-200 hover:border-green-300 hover:shadow-sm hover:transform hover:scale-101'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                taskType === 'recurring' 
-                  ? 'bg-green-500 text-white' 
-                  : 'bg-green-100 text-green-600 group-hover:bg-green-200'
-              }`}>
-                <span className="text-sm">🔄</span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-semibold text-gray-900 group-hover:text-green-700">Recurring Task</h4>
-                <p className="text-xs text-gray-500 group-hover:text-gray-600 truncate">Repeats on schedule</p>
-              </div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => setTaskType('milestone')}
-            className={`p-3 border-2 rounded-xl text-left transition-all duration-300 group ${
-              taskType === 'milestone' 
-                ? 'border-purple-500 bg-gradient-to-br from-purple-50 to-violet-50 shadow-md transform scale-102' 
-                : 'border-gray-200 hover:border-purple-300 hover:shadow-sm hover:transform hover:scale-101'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                taskType === 'milestone' 
-                  ? 'bg-purple-500 text-white' 
-                  : 'bg-purple-100 text-purple-600 group-hover:bg-purple-200'
-              }`}>
-                <span className="text-sm">🎯</span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-semibold text-gray-900 group-hover:text-purple-700">Milestone</h4>
-                <p className="text-xs text-gray-500 group-hover:text-gray-600 truncate">Project checkpoint</p>
-              </div>
-            </div>
-          </button>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Create New Task</h2>
+            <p className="text-gray-600 mt-1">
+              Creating as: <span className="font-semibold capitalize">{userType} User</span>
+            </p>
+          </div>
+          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+            userType === 'solo' 
+              ? 'bg-blue-100 text-blue-800' 
+              : 'bg-green-100 text-green-800'
+          }`}>
+            {userType === 'solo' ? '👤 Solo Mode' : '🏢 Organization Mode'}
+          </div>
         </div>
       </div>
 
-      {/* Task Form */}
+      {/* Main Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="card">
           <div className="card-header">
@@ -132,57 +146,59 @@ export default function CreateTask({ onClose }) {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Title */}
+            {/* Task Name */}
             <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Task Title *
+              <label className="form-label">
+                Task Name *
               </label>
               <input
                 type="text"
-                value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
+                value={formData.taskName}
+                onChange={(e) => handleInputChange('taskName', e.target.value)}
                 className="form-input"
-                placeholder="Enter task title..."
+                placeholder="Enter task name..."
                 required
               />
             </div>
 
-            {/* Description */}
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                className="form-textarea"
-                placeholder="Describe the task..."
-                rows={4}
-              />
-            </div>
-
-            {/* Assignee */}
+            {/* Assigned To */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Assign to
+              <label className="form-label">
+                Assigned To *
               </label>
-              <select
-                value={formData.assignee}
-                onChange={(e) => handleInputChange('assignee', e.target.value)}
-                className="form-select"
-              >
-                <option value="">Select assignee...</option>
-                <option value="john">John Doe</option>
-                <option value="jane">Jane Smith</option>
-                <option value="mike">Mike Johnson</option>
-                <option value="sarah">Sarah Wilson</option>
-              </select>
+              {userType === 'solo' ? (
+                <input
+                  type="text"
+                  value={currentUser.name}
+                  className="form-input bg-gray-100 cursor-not-allowed"
+                  disabled
+                />
+              ) : (
+                <select
+                  value={formData.assignedTo}
+                  onChange={(e) => handleInputChange('assignedTo', e.target.value)}
+                  className="form-select"
+                  required
+                >
+                  <option value="">Select assignee...</option>
+                  {orgUsers.map(user => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+              {userType === 'solo' && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Auto-assigned to you in solo mode
+                </p>
+              )}
             </div>
 
             {/* Priority */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Priority
+              <label className="form-label">
+                Priority *
               </label>
               <select
                 value={formData.priority}
@@ -192,166 +208,144 @@ export default function CreateTask({ onClose }) {
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
-                <option value="urgent">Urgent</option>
               </select>
-            </div>
-
-            {/* Status */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Initial Status
-              </label>
-              <select
-                value={formData.status}
-                onChange={(e) => handleInputChange('status', e.target.value)}
-                className="form-select"
-              >
-                <option value="todo">To Do</option>
-                <option value="progress">In Progress</option>
-                <option value="review">In Review</option>
-              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                {userType === 'solo' 
+                  ? 'Low/Medium = 30 days, High = 7 days'
+                  : 'High priority = 7 days, others = 30 days'
+                }
+              </p>
             </div>
 
             {/* Due Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Due Date
+              <label className="form-label">
+                Due Date *
               </label>
               <input
                 type="date"
                 value={formData.dueDate}
                 onChange={(e) => handleInputChange('dueDate', e.target.value)}
                 className="form-input"
+                required
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Auto-calculated based on priority
+              </p>
             </div>
 
-            {/* Category */}
+            {/* Visibility */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category
+              <label className="form-label">
+                Visibility *
               </label>
               <select
-                value={formData.category}
-                onChange={(e) => handleInputChange('category', e.target.value)}
+                value={formData.visibility}
+                onChange={(e) => handleInputChange('visibility', e.target.value)}
                 className="form-select"
               >
-                <option value="">Select category...</option>
-                <option value="development">Development</option>
-                <option value="design">Design</option>
-                <option value="research">Research</option>
-                <option value="marketing">Marketing</option>
-                <option value="support">Support</option>
+                <option value="public">Public</option>
+                <option value="private">Private</option>
               </select>
-            </div>
-
-            {/* Tags */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tags
-              </label>
-              <input
-                type="text"
-                value={formData.tags}
-                onChange={(e) => handleInputChange('tags', e.target.value)}
-                className="form-input"
-                placeholder="Enter tags separated by commas..."
-              />
-              <p className="mt-1 text-xs text-gray-500">Separate multiple tags with commas</p>
+              <p className="text-xs text-gray-500 mt-1">
+                {userType === 'solo' 
+                  ? 'Defaults to private for solo users'
+                  : 'Choose who can see this task'
+                }
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Recurring Options (if recurring task selected) */}
-        {taskType === 'recurring' && (
+        {/* More Options - Only for Org Users */}
+        {userType === 'org' && (
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Recurring Settings</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Frequency
-                </label>
-                <select className="form-select">
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="quarterly">Quarterly</option>
-                </select>
+                <h3 className="text-lg font-semibold text-gray-900">More Options</h3>
+                <p className="text-sm text-gray-600">Additional configuration for organization tasks</p>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Start Date
-                </label>
-                <input type="date" className="form-input" />
-              </div>
+              <button
+                type="button"
+                onClick={() => setShowMoreOptions(!showMoreOptions)}
+                className="btn btn-secondary flex items-center space-x-2"
+              >
+                <span>{showMoreOptions ? '🔼' : '🔽'}</span>
+                <span>{showMoreOptions ? 'Hide' : 'Show'} Options</span>
+              </button>
             </div>
+
+            {showMoreOptions && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4 border-t border-gray-200">
+                {/* Reference Process */}
+                <div>
+                  <label className="form-label">
+                    Reference Process
+                  </label>
+                  <select
+                    value={moreOptionsData.referenceProcess}
+                    onChange={(e) => handleMoreOptionsChange('referenceProcess', e.target.value)}
+                    className="form-select"
+                  >
+                    <option value="">Select process...</option>
+                    {referenceProcesses.map(process => (
+                      <option key={process.id} value={process.id}>
+                        {process.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Link to an existing workflow
+                  </p>
+                </div>
+
+                {/* Form Template */}
+                <div>
+                  <label className="form-label">
+                    Form Template
+                  </label>
+                  <select
+                    value={moreOptionsData.formTemplate}
+                    onChange={(e) => handleMoreOptionsChange('formTemplate', e.target.value)}
+                    className="form-select"
+                  >
+                    <option value="">Select template...</option>
+                    {formTemplates.map(template => (
+                      <option key={template.id} value={template.id}>
+                        {template.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Use a predefined form
+                  </p>
+                </div>
+
+                {/* Dependency */}
+                <div>
+                  <label className="form-label">
+                    Dependency
+                  </label>
+                  <select
+                    value={moreOptionsData.dependency}
+                    onChange={(e) => handleMoreOptionsChange('dependency', e.target.value)}
+                    className="form-select"
+                  >
+                    <option value="">Select dependency...</option>
+                    {existingTasks.map(task => (
+                      <option key={task.id} value={task.id}>
+                        {task.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Task that must complete first
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
-
-        {/* Milestone Options (if milestone selected) */}
-        {taskType === 'milestone' && (
-          <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Milestone Settings</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Project
-                </label>
-                <select className="form-select">
-                  <option value="">Select project...</option>
-                  <option value="website">Website Redesign</option>
-                  <option value="mobile">Mobile App</option>
-                  <option value="api">API Development</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Milestone Type
-                </label>
-                <select className="form-select">
-                  <option value="checkpoint">Checkpoint</option>
-                  <option value="deliverable">Deliverable</option>
-                  <option value="review">Review</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* File Attachments */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Attachments</h3>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <div className="mt-4">
-              <label className="cursor-pointer">
-                <span className="text-primary-600 hover:text-primary-500">Upload files</span>
-                <input type="file" className="sr-only" multiple />
-              </label>
-              <p className="text-gray-500"> or drag and drop</p>
-            </div>
-            <p className="text-xs text-gray-500 mt-2">PNG, JPG, PDF up to 10MB</p>
-          </div>
-        </div>
-
-        {/* More Options Button */}
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Advanced Options</h3>
-              <p className="text-sm text-gray-600">Configure additional task settings</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowMoreOptions(true)}
-              className="btn btn-secondary flex items-center space-x-2"
-            >
-              <span>⚙️</span>
-              <span>More Options</span>
-            </button>
-          </div>
-        </div>
 
         {/* Form Actions */}
         <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
@@ -367,220 +361,23 @@ export default function CreateTask({ onClose }) {
         </div>
       </form>
 
-      {/* More Options Modal */}
-      {showMoreOptions && (
-        <MoreOptionsModal
-          data={moreOptionsData}
-          onChange={handleMoreOptionsChange}
-          onClose={() => setShowMoreOptions(false)}
-          onSave={() => setShowMoreOptions(false)}
-        />
-      )}
-    </div>
-  )
-}
-
-// More Options Modal Component
-function MoreOptionsModal({ data, onChange, onClose, onSave }) {
-  const [searchTerms, setSearchTerms] = useState({
-    process: '',
-    form: '',
-    dependencies: ''
-  })
-
-  // Sample data - in real app, these would come from API
-  const referenceProcesses = [
-    { id: 'sop001', name: 'Customer Onboarding SOP' },
-    { id: 'sop002', name: 'Bug Report Workflow' },
-    { id: 'sop003', name: 'Feature Request Process' },
-    { id: 'sop004', name: 'Quality Assurance Checklist' },
-    { id: 'sop005', name: 'Deployment Process' }
-  ]
-
-  const customForms = [
-    { id: 'form001', name: 'Bug Report Form' },
-    { id: 'form002', name: 'Feature Request Form' },
-    { id: 'form003', name: 'Customer Feedback Form' },
-    { id: 'form004', name: 'Project Evaluation Form' },
-    { id: 'form005', name: 'Performance Review Form' }
-  ]
-
-  const existingTasks = [
-    { id: 'task001', name: 'Setup Development Environment' },
-    { id: 'task002', name: 'Design Database Schema' },
-    { id: 'task003', name: 'Create API Endpoints' },
-    { id: 'task004', name: 'Write Unit Tests' },
-    { id: 'task005', name: 'User Interface Design' }
-  ]
-
-  const filteredProcesses = referenceProcesses.filter(process =>
-    process.name.toLowerCase().includes(searchTerms.process.toLowerCase())
-  )
-
-  const filteredForms = customForms.filter(form =>
-    form.name.toLowerCase().includes(searchTerms.form.toLowerCase())
-  )
-
-  const filteredTasks = existingTasks.filter(task =>
-    task.name.toLowerCase().includes(searchTerms.dependencies.toLowerCase())
-  )
-
-  const handleDependencyToggle = (taskId) => {
-    const currentDeps = data.dependencies || []
-    const newDeps = currentDeps.includes(taskId)
-      ? currentDeps.filter(id => id !== taskId)
-      : [...currentDeps, taskId]
-    onChange('dependencies', newDeps)
-  }
-
-  const handleSave = () => {
-    // In real app, would validate and save data
-    onSave()
-  }
-
-  return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm  bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">More Options</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-xl font-bold w-8 h-8 flex items-center justify-center"
-            >
-              ×
-            </button>
-          </div>
-          <p className="text-gray-600 mt-1">Configure advanced task settings</p>
-        </div>
-
-        <div className="p-6 space-y-6">
-          {/* Reference Process */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Reference Process
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search for a process..."
-                value={searchTerms.process}
-                onChange={(e) => setSearchTerms(prev => ({ ...prev, process: e.target.value }))}
-                className="form-input mb-2"
-              />
-              <select
-                value={data.referenceProcess}
-                onChange={(e) => onChange('referenceProcess', e.target.value)}
-                className="form-select"
-              >
-                <option value="">Select a process...</option>
-                {filteredProcesses.map(process => (
-                  <option key={process.id} value={process.id}>
-                    {process.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <p className="text-xs text-gray-500 mt-1">Link this task to an existing process (e.g., SOP or workflow)</p>
-          </div>
-
-          {/* Custom Form */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Custom Form
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search for a form..."
-                value={searchTerms.form}
-                onChange={(e) => setSearchTerms(prev => ({ ...prev, form: e.target.value }))}
-                className="form-input mb-2"
-              />
-              <select
-                value={data.customForm}
-                onChange={(e) => onChange('customForm', e.target.value)}
-                className="form-select"
-              >
-                <option value="">Select a form...</option>
-                {filteredForms.map(form => (
-                  <option key={form.id} value={form.id}>
-                    {form.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <p className="text-xs text-gray-500 mt-1">Choose a predefined form to collect data for this task</p>
-          </div>
-
-          {/* Dependencies */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Dependencies
-            </label>
-            <input
-              type="text"
-              placeholder="Search for tasks..."
-              value={searchTerms.dependencies}
-              onChange={(e) => setSearchTerms(prev => ({ ...prev, dependencies: e.target.value }))}
-              className="form-input mb-2"
-            />
-            <div className="border border-gray-300 rounded-lg max-h-40 overflow-y-auto">
-              {filteredTasks.map(task => (
-                <label key={task.id} className="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0">
-                  <input
-                    type="checkbox"
-                    checked={data.dependencies?.includes(task.id) || false}
-                    onChange={() => handleDependencyToggle(task.id)}
-                    className="mr-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-900">{task.name}</span>
-                </label>
-              ))}
-              {filteredTasks.length === 0 && (
-                <div className="p-3 text-sm text-gray-500 text-center">
-                  No tasks found
-                </div>
-              )}
-            </div>
-            <p className="text-xs text-gray-500 mt-1">Select existing tasks that must be completed before this one starts</p>
-          </div>
-
-          {/* Task Type */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Task Type *
-            </label>
-            <select
-              value={data.taskTypeAdvanced}
-              onChange={(e) => onChange('taskTypeAdvanced', e.target.value)}
-              className="form-select"
-              required
-            >
-              <option value="simple">Simple</option>
-              <option value="recurring">Recurring</option>
-              <option value="approval">Approval</option>
-            </select>
-            <p className="text-xs text-gray-500 mt-1">Determines the task behavior</p>
-          </div>
-        </div>
-
-        {/* Modal Actions */}
-        <div className="p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3 sm:justify-end">
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn btn-secondary"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            className="btn btn-primary"
-          >
-            Save Options
-          </button>
+      {/* Debug Info */}
+      <div className="card bg-gray-50">
+        <h4 className="text-sm font-semibold text-gray-700 mb-2">Debug Info</h4>
+        <div className="text-xs text-gray-600 space-y-1">
+          <p><strong>User Type:</strong> {userType}</p>
+          <p><strong>Current Form Data:</strong></p>
+          <pre className="text-xs bg-white p-2 rounded border overflow-x-auto">
+            {JSON.stringify(formData, null, 2)}
+          </pre>
+          {userType === 'org' && showMoreOptions && (
+            <>
+              <p><strong>More Options Data:</strong></p>
+              <pre className="text-xs bg-white p-2 rounded border overflow-x-auto">
+                {JSON.stringify(moreOptionsData, null, 2)}
+              </pre>
+            </>
+          )}
         </div>
       </div>
     </div>
