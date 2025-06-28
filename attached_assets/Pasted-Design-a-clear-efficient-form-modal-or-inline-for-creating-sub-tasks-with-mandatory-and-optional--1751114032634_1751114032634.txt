@@ -1,0 +1,62 @@
+Design a clear, efficient form (modal or inline) for creating sub-tasks with mandatory and optional fields, ensuring consistency with the parent task while allowing customization.
+
+Core Requirements
+1. Form Fields & Rules
+Field	Mandatory?	Default Behavior & Rules
+Sub-task Name	Yes (M)	- Default text: "New Sub-Task"
+- Max 60 chars.
+- Inline edit on click (if in list view).
+Assigned To	Yes (M)	- Dropdown: Searchable, single-select.
+- Default: Current user ("Self").
+- Avatar + name display.
+Due Date	Yes (M)	- Auto-filled: Matches parent task’s due date.
+- Priority override: If priority is set (e.g., "Critical" → due date adjusts to sooner).
+- Manual edit allowed (date picker).
+Priority	No (O)	- Default: "Low".
+- Options: Low, Medium, High, Critical (color-coded).
+- Affects due date logic if not manually set.
+Status	Yes (M)	- Default: "To Do".
+- Options: To Do, In Progress, Blocked, Completed (with icons/colors).
+- Visual badge in list view.
+Visibility	Yes (M)	- Default: Inherits parent’s visibility (e.g., "Company-wide").
+- Optional override (dropdown).
+Description	No (O)	- Rich text editor (bold, bullets, links).
+- Collapsible in list view.
+Attachments	No (O)	- Drag-and-drop zone + file upload button.
+- Thumbnail previews for images/docs.
+2. Interaction & UI
+Modal (if separate):
+
+Title: "Add Sub-task" with parent task name as context (e.g., "Under: [Parent Task]").
+
+Save/Cancel buttons (primary action sticky to bottom).
+
+Inline (if in-list):
+
+Auto-focus on "Sub-task Name" field.
+
+Save on blur or explicit "✓" button.
+
+Validation:
+
+Highlight empty mandatory fields (e.g., red outline for "Sub-task Name" if blank).
+
+3. Conditional Logic
+Due Date & Priority:
+
+If user manually edits due date, priority becomes "—" (custom).
+
+If priority is changed → due date adjusts dynamically (e.g., "High" → +1 day from today).
+
+4. Empty States & Helpers
+Placeholder text:
+
+Description: "Add internal notes or instructions…"
+
+Attachments: "Drag files here or click to upload."
+
+Tooltips:
+
+Explain "Visibility" inheritance.
+
+Clarify priority/due date relationship.
