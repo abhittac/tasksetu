@@ -22,6 +22,7 @@ export default function AllTasks() {
       dueDate: "2024-01-25",
       category: "Development",
       progress: 60,
+      subtaskCount: 3,
     },
     {
       id: 2,
@@ -32,6 +33,7 @@ export default function AllTasks() {
       dueDate: "2024-01-30",
       category: "Design",
       progress: 0,
+      subtaskCount: 0,
     },
     {
       id: 3,
@@ -42,6 +44,7 @@ export default function AllTasks() {
       dueDate: "2024-01-20",
       category: "Development",
       progress: 100,
+      subtaskCount: 2,
     },
     {
       id: 4,
@@ -52,6 +55,7 @@ export default function AllTasks() {
       dueDate: "2024-01-28",
       category: "Research",
       progress: 80,
+      subtaskCount: 5,
     },
   ]);
 
@@ -285,26 +289,39 @@ export default function AllTasks() {
                   <td className="px-6 py-4">
                     <div>
                       <div className="font-medium text-gray-900">
-                        {editingTaskId === task.id ? (
-                          <input
-                            type="text"
-                            value={editingTitle}
-                            onChange={(e) => setEditingTitle(e.target.value)}
-                            onBlur={() => handleTitleSave(task.id)}
-                            onKeyDown={(e) => handleTitleKeyDown(e, task.id)}
-                            className="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all duration-200"
-                            autoFocus
-                            maxLength={100}
-                          />
-                        ) : (
-                          <span
-                            className="cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-all duration-200 inline-block w-full editable-task-title"
-                            onClick={() => handleTaskTitleClick(task)}
-                            title="Click to edit"
-                          >
-                            {task.title}
-                          </span>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {editingTaskId === task.id ? (
+                            <input
+                              type="text"
+                              value={editingTitle}
+                              onChange={(e) => setEditingTitle(e.target.value)}
+                              onBlur={() => handleTitleSave(task.id)}
+                              onKeyDown={(e) => handleTitleKeyDown(e, task.id)}
+                              className="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all duration-200"
+                              autoFocus
+                              maxLength={100}
+                            />
+                          ) : (
+                            <>
+                              <span
+                                className="cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-all duration-200 inline-block flex-1 editable-task-title"
+                                onClick={() => handleTaskTitleClick(task)}
+                                title="Click to edit"
+                              >
+                                {task.title}
+                              </span>
+                              {task.subtaskCount > 0 && (
+                                <span 
+                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200 transition-colors"
+                                  title={`${task.subtaskCount} sub-tasks`}
+                                  onClick={() => console.log(`View sub-tasks for task ${task.id}`)}
+                                >
+                                  ⋗ {task.subtaskCount}
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </div>
                       </div>
                       <div className="text-sm text-gray-500">
                         {task.category}
@@ -373,6 +390,7 @@ export default function AllTasks() {
                           />
                         </svg>
                       </button>
+                      <TaskContextMenu taskId={task.id} />
                       <button className="text-gray-400 hover:text-gray-600 transition-colors">
                         <svg
                           className="w-4 h-4"
@@ -467,6 +485,60 @@ export default function AllTasks() {
             setEditingTask(null);
           }}
         />
+      )}
+    </div>
+  );
+}
+
+function TaskContextMenu({ taskId }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const handleAddSubtask = () => {
+    console.log(`Add sub-task to task ${taskId}`);
+    setIsOpen(false);
+  };
+  
+  const handleViewSubtasks = () => {
+    console.log(`View sub-tasks for task ${taskId}`);
+    setIsOpen(false);
+  };
+  
+  return (
+    <div className="relative">
+      <button
+        className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+        onClick={() => setIsOpen(!isOpen)}
+        title="More options"
+      >
+        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+        </svg>
+      </button>
+      
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div className="absolute right-0 top-8 z-20 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+            <button
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+              onClick={handleAddSubtask}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add Sub-task
+            </button>
+            <button
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+              onClick={handleViewSubtasks}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+              View Sub-tasks
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

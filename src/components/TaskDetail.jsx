@@ -919,8 +919,9 @@ function EditableDateField({ value, onSave, canEdit }) {
 function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
   const [filter, setFilter] = useState('all')
   const [showInlineAdd, setShowInlineAdd] = useState(false)
-  const [expandedSubtask, setExpandedSubtask] = useState(null)
+  const [selectedSubtask, setSelectedSubtask] = useState(null)
   const [subtaskList, setSubtaskList] = useState(subtasks)
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   const filteredSubtasks = subtaskList.filter(subtask => {
     if (filter === 'all') return true
@@ -947,8 +948,8 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
 
   const handleDeleteSubtask = (subtaskId) => {
     setSubtaskList(subtaskList.filter(st => st.id !== subtaskId))
-    if (expandedSubtask?.id === subtaskId) {
-      setExpandedSubtask(null)
+    if (selectedSubtask?.id === subtaskId) {
+      setSelectedSubtask(null)
     }
   }
 
@@ -961,77 +962,182 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
   const canDeleteSubtask = (subtask) => {
     return subtask.createdBy === currentUser.name || currentUser.role === 'admin'
   }
-  // Previous implementation
+
+  const getStatusIcon = (status) => {
+    switch (status.toLowerCase()) {
+      case 'completed': return '✅'
+      case 'in-progress': return '🔄'
+      case 'to-do': return '⭕'
+      default: return '⭕'
+    }
+  }
+
+  const completedCount = subtaskList.filter(st => st.status === 'completed').length
+  const progressPercentage = subtaskList.length > 0 ? Math.round((completedCount / subtaskList.length) * 100) : 0
+
   return (
-    <div className="subtasks-panel">
-      <div className="subtasks-header">
-        <h3>Sub-tasks ({subtaskList.length})</h3>
-        <div className="subtasks-filters">
-          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-            <option value="all">All Status</option>
-            <option value="to-do">To Do</option>
-            <option value="in-progress">In Progress</option>
-            <option value="blocked">Blocked</option>
-            <option value="completed">Completed</option>
-          </select>
-          <button 
-            className="btn-primary" 
-            onClick={() => setShowInlineAdd(true)}
-          >
-            + Add Sub-task
+    <div className="subtasks-panel bg-white border border-gray-200 rounded-lg">
+      {/* Collapsible Header */}
+      <div 
+        className="subtasks-header flex items-center justify-between p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+      >
+        <div className="flex items-center gap-3">
+          <button className="text-gray-500 hover:text-gray-700">
+            {isCollapsed ? '▶' : '▼'}
           </button>
+          <h3 className="text-lg font-semibold text-gray-900">
+            Sub-tasks ({subtaskList.length})
+          </h3>
+          {subtaskList.length > 0 && (
+            <div className="flex items-center gap-2">
+              <div className="w-16 bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-green-500 h-2 rounded-full transition-all duration-300" 
+                  style={{ width: `${progressPercentage}%` }}
+                />
+              </div>
+              <span className="text-sm text-gray-600">{progressPercentage}%</span>
+            </div>
+          )}
         </div>
-      </div>
-
-      <div className="subtasks-list">
-        {showInlineAdd && (
-          <InlineSubtaskAdd
-            parentTask={parentTask}
-            currentUser={currentUser}
-            onSubmit={handleCreateSubtask}
-            onCancel={() => setShowInlineAdd(false)}
-          />
-        )}
-
-        {filteredSubtasks.map(subtask => (
-          <div key={subtask.id} className="subtask-item">
-            <SubtaskSummary 
-              subtask={subtask}
-              isExpanded={expandedSubtask?.id === subtask.id}
-              onExpand={() => {
-                setExpandedSubtask(expandedSubtask?.id === subtask.id ? null : subtask)
-              }}
-              onUpdate={handleUpdateSubtask}
-              onDelete={handleDeleteSubtask}
-              canEdit={canEditSubtask(subtask)}
-              canDelete={canDeleteSubtask(subtask)}
-              currentUser={currentUser}
-            />
-
-            {expandedSubtask?.id === subtask.id && (
-              <SubtaskDetailView 
-                subtask={subtask}
-                onUpdate={handleUpdateSubtask}
-                onClose={() => setExpandedSubtask(null)}
-                canEdit={canEditSubtask(subtask)}
-                currentUser={currentUser}
-              />
-            )}
-          </div>
-        ))}
-
-        {filteredSubtasks.length === 0 && !showInlineAdd && (
-          <div className="empty-subtasks">
-            <p>No sub-tasks found. Create your first sub-task to break down this task into manageable pieces.</p>
+        
+        {!isCollapsed && (
+          <div className="flex items-center gap-2">
+            <select 
+              value={filter} 
+              onChange={(e) => setFilter(e.target.value)}
+              className="text-sm border border-gray-300 rounded px-2 py-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <option value="all">All Status</option>
+              <option value="to-do">To Do</option>
+              <option value="in-progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
             <button 
-              className="btn-secondary"
-              onClick={() => setShowInlineAdd(true)}
+              className="btn btn-primary btn-sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowInlineAdd(true)
+              }}
             >
               + Add Sub-task
             </button>
           </div>
         )}
       </div>
+
+      {/* Collapsible Content */}
+      {!isCollapsed && (
+        <div className="subtasks-content">
+          {showInlineAdd && (
+            <div className="p-4 border-b border-gray-100 bg-blue-50">
+              <InlineSubtaskAdd
+                parentTask={parentTask}
+                currentUser={currentUser}
+                onSubmit={handleCreateSubtask}
+                onCancel={() => setShowInlineAdd(false)}
+              />
+            </div>
+          )}
+
+          <div className="subtasks-list">
+            {filteredSubtasks.map((subtask, index) => (
+              <div 
+                key={subtask.id} 
+                className={`subtask-item border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors cursor-pointer ${
+                  selectedSubtask?.id === subtask.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                }`}
+                onClick={() => setSelectedSubtask(selectedSubtask?.id === subtask.id ? null : subtask)}
+              >
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center gap-3 flex-1">
+                    <span className="text-lg">{getStatusIcon(subtask.status)}</span>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-gray-900 truncate">
+                        {subtask.title}
+                      </div>
+                      <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                        <span>Due: {subtask.dueDate}</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          subtask.priority === 'high' ? 'bg-red-100 text-red-800' :
+                          subtask.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {subtask.priority}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-medium text-gray-600">
+                          {subtask.assignee?.charAt(0) || 'U'}
+                        </span>
+                      </div>
+                      <span className="text-sm text-gray-600 hidden sm:inline">
+                        {subtask.assignee}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 ml-4">
+                    {canDeleteSubtask(subtask) && (
+                      <button
+                        className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (window.confirm('Delete this sub-task?')) {
+                            handleDeleteSubtask(subtask.id)
+                          }
+                        }}
+                        title="Delete sub-task"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                    <span className="text-gray-400">
+                      {selectedSubtask?.id === subtask.id ? '▼' : '▶'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {filteredSubtasks.length === 0 && !showInlineAdd && (
+              <div className="empty-subtasks p-8 text-center">
+                <div className="text-gray-400 mb-4">
+                  <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 5H7a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <p className="text-gray-600 mb-4">No sub-tasks found. Break down this task into manageable pieces.</p>
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setShowInlineAdd(true)}
+                >
+                  + Create First Sub-task
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Slide-up Panel for Selected Sub-task */}
+      {selectedSubtask && (
+        <SubtaskSlideUpPanel
+          subtask={selectedSubtask}
+          onUpdate={handleUpdateSubtask}
+          onClose={() => setSelectedSubtask(null)}
+          canEdit={canEditSubtask(selectedSubtask)}
+          currentUser={currentUser}
+        />
+      )}
     </div>
   )
 }
@@ -1124,22 +1230,30 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
   }
 
   return (
-    <div className="inline-subtask-add">
-      <form onSubmit={handleSubmit} className="subtask-form">
+    <div className="inline-subtask-add bg-white border border-blue-200 rounded-lg p-4">
+      <form onSubmit={handleSubmit} className="subtask-form space-y-4">
         <div className="subtask-form-header">
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            placeholder="Enter sub-task name (max 60 characters)"
-            maxLength={60}
-            required
-            autoFocus
-            className="subtask-title-input"
-            onKeyDown={handleKeyPress}
-          />
-          <div className="character-count">{formData.title.length}/60</div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-blue-500 text-lg">📝</span>
+            <h4 className="text-lg font-medium text-gray-900">New Sub-task</h4>
+          </div>
+          <div className="relative">
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="Enter sub-task name (max 60 characters)"
+              maxLength={60}
+              required
+              autoFocus
+              className="form-input w-full pr-16"
+              onKeyDown={handleKeyPress}
+            />
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
+              {formData.title.length}/60
+            </div>
+          </div>
         </div>
 
         <div className="subtask-form-fields">
@@ -1227,11 +1341,11 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
           </div>
         </div>
 
-        <div className="subtask-form-actions">
-          <button type="button" className="btn-secondary" onClick={onCancel}>
+        <div className="subtask-form-actions flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <button type="button" className="btn btn-secondary" onClick={onCancel}>
             Cancel
           </button>
-          <button type="submit" className="btn-primary">
+          <button type="submit" className="btn btn-primary" disabled={!formData.title.trim()}>
             Create Sub-task
           </button>
         </div>
@@ -1411,6 +1525,260 @@ function SubtaskSummary({ subtask, isExpanded, onExpand, onUpdate, onDelete, can
       </div>
     </div>
   )
+}
+
+function SubtaskSlideUpPanel({ subtask, onUpdate, onClose, canEdit, currentUser }) {
+  const [formData, setFormData] = useState({
+    ...subtask
+  });
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleSave = () => {
+    onUpdate(formData);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setFormData({ ...subtask });
+    setIsEditing(false);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+      <div 
+        className="absolute inset-0" 
+        onClick={onClose}
+      />
+      <div 
+        className="relative bg-white rounded-t-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
+        style={{ animation: 'slideUp 0.3s ease-out' }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">
+              {subtask.status === 'completed' ? '✅' : 
+               subtask.status === 'in-progress' ? '🔄' : '⭕'}
+            </span>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Sub-task Details</h3>
+              <p className="text-sm text-gray-600">Part of parent task</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {canEdit && (
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => setIsEditing(!isEditing)}
+              >
+                {isEditing ? 'Cancel' : 'Edit'}
+              </button>
+            )}
+            <button
+              className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100"
+              onClick={onClose}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 140px)' }}>
+          <div className="space-y-6">
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  className="form-input w-full"
+                  maxLength={100}
+                />
+              ) : (
+                <p className="text-gray-900 font-medium bg-gray-50 p-3 rounded-lg">{subtask.title}</p>
+              )}
+            </div>
+
+            {/* Two Column Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Status */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                {isEditing ? (
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                    className="form-select w-full"
+                  >
+                    <option value="to-do">To Do</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                ) : (
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    subtask.status === 'completed' ? 'bg-green-100 text-green-800' :
+                    subtask.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {subtask.status.replace('-', ' ')}
+                  </span>
+                )}
+              </div>
+
+              {/* Priority */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                {isEditing ? (
+                  <select
+                    name="priority"
+                    value={formData.priority}
+                    onChange={handleChange}
+                    className="form-select w-full"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                  </select>
+                ) : (
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    subtask.priority === 'high' ? 'bg-red-100 text-red-800' :
+                    subtask.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                    subtask.priority === 'critical' ? 'bg-purple-100 text-purple-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {subtask.priority}
+                  </span>
+                )}
+              </div>
+
+              {/* Assignee */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Assignee</label>
+                {isEditing ? (
+                  <select
+                    name="assignee"
+                    value={formData.assignee}
+                    onChange={handleChange}
+                    className="form-select w-full"
+                  >
+                    <option value="John Smith">John Smith</option>
+                    <option value="Sarah Wilson">Sarah Wilson</option>
+                    <option value="Mike Johnson">Mike Johnson</option>
+                    <option value="Emily Davis">Emily Davis</option>
+                  </select>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-medium text-gray-600">
+                        {subtask.assignee?.charAt(0) || 'U'}
+                      </span>
+                    </div>
+                    <span className="text-gray-900">{subtask.assignee}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Due Date */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                {isEditing ? (
+                  <input
+                    type="date"
+                    name="dueDate"
+                    value={formData.dueDate}
+                    onChange={handleChange}
+                    className="form-input w-full"
+                  />
+                ) : (
+                  <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{subtask.dueDate}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              {isEditing ? (
+                <textarea
+                  name="description"
+                  value={formData.description || ''}
+                  onChange={handleChange}
+                  className="form-textarea w-full"
+                  rows="4"
+                  placeholder="Add description..."
+                />
+              ) : (
+                <div className="bg-gray-50 p-4 rounded-lg min-h-[100px]">
+                  <p className="text-gray-900">
+                    {subtask.description || 'No description provided.'}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Metadata */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">Task Information</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-500">Created by:</span>
+                  <span className="ml-2 text-gray-900">{subtask.createdBy}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500">Created:</span>
+                  <span className="ml-2 text-gray-900">
+                    {new Date(subtask.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-500">Visibility:</span>
+                  <span className="ml-2 text-gray-900">{subtask.visibility || 'Private'}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500">Parent Task:</span>
+                  <span className="ml-2 text-gray-900">#{subtask.parentTaskId}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        {isEditing && (
+          <div className="flex justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
+            <button
+              className="btn btn-secondary"
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={handleSave}
+            >
+              Save Changes
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function SubtaskDetailView({ subtask, onUpdate, onClose, canEdit, currentUser }) {
