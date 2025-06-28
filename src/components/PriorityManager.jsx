@@ -286,8 +286,6 @@ export default function PriorityManager() {
     </div>
   )
 }
-import React, { useState } from 'react'
-import PriorityFormModal from './PriorityFormModal'
 
 // Helper functions moved outside component
 const getTaskCount = (priorityCode) => {
