@@ -1029,4 +1029,39 @@
   .status-form-modal .modal-content {
     padding: 2rem;
   }
+
+/* Inline Editing Styles */
+.inline-edit-input {
+  transition: all 0.2s ease-in-out;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: inherit;
+  font-weight: inherit;
+  background-color: white;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
+
+.inline-edit-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.editable-task-title {
+  transition: background-color 0.15s ease-in-out;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  display: inline-block;
+  width: calc(100% + 16px);
+  min-height: 1.5em;
+}
+
+.editable-task-title:hover {
+  background-color: #f9fafb;
+  cursor: pointer;
+}
+
+/* Task Detail Styles */
+.task-detail-container {

@@ -7,8 +7,10 @@ export default function AllTasks() {
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [showSnooze, setShowSnooze] = useState(false)
   const [showCreateTaskDrawer, setShowCreateTaskDrawer] = useState(false)
+  const [editingTaskId, setEditingTaskId] = useState(null)
+  const [editingTitle, setEditingTitle] = useState('')
 
-  const tasks = [
+  const [tasks, setTasks] = useState([
     {
       id: 1,
       title: 'Update user authentication system',
@@ -49,7 +51,7 @@ export default function AllTasks() {
       category: 'Research',
       progress: 80
     }
-  ]
+  ])
 
   const getStatusBadge = (status) => {
     const statusClasses = {
@@ -69,6 +71,40 @@ export default function AllTasks() {
       'Urgent': 'status-badge priority-urgent'
     }
     return priorityClasses[priority] || 'status-badge priority-low'
+  }
+
+  const handleTaskTitleClick = (task) => {
+    setEditingTaskId(task.id)
+    setEditingTitle(task.title)
+  }
+
+  const handleTitleSave = (taskId) => {
+    if (editingTitle.trim() && editingTitle !== tasks.find(t => t.id === taskId)?.title) {
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === taskId 
+            ? { ...task, title: editingTitle.trim() }
+            : task
+        )
+      )
+    }
+    setEditingTaskId(null)
+    setEditingTitle('')
+  }
+
+  const handleTitleCancel = () => {
+    setEditingTaskId(null)
+    setEditingTitle('')
+  }
+
+  const handleTitleKeyDown = (e, taskId) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleTitleSave(taskId)
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      handleTitleCancel()
+    }
   }
 
   return (
@@ -181,7 +217,28 @@ export default function AllTasks() {
                 <tr key={task.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div>
-                      <div className="font-medium text-gray-900">{task.title}</div>
+                      <div className="font-medium text-gray-900">
+                        {editingTaskId === task.id ? (
+                          <input
+                            type="text"
+                            value={editingTitle}
+                            onChange={(e) => setEditingTitle(e.target.value)}
+                            onBlur={() => handleTitleSave(task.id)}
+                            onKeyDown={(e) => handleTitleKeyDown(e, task.id)}
+                            className="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                            autoFocus
+                            maxLength={100}
+                          />
+                        ) : (
+                          <span 
+                            className="cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-colors duration-150 inline-block w-full"
+                            onClick={() => handleTaskTitleClick(task)}
+                            title="Click to edit"
+                          >
+                            {task.title}
+                          </span>
+                        )}
+                      </div>
                       <div className="text-sm text-gray-500">{task.category}</div>
                     </div>
                   </td>
