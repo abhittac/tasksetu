@@ -1,6 +1,12 @@
 import React, { useState } from 'react'
 
-export default function RecurringTaskManager() {
+export default function RecurringTaskManager({ onClose }) {
+  // If onClose is provided, we're being used as a form component
+  if (onClose) {
+    return <RecurringTaskForm onClose={onClose} />
+  }
+
+  // Otherwise, we're being used as a standalone manager
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' })
   const [showCreateRecurringDrawer, setShowCreateRecurringDrawer] = useState(false)
   const [recurringTasks, setRecurringTasks] = useState([

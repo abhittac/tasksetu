@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { calculateDueDateFromPriority } from './PriorityManager'
+import RecurringTaskManager from './RecurringTaskManager'
+import MilestoneManager from './MilestoneManager'
 
 export default function CreateTask({ onClose }) {
   const [taskType, setTaskType] = useState('regular')
@@ -139,8 +141,9 @@ export default function CreateTask({ onClose }) {
         </div>
       </div>
 
-      {/* Task Form */}
-      <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Conditional Task Forms */}
+      {taskType === 'regular' && (
+        <form onSubmit={handleSubmit} className="space-y-6">
         <div className="card">
           <div className="card-header">
             <h3 className="text-xl font-bold text-gray-900 mb-2">Task Details</h3>
@@ -305,61 +308,7 @@ export default function CreateTask({ onClose }) {
           </div>
         </div>
 
-        {/* Recurring Options (if recurring task selected) */}
-        {taskType === 'recurring' && (
-          <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Recurring Settings</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Frequency
-                </label>
-                <select className="form-select">
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="quarterly">Quarterly</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Start Date
-                </label>
-                <input type="date" className="form-input" />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Milestone Options (if milestone selected) */}
-        {taskType === 'milestone' && (
-          <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Milestone Settings</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Project
-                </label>
-                <select className="form-select">
-                  <option value="">Select project...</option>
-                  <option value="website">Website Redesign</option>
-                  <option value="mobile">Mobile App</option>
-                  <option value="api">API Development</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Milestone Type
-                </label>
-                <select className="form-select">
-                  <option value="checkpoint">Checkpoint</option>
-                  <option value="deliverable">Deliverable</option>
-                  <option value="review">Review</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        )}
+        
 
         {/* File Attachments */}
         <div className="card">
@@ -410,6 +359,17 @@ export default function CreateTask({ onClose }) {
           </button>
         </div>
       </form>
+      )}
+
+      {/* Recurring Task Form */}
+      {taskType === 'recurring' && (
+        <RecurringTaskManager onClose={onClose} />
+      )}
+
+      {/* Milestone Task Form */}
+      {taskType === 'milestone' && (
+        <MilestoneManager onClose={onClose} />
+      )}
 
       {/* More Options Modal */}
       {showMoreOptions && (
