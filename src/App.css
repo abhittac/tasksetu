@@ -922,6 +922,7 @@
     margin-top: 1.5rem;
   }
 
+```text
   .grid {
     display: grid;
   }
@@ -1029,4 +1030,19 @@
   .status-form-modal .modal-content {
     padding: 2rem;
   }
+
+/* Inline Editing Styles */
+.editable-task-title {
+  transition: background-color 0.2s ease-in-out;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  display: inline-block;
+  width: calc(100% + 16px);
+  min-height: 1.5em;
+}
+
+.editable-task-title:hover {
+  background-color: #f9fafb;
+  cursor: pointer;
 }

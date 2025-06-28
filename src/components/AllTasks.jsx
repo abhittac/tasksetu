@@ -7,8 +7,12 @@ export default function AllTasks() {
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [showSnooze, setShowSnooze] = useState(false)
   const [showCreateTaskDrawer, setShowCreateTaskDrawer] = useState(false)
+  const [editingTaskId, setEditingTaskId] = useState(null)
+  const [editingTitle, setEditingTitle] = useState('')
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingTask, setEditingTask] = useState(null)
 
-  const tasks = [
+  const [tasks, setTasks] = useState([
     {
       id: 1,
       title: 'Update user authentication system',
@@ -49,7 +53,7 @@ export default function AllTasks() {
       category: 'Research',
       progress: 80
     }
-  ]
+  ])
 
   const getStatusBadge = (status) => {
     const statusClasses = {
@@ -69,6 +73,55 @@ export default function AllTasks() {
       'Urgent': 'status-badge priority-urgent'
     }
     return priorityClasses[priority] || 'status-badge priority-low'
+  }
+
+  const handleTaskTitleClick = (task) => {
+    setEditingTaskId(task.id)
+    setEditingTitle(task.title)
+  }
+
+  const handleTitleSave = (taskId) => {
+    if (editingTitle.trim() && editingTitle !== tasks.find(t => t.id === taskId)?.title) {
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === taskId 
+            ? { ...task, title: editingTitle.trim() }
+            : task
+        )
+      )
+    }
+    setEditingTaskId(null)
+    setEditingTitle('')
+  }
+
+  const handleTitleCancel = () => {
+    setEditingTaskId(null)
+    setEditingTitle('')
+  }
+
+  const handleTitleKeyDown = (e, taskId) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleTitleSave(taskId)
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      handleTitleCancel()
+    }
+  }
+
+  const handleEditTask = (task) => {
+    setEditingTask(task)
+    setShowEditModal(true)
+  }
+
+  const handleSaveEditedTask = (updatedTask) => {
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === updatedTask.id ? updatedTask : task
+      )
+    )
+    setShowEditModal(false)
+    setEditingTask(null)
   }
 
   return (
@@ -181,7 +234,28 @@ export default function AllTasks() {
                 <tr key={task.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div>
-                      <div className="font-medium text-gray-900">{task.title}</div>
+                      <div className="font-medium text-gray-900">
+                        {editingTaskId === task.id ? (
+                          <input
+                            type="text"
+                            value={editingTitle}
+                            onChange={(e) => setEditingTitle(e.target.value)}
+                            onBlur={() => handleTitleSave(task.id)}
+                            onKeyDown={(e) => handleTitleKeyDown(e, task.id)}
+                            className="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all duration-200"
+                            autoFocus
+                            maxLength={100}
+                          />
+                        ) : (
+                          <span 
+                            className="cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-all duration-200 inline-block w-full editable-task-title"
+                            onClick={() => handleTaskTitleClick(task)}
+                            title="Click to edit"
+                          >
+                            {task.title}
+                          </span>
+                        )}
+                      </div>
                       <div className="text-sm text-gray-500">{task.category}</div>
                     </div>
                   </td>
@@ -213,7 +287,11 @@ export default function AllTasks() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">
-                      <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                      <button 
+                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                        onClick={() => handleEditTask(task)}
+                        title="Edit task"
+                      >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
@@ -269,6 +347,181 @@ export default function AllTasks() {
           </div>
         </div>
       )}
+
+      {/* Task Edit Modal */}
+      {showEditModal && editingTask && (
+        <TaskEditModal
+          task={editingTask}
+          onSave={handleSaveEditedTask}
+          onClose={() => {
+            setShowEditModal(false)
+            setEditingTask(null)
+          }}
+        />
+      )}
+    </div>
+  )
+}
+
+function TaskEditModal({ task, onSave, onClose }) {
+  const [formData, setFormData] = useState({
+    title: task.title,
+    assignee: task.assignee,
+    status: task.status,
+    priority: task.priority,
+    dueDate: task.dueDate,
+    category: task.category
+  })
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    onSave({
+      ...task,
+      ...formData
+    })
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-900">Edit Task</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 text-xl font-bold w-8 h-8 flex items-center justify-center transition-colors"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Title */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Task Title *
+            </label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => handleChange('title', e.target.value)}
+              className="form-input w-full"
+              placeholder="Enter task title..."
+              required
+              maxLength={100}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Assignee */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Assignee
+              </label>
+              <select
+                value={formData.assignee}
+                onChange={(e) => handleChange('assignee', e.target.value)}
+                className="form-select w-full"
+              >
+                <option value="John Doe">John Doe</option>
+                <option value="Jane Smith">Jane Smith</option>
+                <option value="Mike Johnson">Mike Johnson</option>
+                <option value="Sarah Wilson">Sarah Wilson</option>
+              </select>
+            </div>
+
+            {/* Status */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status
+              </label>
+              <select
+                value={formData.status}
+                onChange={(e) => handleChange('status', e.target.value)}
+                className="form-select w-full"
+              >
+                <option value="To Do">To Do</option>
+                <option value="In Progress">In Progress</option>
+                <option value="In Review">In Review</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+
+            {/* Priority */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Priority
+              </label>
+              <select
+                value={formData.priority}
+                onChange={(e) => handleChange('priority', e.target.value)}
+                className="form-select w-full"
+              >
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Urgent">Urgent</option>
+              </select>
+            </div>
+
+            {/* Due Date */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Due Date
+              </label>
+              <input
+                type="date"
+                value={formData.dueDate}
+                onChange={(e) => handleChange('dueDate', e.target.value)}
+                className="form-input w-full"
+              />
+            </div>
+
+            {/* Category */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
+              <select
+                value={formData.category}
+                onChange={(e) => handleChange('category', e.target.value)}
+                className="form-select w-full"
+              >
+                <option value="Development">Development</option>
+                <option value="Design">Design</option>
+                <option value="Research">Research</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Support">Support</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Form Actions */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:justify-end pt-4 border-t border-gray-200">
+            <button 
+              type="button" 
+              onClick={onClose}
+              className="btn btn-secondary"
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }
