@@ -51,7 +51,7 @@ export default function CreateTask({ onClose }) {
           <h3 className="text-xl font-bold text-gray-900 mb-2">Task Type</h3>
           <p className="text-gray-600">Choose the type of task you want to create</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 md:grid-cols-3 gap-3">
           <button
             onClick={() => setTaskType('regular')}
             className={`p-3 border-2 rounded-xl text-left transition-all duration-300 group ${
