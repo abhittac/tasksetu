@@ -1,19 +1,32 @@
-import React, { useState } from 'react'
 
-export default function CreateTask({ onClose }) {
+import React, { useState, useRef, useEffect } from 'react'
+
+export default function CreateTask({ onClose, userContext = { isOrganization: true } }) {
   const [taskType, setTaskType] = useState('regular')
   const [showMoreOptions, setShowMoreOptions] = useState(false)
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [validationErrors, setValidationErrors] = useState({})
+  const titleInputRef = useRef(null)
+
+  // Calculate default due date (today + 30 days)
+  const getDefaultDueDate = () => {
+    const today = new Date()
+    const defaultDate = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000))
+    return defaultDate.toISOString().split('T')[0]
+  }
+
   const [formData, setFormData] = useState({
-    title: '',
+    title: 'Untitled Task',
     description: '',
     assignee: '',
-    priority: 'medium',
+    priority: 'low', // Default to low priority
     status: 'todo',
-    dueDate: '',
+    dueDate: getDefaultDueDate(), // Auto-filled default
     category: '',
     tags: '',
     attachments: []
   })
+
   const [moreOptionsData, setMoreOptionsData] = useState({
     referenceProcess: '',
     customForm: '',
@@ -21,10 +34,75 @@ export default function CreateTask({ onClose }) {
     taskTypeAdvanced: 'simple'
   })
 
+  // Focus title when editing
+  useEffect(() => {
+    if (isEditingTitle && titleInputRef.current) {
+      titleInputRef.current.focus()
+      titleInputRef.current.select()
+    }
+  }, [isEditingTitle])
+
+  // Live validation
+  const validateField = (field, value) => {
+    const errors = { ...validationErrors }
+    
+    switch (field) {
+      case 'title':
+        if (!value || value.trim() === '') {
+          errors.title = 'Task title is required'
+        } else {
+          delete errors.title
+        }
+        break
+      case 'dueDate':
+        if (value && new Date(value) < new Date()) {
+          errors.dueDate = 'Due date cannot be in the past'
+        } else {
+          delete errors.dueDate
+        }
+        break
+      case 'assignee':
+        if (value && !value.includes('@') && value.includes('.')) {
+          // Basic email validation if it looks like an email
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+          if (!emailRegex.test(value)) {
+            errors.assignee = 'Invalid email format'
+          } else {
+            delete errors.assignee
+          }
+        } else {
+          delete errors.assignee
+        }
+        break
+    }
+
+    setValidationErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('Creating task:', formData)
-    // Handle task creation
+    
+    // Validate required fields
+    const requiredFields = ['title']
+    let hasErrors = false
+    
+    requiredFields.forEach(field => {
+      if (!validateField(field, formData[field])) {
+        hasErrors = true
+      }
+    })
+
+    if (moreOptionsData.taskTypeAdvanced === '') {
+      setValidationErrors(prev => ({ ...prev, taskTypeAdvanced: 'Task type is required' }))
+      hasErrors = true
+    }
+
+    if (hasErrors) {
+      return
+    }
+
+    console.log('Creating task:', { ...formData, ...moreOptionsData })
     if (onClose) onClose()
   }
 
@@ -33,6 +111,9 @@ export default function CreateTask({ onClose }) {
       ...prev,
       [field]: value
     }))
+    
+    // Live validation
+    validateField(field, value)
   }
 
   const handleMoreOptionsChange = (field, value) => {
@@ -40,6 +121,35 @@ export default function CreateTask({ onClose }) {
       ...prev,
       [field]: value
     }))
+
+    // Validate advanced fields
+    if (field === 'taskTypeAdvanced' && value) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors.taskTypeAdvanced
+        return newErrors
+      })
+    }
+  }
+
+  const handleTitleClick = () => {
+    setIsEditingTitle(true)
+  }
+
+  const handleTitleBlur = () => {
+    setIsEditingTitle(false)
+    if (formData.title.trim() === '') {
+      handleInputChange('title', 'Untitled Task')
+    }
+  }
+
+  const handleTitleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      setIsEditingTitle(false)
+      if (formData.title.trim() === '') {
+        handleInputChange('title', 'Untitled Task')
+      }
+    }
   }
 
   return (
@@ -132,19 +242,38 @@ export default function CreateTask({ onClose }) {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Title */}
+            {/* Inline Editable Title */}
             <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Task Title *
               </label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
-                className="form-input"
-                placeholder="Enter task title..."
-                required
-              />
+              {isEditingTitle ? (
+                <input
+                  ref={titleInputRef}
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  onBlur={handleTitleBlur}
+                  onKeyPress={handleTitleKeyPress}
+                  className={`form-input ${validationErrors.title ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                  placeholder="Enter task title..."
+                />
+              ) : (
+                <div
+                  onClick={handleTitleClick}
+                  className={`form-input cursor-pointer hover:border-blue-300 transition-colors ${
+                    validationErrors.title ? 'border-red-500' : ''
+                  } ${formData.title === 'Untitled Task' ? 'text-gray-500 italic' : ''}`}
+                >
+                  {formData.title}
+                </div>
+              )}
+              {validationErrors.title && (
+                <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <span className="mr-1">⚠️</span>
+                  {validationErrors.title}
+                </p>
+              )}
             </div>
 
             {/* Description */}
@@ -161,25 +290,27 @@ export default function CreateTask({ onClose }) {
               />
             </div>
 
-            {/* Assignee */}
+            {/* Assignee with live validation */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Assign to
               </label>
-              <select
+              <SearchableSelect
                 value={formData.assignee}
-                onChange={(e) => handleInputChange('assignee', e.target.value)}
-                className="form-select"
-              >
-                <option value="">Select assignee...</option>
-                <option value="john">John Doe</option>
-                <option value="jane">Jane Smith</option>
-                <option value="mike">Mike Johnson</option>
-                <option value="sarah">Sarah Wilson</option>
-              </select>
+                onChange={(value) => handleInputChange('assignee', value)}
+                options={[
+                  { value: '', label: 'Select assignee...' },
+                  { value: 'john@company.com', label: 'John Doe (john@company.com)' },
+                  { value: 'jane@company.com', label: 'Jane Smith (jane@company.com)' },
+                  { value: 'mike@company.com', label: 'Mike Johnson (mike@company.com)' },
+                  { value: 'sarah@company.com', label: 'Sarah Wilson (sarah@company.com)' }
+                ]}
+                placeholder="Search for assignee..."
+                error={validationErrors.assignee}
+              />
             </div>
 
-            {/* Priority */}
+            {/* Priority with default */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Priority
@@ -189,7 +320,7 @@ export default function CreateTask({ onClose }) {
                 onChange={(e) => handleInputChange('priority', e.target.value)}
                 className="form-select"
               >
-                <option value="low">Low</option>
+                <option value="low">Low (Default)</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
                 <option value="urgent">Urgent</option>
@@ -212,7 +343,7 @@ export default function CreateTask({ onClose }) {
               </select>
             </div>
 
-            {/* Due Date */}
+            {/* Due Date with validation */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Due Date
@@ -221,8 +352,14 @@ export default function CreateTask({ onClose }) {
                 type="date"
                 value={formData.dueDate}
                 onChange={(e) => handleInputChange('dueDate', e.target.value)}
-                className="form-input"
+                className={`form-input ${validationErrors.dueDate ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
               />
+              {validationErrors.dueDate && (
+                <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <span className="mr-1">⚠️</span>
+                  {validationErrors.dueDate}
+                </p>
+              )}
             </div>
 
             {/* Category */}
@@ -230,18 +367,19 @@ export default function CreateTask({ onClose }) {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category
               </label>
-              <select
+              <SearchableSelect
                 value={formData.category}
-                onChange={(e) => handleInputChange('category', e.target.value)}
-                className="form-select"
-              >
-                <option value="">Select category...</option>
-                <option value="development">Development</option>
-                <option value="design">Design</option>
-                <option value="research">Research</option>
-                <option value="marketing">Marketing</option>
-                <option value="support">Support</option>
-              </select>
+                onChange={(value) => handleInputChange('category', value)}
+                options={[
+                  { value: '', label: 'Select category...' },
+                  { value: 'development', label: 'Development' },
+                  { value: 'design', label: 'Design' },
+                  { value: 'research', label: 'Research' },
+                  { value: 'marketing', label: 'Marketing' },
+                  { value: 'support', label: 'Support' }
+                ]}
+                placeholder="Search categories..."
+              />
             </div>
 
             {/* Tags */}
@@ -335,23 +473,25 @@ export default function CreateTask({ onClose }) {
           </div>
         </div>
 
-        {/* More Options Button */}
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">Advanced Options</h3>
-              <p className="text-sm text-gray-600">Configure additional task settings</p>
+        {/* Context-Aware More Options Button - Only show for Organization users */}
+        {userContext.isOrganization && (
+          <div className="card">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Advanced Options</h3>
+                <p className="text-sm text-gray-600">Configure additional task settings</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowMoreOptions(true)}
+                className="btn btn-secondary flex items-center space-x-2"
+              >
+                <span>⚙️</span>
+                <span>More Options</span>
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowMoreOptions(true)}
-              className="btn btn-secondary flex items-center space-x-2"
-            >
-              <span>⚙️</span>
-              <span>More Options</span>
-            </button>
           </div>
-        </div>
+        )}
 
         {/* Form Actions */}
         <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
@@ -367,21 +507,116 @@ export default function CreateTask({ onClose }) {
         </div>
       </form>
 
-      {/* More Options Modal */}
-      {showMoreOptions && (
+      {/* More Options Modal - Only shown for Organization users */}
+      {showMoreOptions && userContext.isOrganization && (
         <MoreOptionsModal
           data={moreOptionsData}
           onChange={handleMoreOptionsChange}
           onClose={() => setShowMoreOptions(false)}
           onSave={() => setShowMoreOptions(false)}
+          validationErrors={validationErrors}
         />
       )}
     </div>
   )
 }
 
-// More Options Modal Component
-function MoreOptionsModal({ data, onChange, onClose, onSave }) {
+// Searchable Select Component
+function SearchableSelect({ value, onChange, options, placeholder, error }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [displayValue, setDisplayValue] = useState('')
+  const dropdownRef = useRef(null)
+
+  const filteredOptions = options.filter(option =>
+    option.label.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  useEffect(() => {
+    const selectedOption = options.find(option => option.value === value)
+    setDisplayValue(selectedOption ? selectedOption.label : '')
+  }, [value, options])
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false)
+        setSearchTerm('')
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleSelect = (selectedValue) => {
+    onChange(selectedValue)
+    setIsOpen(false)
+    setSearchTerm('')
+  }
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <div
+        onClick={() => setIsOpen(!isOpen)}
+        className={`form-select cursor-pointer flex items-center justify-between ${
+          error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
+        }`}
+      >
+        <span className={displayValue ? 'text-gray-900' : 'text-gray-500'}>
+          {displayValue || placeholder}
+        </span>
+        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+
+      {isOpen && (
+        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden">
+          <div className="p-2 border-b border-gray-200">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              autoFocus
+            />
+          </div>
+          <div className="max-h-48 overflow-y-auto">
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option) => (
+                <div
+                  key={option.value}
+                  onClick={() => handleSelect(option.value)}
+                  className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
+                    option.value === value ? 'bg-blue-50 text-blue-900' : 'text-gray-900'
+                  }`}
+                >
+                  {option.label}
+                </div>
+              ))
+            ) : (
+              <div className="px-4 py-2 text-gray-500 text-center">
+                No options found
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <p className="mt-1 text-sm text-red-600 flex items-center">
+          <span className="mr-1">⚠️</span>
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
+// More Options Modal Component with enhanced features
+function MoreOptionsModal({ data, onChange, onClose, onSave, validationErrors }) {
   const [searchTerms, setSearchTerms] = useState({
     process: '',
     form: '',
@@ -434,7 +669,6 @@ function MoreOptionsModal({ data, onChange, onClose, onSave }) {
   }
 
   const handleSave = () => {
-    // In real app, would validate and save data
     onSave()
   }
 
@@ -460,27 +694,18 @@ function MoreOptionsModal({ data, onChange, onClose, onSave }) {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Reference Process
             </label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search for a process..."
-                value={searchTerms.process}
-                onChange={(e) => setSearchTerms(prev => ({ ...prev, process: e.target.value }))}
-                className="form-input mb-2"
-              />
-              <select
-                value={data.referenceProcess}
-                onChange={(e) => onChange('referenceProcess', e.target.value)}
-                className="form-select"
-              >
-                <option value="">Select a process...</option>
-                {filteredProcesses.map(process => (
-                  <option key={process.id} value={process.id}>
-                    {process.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <SearchableSelect
+              value={data.referenceProcess}
+              onChange={(value) => onChange('referenceProcess', value)}
+              options={[
+                { value: '', label: 'Select a process...' },
+                ...filteredProcesses.map(process => ({
+                  value: process.id,
+                  label: process.name
+                }))
+              ]}
+              placeholder="Search for a process..."
+            />
             <p className="text-xs text-gray-500 mt-1">Link this task to an existing process (e.g., SOP or workflow)</p>
           </div>
 
@@ -489,27 +714,18 @@ function MoreOptionsModal({ data, onChange, onClose, onSave }) {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Custom Form
             </label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search for a form..."
-                value={searchTerms.form}
-                onChange={(e) => setSearchTerms(prev => ({ ...prev, form: e.target.value }))}
-                className="form-input mb-2"
-              />
-              <select
-                value={data.customForm}
-                onChange={(e) => onChange('customForm', e.target.value)}
-                className="form-select"
-              >
-                <option value="">Select a form...</option>
-                {filteredForms.map(form => (
-                  <option key={form.id} value={form.id}>
-                    {form.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <SearchableSelect
+              value={data.customForm}
+              onChange={(value) => onChange('customForm', value)}
+              options={[
+                { value: '', label: 'Select a form...' },
+                ...filteredForms.map(form => ({
+                  value: form.id,
+                  label: form.name
+                }))
+              ]}
+              placeholder="Search for a form..."
+            />
             <p className="text-xs text-gray-500 mt-1">Choose a predefined form to collect data for this task</p>
           </div>
 
@@ -546,7 +762,7 @@ function MoreOptionsModal({ data, onChange, onClose, onSave }) {
             <p className="text-xs text-gray-500 mt-1">Select existing tasks that must be completed before this one starts</p>
           </div>
 
-          {/* Task Type */}
+          {/* Task Type with validation */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Task Type *
@@ -554,13 +770,20 @@ function MoreOptionsModal({ data, onChange, onClose, onSave }) {
             <select
               value={data.taskTypeAdvanced}
               onChange={(e) => onChange('taskTypeAdvanced', e.target.value)}
-              className="form-select"
+              className={`form-select ${validationErrors?.taskTypeAdvanced ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
               required
             >
+              <option value="">Select task type...</option>
               <option value="simple">Simple</option>
               <option value="recurring">Recurring</option>
               <option value="approval">Approval</option>
             </select>
+            {validationErrors?.taskTypeAdvanced && (
+              <p className="mt-1 text-sm text-red-600 flex items-center">
+                <span className="mr-1">⚠️</span>
+                {validationErrors.taskTypeAdvanced}
+              </p>
+            )}
             <p className="text-xs text-gray-500 mt-1">Determines the task behavior</p>
           </div>
         </div>
