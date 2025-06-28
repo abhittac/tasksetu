@@ -6,6 +6,26 @@ const getSystemPriorityLabel = (systemCode, systemPriorities) => {
   return systemPriority ? systemPriority.label : systemCode
 }
 
+// Calculate due date based on priority
+export const calculateDueDateFromPriority = (priority, creationDate = new Date()) => {
+  const date = new Date(creationDate)
+  const prioritySettings = JSON.parse(localStorage.getItem('prioritySettings') || '{}')
+  
+  // Default days mapping
+  const defaultDays = {
+    'LOW': 30,
+    'MEDIUM': 14,
+    'HIGH': 7,
+    'CRITICAL': 2,
+    'URGENT': 2
+  }
+  
+  const daysToAdd = prioritySettings[priority?.toUpperCase()] || defaultDays[priority?.toUpperCase()] || 7
+  date.setDate(date.getDate() + daysToAdd)
+  
+  return date.toISOString().split('T')[0] // Return YYYY-MM-DD format
+}
+
 function CompanyPriorityRow({ priority, systemPriorities, onEdit, onDelete, onSetDefault, canEdit }) {
   // Guard against undefined priority
   if (!priority) {
@@ -31,6 +51,18 @@ function CompanyPriorityRow({ priority, systemPriorities, onEdit, onDelete, onSe
           <span className="system-priority-label text-sm text-gray-600">
             {getSystemPriorityLabel(priority.systemMapping, systemPriorities)}
           </span>
+        </div>
+      </td>
+      <td className="px-6 py-4">
+        <div className="flex items-center space-x-2">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            {priority.daysToDue} days
+          </span>
+          {priority.isDefault && (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              Default
+            </span>
+          )}
         </div>
       </td>
       <td className="px-6 py-4">
@@ -64,26 +96,37 @@ function CompanyPriorityRow({ priority, systemPriorities, onEdit, onDelete, onSe
 
 export default function PriorityManager() {
   const [priorities, setPriorities] = useState([
-    { id: 1, name: 'Low Priority', systemMapping: 'LOW', isDefault: false },
-    { id: 2, name: 'Medium Priority', systemMapping: 'MEDIUM', isDefault: true },
-    { id: 3, name: 'High Priority', systemMapping: 'HIGH', isDefault: false },
-    { id: 4, name: 'Urgent Priority', systemMapping: 'URGENT', isDefault: false }
+    { id: 1, name: 'Low Priority', systemMapping: 'LOW', isDefault: false, daysToDue: 30 },
+    { id: 2, name: 'Medium Priority', systemMapping: 'MEDIUM', isDefault: true, daysToDue: 14 },
+    { id: 3, name: 'High Priority', systemMapping: 'HIGH', isDefault: false, daysToDue: 7 },
+    { id: 4, name: 'Critical Priority', systemMapping: 'CRITICAL', isDefault: false, daysToDue: 2 },
+    { id: 5, name: 'Urgent Priority', systemMapping: 'URGENT', isDefault: false, daysToDue: 2 }
   ])
 
   const systemPriorities = [
     { code: 'LOW', label: 'Low' },
     { code: 'MEDIUM', label: 'Medium' },
     { code: 'HIGH', label: 'High' },
+    { code: 'CRITICAL', label: 'Critical' },
     { code: 'URGENT', label: 'Urgent' }
   ]
 
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingPriority, setEditingPriority] = useState(null)
-  const [formData, setFormData] = useState({ name: '', systemMapping: 'LOW' })
+  const [formData, setFormData] = useState({ name: '', systemMapping: 'LOW', daysToDue: 7 })
+
+  // Save priority settings to localStorage whenever priorities change
+  React.useEffect(() => {
+    const settings = {}
+    priorities.forEach(priority => {
+      settings[priority.systemMapping] = priority.daysToDue
+    })
+    localStorage.setItem('prioritySettings', JSON.stringify(settings))
+  }, [priorities])
 
   const handleEdit = (priority) => {
     setEditingPriority(priority)
-    setFormData({ name: priority.name, systemMapping: priority.systemMapping })
+    setFormData({ name: priority.name, systemMapping: priority.systemMapping, daysToDue: priority.daysToDue })
     setShowAddForm(true)
   }
 
@@ -102,7 +145,7 @@ export default function PriorityManager() {
     if (editingPriority) {
       setPriorities(priorities.map(p => 
         p.id === editingPriority.id 
-          ? { ...p, name: formData.name, systemMapping: formData.systemMapping }
+          ? { ...p, name: formData.name, systemMapping: formData.systemMapping, daysToDue: parseInt(formData.daysToDue) }
           : p
       ))
     } else {
@@ -110,13 +153,14 @@ export default function PriorityManager() {
         id: Date.now(),
         name: formData.name,
         systemMapping: formData.systemMapping,
+        daysToDue: parseInt(formData.daysToDue),
         isDefault: false
       }
       setPriorities([...priorities, newPriority])
     }
     setShowAddForm(false)
     setEditingPriority(null)
-    setFormData({ name: '', systemMapping: 'LOW' })
+    setFormData({ name: '', systemMapping: 'LOW', daysToDue: 7 })
   }
 
   return (
@@ -143,7 +187,7 @@ export default function PriorityManager() {
             {editingPriority ? 'Edit Priority' : 'Add New Priority'}
           </h3>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="form-label">Priority Name</label>
                 <input
@@ -169,6 +213,20 @@ export default function PriorityManager() {
                   ))}
                 </select>
               </div>
+              <div>
+                <label className="form-label">Days to Due Date</label>
+                <input
+                  type="number"
+                  value={formData.daysToDue}
+                  onChange={(e) => setFormData({ ...formData, daysToDue: e.target.value })}
+                  className="form-input"
+                  placeholder="7"
+                  min="1"
+                  max="365"
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">Auto-assign due date after this many days</p>
+              </div>
             </div>
             <div className="flex justify-end space-x-3">
               <button
@@ -176,7 +234,7 @@ export default function PriorityManager() {
                 onClick={() => {
                   setShowAddForm(false)
                   setEditingPriority(null)
-                  setFormData({ name: '', systemMapping: 'LOW' })
+                  setFormData({ name: '', systemMapping: 'LOW', daysToDue: 7 })
                 }}
                 className="btn btn-secondary"
               >
@@ -200,6 +258,9 @@ export default function PriorityManager() {
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   System Mapping
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Days to Due
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions

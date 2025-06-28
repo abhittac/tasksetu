@@ -349,8 +349,13 @@ function RecurringTaskForm({ onClose }) {
     category: ''
   })
 
+  const [isManualDueDate, setIsManualDueDate] = useState(false)
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
+    if (name === 'dueDate') {
+      setIsManualDueDate(true)
+    }
     setFormData({
       ...formData,
       [name]: type === 'checkbox' ? checked : value

@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { calculateDueDateFromPriority } from './PriorityManager'
 
 export default function CreateTask({ onClose }) {
   const [taskType, setTaskType] = useState('regular')
@@ -14,6 +15,7 @@ export default function CreateTask({ onClose }) {
     tags: '',
     attachments: []
   })
+  const [isManualDueDate, setIsManualDueDate] = useState(false)
   const [moreOptionsData, setMoreOptionsData] = useState({
     referenceProcess: '',
     customForm: '',
@@ -28,7 +30,21 @@ export default function CreateTask({ onClose }) {
     if (onClose) onClose()
   }
 
+  // Auto-calculate due date when priority changes (unless manually overridden)
+  useEffect(() => {
+    if (!isManualDueDate && formData.priority) {
+      const calculatedDueDate = calculateDueDateFromPriority(formData.priority)
+      setFormData(prev => ({
+        ...prev,
+        dueDate: calculatedDueDate
+      }))
+    }
+  }, [formData.priority, isManualDueDate])
+
   const handleInputChange = (field, value) => {
+    if (field === 'dueDate') {
+      setIsManualDueDate(true)
+    }
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -189,10 +205,11 @@ export default function CreateTask({ onClose }) {
                 onChange={(e) => handleInputChange('priority', e.target.value)}
                 className="form-select"
               >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="urgent">Urgent</option>
+                <option value="low">Low (30 days)</option>
+                <option value="medium">Medium (14 days)</option>
+                <option value="high">High (7 days)</option>
+                <option value="critical">Critical (2 days)</option>
+                <option value="urgent">Urgent (2 days)</option>
               </select>
             </div>
 
@@ -216,6 +233,9 @@ export default function CreateTask({ onClose }) {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Due Date
+                {!isManualDueDate && (
+                  <span className="text-xs text-blue-600 ml-2">(Auto-calculated from priority)</span>
+                )}
               </label>
               <input
                 type="date"
@@ -223,6 +243,30 @@ export default function CreateTask({ onClose }) {
                 onChange={(e) => handleInputChange('dueDate', e.target.value)}
                 className="form-input"
               />
+              {!isManualDueDate && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Due date automatically calculated based on selected priority. Change manually to override.
+                </p>
+              )}
+              {isManualDueDate && (
+                <div className="flex items-center mt-1">
+                  <p className="text-xs text-gray-500">Manual override active.</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsManualDueDate(false)
+                      const calculatedDueDate = calculateDueDateFromPriority(formData.priority)
+                      setFormData(prev => ({
+                        ...prev,
+                        dueDate: calculatedDueDate
+                      }))
+                    }}
+                    className="text-xs text-blue-600 hover:text-blue-800 ml-2 underline"
+                  >
+                    Reset to auto-calculate
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Category */}
