@@ -496,6 +496,199 @@
         border-bottom: 1px solid #e9ecef;
       }
 
+      /* Priority Management Styles */
+      .priority-workflow-diagram {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+      }
+
+      .priority-workflow-diagram h3 {
+        margin-bottom: 1rem;
+        color: #495057;
+        font-weight: 600;
+      }
+
+      .workflow-visualization {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+
+      .workflow-node {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .priority-node {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        color: white;
+        font-weight: 500;
+        min-width: 120px;
+        text-align: center;
+        position: relative;
+      }
+
+      .priority-node.company-priority {
+        border: 2px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .priority-label {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .due-days {
+        font-size: 0.75rem;
+        opacity: 0.9;
+        margin-top: 0.25rem;
+      }
+
+      .escalation-info {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-align: center;
+        padding: 0.25rem 0.5rem;
+        background: #fff3cd;
+        border-radius: 4px;
+        border: 1px solid #ffeaa7;
+      }
+
+      .escalation-text {
+        font-weight: 500;
+      }
+
+      .priority-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .priority-list {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e9ecef;
+      }
+
+      .priority-table {
+        display: table;
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .priority-color-indicator {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 0.5rem;
+        border: 2px solid white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+
+      .priority-display {
+        display: flex;
+        align-items: center;
+      }
+
+      .priority-name {
+        font-weight: 500;
+        margin-right: 0.5rem;
+      }
+
+      .priority-code {
+        background: #f8f9fa;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        border: 1px solid #e9ecef;
+      }
+
+      .system-priority-label {
+        font-weight: 500;
+        color: #495057;
+      }
+
+      .system-priority-code {
+        color: #6c757d;
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+      }
+
+      .due-days-display {
+        color: #495057;
+        font-weight: 500;
+      }
+
+      .escalation-display .escalation-text {
+        color: #fd7e14;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .escalation-display .no-escalation {
+        color: #6c757d;
+        font-style: italic;
+      }
+
+      .priority-weight {
+        font-weight: 600;
+        color: #495057;
+      }
+
+      .priority-form-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .priority-form-modal {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        max-width: 600px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .escalation-fields {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      @media (max-width: 768px) {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
       .section-header h3 {
         margin: 0 0 0.25rem 0;
         font-size: 1.1rem;
