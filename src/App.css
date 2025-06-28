@@ -1138,3 +1138,198 @@
         padding-left: 0.75rem;
       }
     }
+
+    /* Subtask Creation Modal Styles */
+    .subtask-creation-modal .modal-content {
+      padding: 1.5rem;
+    }
+
+    .subtask-creation-modal .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .subtask-creation-modal .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtasks-view-modal .modal-content {
+      padding: 1.5rem;
+    }
+
+    /* Quick Actions Bar Styles */
+    .quick-actions-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      background: rgba(249, 250, 251, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      border: 1px solid #d1d5db;
+      background: white;
+      color: #374151;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .action-btn:hover {
+      background: #f9fafb;
+      border-color: #9ca3af;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    .action-btn.primary:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+      border-color: #1d4ed8;
+    }
+
+    .action-btn.danger {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      border-color: #ef4444;
+    }
+
+    .action-btn.danger:hover {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      border-color: #dc2626;
+    }
+
+    .action-btn.success {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border-color: #10b981;
+    }
+
+    .action-btn.success:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      border-color: #059669;
+    }
+
+    .action-btn.warning {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+      border-color: #f59e0b;
+    }
+
+    .action-btn.warning:hover {
+      background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+      border-color: #d97706;
+    }
+
+    /* Task Header Bar */
+    .task-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .header-main-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+    }
+
+    .task-type-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255,255,255,0.15);
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .task-type-icon {
+      font-size: 1.25rem;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-badges {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tag-badge {
+      padding: 0.25rem 0.5rem;
+      background: rgba(255,255,255,0.2);
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .status-indicator {
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: rgba(255,255,255,0.2);
+    }
+
+    .status-indicator.snoozed {
+      background: rgba(251, 191, 36, 0.2);
+    }
+
+    .status-indicator.risky {
+      background: rgba(239, 68, 68, 0.2);
+    }
+
+    .close-button {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .close-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(90deg) scale(1.1);
+    }
