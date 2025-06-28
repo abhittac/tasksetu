@@ -429,77 +429,112 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
       <div className="info-grid">
         {/* Description */}
         <div className="info-section full-width">
-          <h3>Description</h3>
-          <EditableTextArea
-            value={task.description}
-            onSave={(newDesc) => onUpdate({...task, description: newDesc})}
-            canEdit={permissions.canEdit}
-            placeholder="Add task description..."
-          />
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <span className="text-blue-600">📝</span>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">Description</h3>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <EditableTextArea
+              value={task.description}
+              onSave={(newDesc) => onUpdate({...task, description: newDesc})}
+              canEdit={permissions.canEdit}
+              placeholder="Add task description..."
+            />
+          </div>
         </div>
 
         {/* Date Information */}
         <div className="info-section">
-          <h4>Timeline</h4>
-          <div className="info-field">
-            <label>Start Date:</label>
-            <EditableDateField
-              value={task.startDate}
-              onSave={(newDate) => onUpdate({...task, startDate: newDate})}
-              canEdit={permissions.canEdit}
-            />
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+              <span className="text-green-600">📅</span>
+            </div>
+            <h4 className="text-lg font-semibold text-gray-900">Timeline</h4>
           </div>
-          <div className="info-field">
-            <label>Due Date:</label>
-            <EditableDateField
-              value={task.dueDate}
-              onSave={(newDate) => onUpdate({...task, dueDate: newDate})}
-              canEdit={permissions.canEdit}
-            />
-          </div>
-          <div className="info-field">
-            <label>Time Estimate:</label>
-            <EditableTextField
-              value={task.timeEstimate}
-              onSave={(newEstimate) => onUpdate({...task, timeEstimate: newEstimate})}
-              canEdit={permissions.canEdit}
-            />
+          <div className="space-y-4">
+            <div className="info-field bg-white rounded-lg p-4 border border-gray-200">
+              <label className="text-sm font-medium text-gray-600 mb-2 block">Start Date:</label>
+              <EditableDateField
+                value={task.startDate}
+                onSave={(newDate) => onUpdate({...task, startDate: newDate})}
+                canEdit={permissions.canEdit}
+              />
+            </div>
+            <div className="info-field bg-white rounded-lg p-4 border border-gray-200">
+              <label className="text-sm font-medium text-gray-600 mb-2 block">Due Date:</label>
+              <EditableDateField
+                value={task.dueDate}
+                onSave={(newDate) => onUpdate({...task, dueDate: newDate})}
+                canEdit={permissions.canEdit}
+              />
+            </div>
+            <div className="info-field bg-white rounded-lg p-4 border border-gray-200">
+              <label className="text-sm font-medium text-gray-600 mb-2 block">Time Estimate:</label>
+              <EditableTextField
+                value={task.timeEstimate}
+                onSave={(newEstimate) => onUpdate({...task, timeEstimate: newEstimate})}
+                canEdit={permissions.canEdit}
+              />
+            </div>
           </div>
         </div>
 
         {/* Task Relationships */}
         <div className="info-section">
-          <h4>Relationships</h4>
-          {task.parentTaskId && (
-            <div className="info-field">
-              <label>Parent Task:</label>
-              <span className="linked-task">Task #{task.parentTaskId}</span>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+              <span className="text-purple-600">🔗</span>
             </div>
-          )}
-          <div className="info-field">
-            <label>Collaborators:</label>
-            <div className="collaborators-list">
-              {task.collaborators.map(collab => (
-                <span key={collab} className="collaborator-badge">{collab}</span>
-              ))}
+            <h4 className="text-lg font-semibold text-gray-900">Relationships</h4>
+          </div>
+          <div className="space-y-4">
+            {task.parentTaskId && (
+              <div className="info-field bg-white rounded-lg p-4 border border-gray-200">
+                <label className="text-sm font-medium text-gray-600 mb-2 block">Parent Task:</label>
+                <span className="linked-task font-medium">Task #{task.parentTaskId}</span>
+              </div>
+            )}
+            <div className="info-field bg-white rounded-lg p-4 border border-gray-200">
+              <label className="text-sm font-medium text-gray-600 mb-2 block">Collaborators:</label>
+              <div className="collaborators-list">
+                {task.collaborators.map(collab => (
+                  <span key={collab} className="collaborator-badge">{collab}</span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Creation Info */}
         <div className="info-section">
-          <h4>Task Details</h4>
-          <div className="info-field">
-            <label>Created By:</label>
-            <span>{task.createdBy}</span>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+              <span className="text-gray-600">ℹ️</span>
+            </div>
+            <h4 className="text-lg font-semibold text-gray-900">Task Details</h4>
           </div>
-          <div className="info-field">
-            <label>Created:</label>
-            <span>{task.createdAt}</span>
-          </div>
-          <div className="info-field">
-            <label>Last Updated:</label>
-            <span>{task.updatedAt}</span>
+          <div className="space-y-4">
+            <div className="info-field bg-white rounded-lg p-4 border border-gray-200">
+              <label className="text-sm font-medium text-gray-600 mb-2 block">Created By:</label>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span className="text-xs text-white font-medium">
+                    {task.createdBy.split(' ').map(n => n[0]).join('')}
+                  </span>
+                </div>
+                <span className="font-medium">{task.createdBy}</span>
+              </div>
+            </div>
+            <div className="info-field bg-white rounded-lg p-4 border border-gray-200">
+              <label className="text-sm font-medium text-gray-600 mb-2 block">Created:</label>
+              <span className="font-medium">{task.createdAt}</span>
+            </div>
+            <div className="info-field bg-white rounded-lg p-4 border border-gray-200">
+              <label className="text-sm font-medium text-gray-600 mb-2 block">Last Updated:</label>
+              <span className="font-medium">{task.updatedAt}</span>
+            </div>
           </div>
         </div>
 
@@ -839,7 +874,14 @@ function EditableTextArea({ value, onSave, canEdit, placeholder }) {
   }
 
   if (!canEdit) {
-    return <p className="readonly-text">{value || placeholder}</p>
+    return (
+      <div className="readonly-text-area">
+        <p className="text-gray-900 leading-relaxed">
+          {value || <span className="text-gray-500 italic">{placeholder}</span>}
+        </p>
+        <span className="readonly-indicator text-xs text-gray-400 mt-2 block">🔒 Read only</span>
+      </div>
+    )
   }
 
   if (isEditing) {
@@ -850,18 +892,43 @@ function EditableTextArea({ value, onSave, canEdit, placeholder }) {
           onChange={(e) => setEditValue(e.target.value)}
           onBlur={handleSave}
           autoFocus
-          className="editable-textarea"
-          rows="4"
+          className="editable-textarea min-h-32 resize-none"
+          rows="6"
           placeholder={placeholder}
         />
+        <div className="flex justify-end gap-2 mt-2">
+          <button 
+            className="text-xs px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+            onClick={() => {
+              setEditValue(value)
+              setIsEditing(false)
+            }}
+          >
+            Cancel
+          </button>
+          <button 
+            className="text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            onClick={handleSave}
+          >
+            Save
+          </button>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="editable-text-display" onClick={() => setIsEditing(true)}>
-      <p>{value || placeholder}</p>
-      <span className="edit-icon">✏️</span>
+    <div className="editable-text-display group" onClick={() => setIsEditing(true)}>
+      <div className="relative">
+        <p className="text-gray-900 leading-relaxed whitespace-pre-wrap">
+          {value || <span className="text-gray-500 italic">{placeholder}</span>}
+        </p>
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded shadow-sm">
+            ✏️ Click to edit
+          </span>
+        </div>
+      </div>
     </div>
   )
 }
