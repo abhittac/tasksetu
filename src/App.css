@@ -1164,11 +1164,11 @@
     .task-header-bar {
       background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
       color: white;
-      padding: 2rem 2.5rem;
+      padding: 1rem 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
       position: relative;
       z-index: 10;
       border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -1177,35 +1177,35 @@
     .header-main-content {
       display: flex;
       align-items: center;
-      gap: 2.5rem;
+      gap: 1.5rem;
       flex: 1;
     }
 
     .task-type-indicator {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1.25rem;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
       background: rgba(255, 255, 255, 0.15);
-      border-radius: 16px;
+      border-radius: 12px;
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
     .task-type-icon {
-      font-size: 1.5rem;
+      font-size: 1.25rem;
     }
 
     .task-type-label {
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       font-weight: 700;
       color: white;
       letter-spacing: 0.025em;
     }
 
     .task-title {
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: 800;
       margin: 0;
       color: white;
@@ -1254,7 +1254,7 @@
     .header-controls {
       display: flex;
       align-items: center;
-      gap: 1.25rem;
+      gap: 0.75rem;
     }
 
     .status-dropdown, .priority-dropdown, .assignee-selector {
@@ -1265,18 +1265,18 @@
       background: rgba(255, 255, 255, 0.15);
       border: 1px solid rgba(255, 255, 255, 0.25);
       color: white;
-      padding: 0.75rem 1.25rem;
-      border-radius: 16px;
+      padding: 0.5rem 0.75rem;
+      border-radius: 12px;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.5rem;
       backdrop-filter: blur(12px);
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       letter-spacing: 0.025em;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
     .status-button:hover, .priority-button:hover, .assignee-button:hover {
@@ -1416,55 +1416,55 @@
       background: rgba(255, 255, 255, 0.15);
       border: 1px solid rgba(255, 255, 255, 0.25);
       color: white;
-      width: 3.5rem;
-      height: 3.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.75rem;
+      font-size: 1.25rem;
       font-weight: bold;
       cursor: pointer;
       transition: all 0.3s ease;
       backdrop-filter: blur(12px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
     .close-button:hover {
       background: rgba(255, 255, 255, 0.25);
       transform: rotate(90deg) scale(1.1);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     }
 
     .quick-actions-bar {
       background: white;
       border-bottom: 1px solid #e5e7eb;
-      padding: 1.5rem 2.5rem;
+      padding: 1rem 1.5rem;
       display: flex;
       align-items: center;
-      gap: 1.25rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
     .action-btn {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 1rem 1.5rem;
-      border: 2px solid #e5e7eb;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid #e5e7eb;
       background: white;
       color: #374151;
-      border-radius: 16px;
-      font-weight: 700;
+      border-radius: 12px;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       text-decoration: none;
       position: relative;
       overflow: hidden;
       letter-spacing: 0.025em;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     }
 
     .action-btn::before {
@@ -1554,19 +1554,19 @@
     .tab-button {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 1.25rem 2rem;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
       border: none;
       background: transparent;
       color: #6b7280;
-      font-weight: 700;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
-      border-bottom: 4px solid transparent;
+      border-bottom: 3px solid transparent;
       white-space: nowrap;
       position: relative;
       overflow: hidden;
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       letter-spacing: 0.025em;
     }
 
@@ -1614,14 +1614,14 @@
     .tab-content {
       flex: 1;
       overflow-y: auto;
-      padding: 2.5rem;
+      padding: 1.25rem;
       background: #fafbfc;
     }
 
     .core-info-panel {
       background: white;
-      border-radius: 24px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
       border: 1px solid #e5e7eb;
       overflow: hidden;
     }
@@ -1629,14 +1629,14 @@
     .info-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 3rem;
-      padding: 2.5rem;
+      gap: 1.5rem;
+      padding: 1.5rem;
     }
 
     .info-section {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1rem;
     }
 
     .info-section.full-width {
@@ -1644,20 +1644,20 @@
     }
 
     .info-section h3 {
-      font-size: 1.5rem;
-      font-weight: 800;
+      font-size: 1.125rem;
+      font-weight: 700;
       color: #1f2937;
-      margin: 0 0 1.5rem 0;
-      padding-bottom: 0.75rem;
-      border-bottom: 3px solid #e5e7eb;
+      margin: 0 0 0.75rem 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e5e7eb;
       letter-spacing: -0.025em;
     }
 
     .info-section h4 {
-      font-size: 1.25rem;
-      font-weight: 700;
+      font-size: 1rem;
+      font-weight: 600;
       color: #374151;
-      margin: 0 0 1.25rem 0;
+      margin: 0 0 0.75rem 0;
       letter-spacing: -0.025em;
     }
 
@@ -1665,7 +1665,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 0;
+      padding: 0.5rem 0;
       border-bottom: 1px solid #f3f4f6;
     }
 
@@ -1690,10 +1690,10 @@
 
     .editable-text-display {
       cursor: pointer;
-      padding: 1.5rem;
+      padding: 0.75rem;
       background: #f8fafc;
-      border-radius: 16px;
-      border: 2px solid transparent;
+      border-radius: 12px;
+      border: 1px solid transparent;
       transition: all 0.3s ease;
       position: relative;
     }
@@ -1702,27 +1702,28 @@
       border-color: #3b82f6;
       background: #eff6ff;
       transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
     }
 
     .editable-text-display p {
       margin: 0;
       color: #374151;
-      line-height: 1.7;
+      line-height: 1.5;
       font-weight: 500;
+      font-size: 0.875rem;
     }
 
     .editable-textarea {
       width: 100%;
-      padding: 1.5rem;
-      border: 3px solid #3b82f6;
-      border-radius: 16px;
+      padding: 0.75rem;
+      border: 2px solid #3b82f6;
+      border-radius: 12px;
       resize: vertical;
       font-family: inherit;
       font-size: 0.875rem;
-      line-height: 1.7;
+      line-height: 1.5;
       font-weight: 500;
-      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+      box-shadow: 0 2px 12px rgba(59, 130, 246, 0.15);
     }
 
     .linked-task {
@@ -1763,39 +1764,39 @@
     .reminder-item {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      padding: 1.25rem;
+      gap: 0.75rem;
+      padding: 0.75rem;
       background: #fef3c7;
       border: 1px solid #fbbf24;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(251, 191, 36, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(251, 191, 36, 0.08);
     }
 
     .reminder-icon {
-      font-size: 1.5rem;
+      font-size: 1.125rem;
     }
 
     .reminder-date {
       color: #92400e;
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       font-weight: 600;
     }
 
     .milestone-list {
       display: flex;
       flex-direction: column;
-      gap: 1.25rem;
+      gap: 0.75rem;
     }
 
     .milestone-item {
       display: flex;
       align-items: center;
-      gap: 1.25rem;
-      padding: 1.25rem;
+      gap: 0.75rem;
+      padding: 0.75rem;
       background: #f0f9ff;
       border: 1px solid #0ea5e9;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(14, 165, 233, 0.08);
     }
 
     .milestone-icon {
@@ -1820,18 +1821,18 @@
     }
 
     .approval-info {
-      padding: 2rem;
+      padding: 1rem;
       background: #f3e8ff;
       border: 1px solid #a855f7;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(168, 85, 247, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(168, 85, 247, 0.08);
     }
 
     .approval-badge {
-      padding: 0.75rem 1.25rem;
-      border-radius: 24px;
-      font-weight: 700;
-      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 16px;
+      font-weight: 600;
+      font-size: 0.75rem;
       letter-spacing: 0.025em;
     }
 
@@ -1843,24 +1844,25 @@
     .risk-section {
       background: #fef2f2;
       border: 1px solid #fca5a5;
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 2px 8px rgba(252, 165, 165, 0.1);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 1px 4px rgba(252, 165, 165, 0.08);
     }
 
     .risk-details p {
       margin: 0;
       color: #991b1b;
-      line-height: 1.7;
+      line-height: 1.5;
       font-weight: 600;
+      font-size: 0.875rem;
     }
 
     .snooze-section {
       background: #fef3c7;
       border: 1px solid #fbbf24;
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 2px 8px rgba(251, 191, 36, 0.1);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 1px 4px rgba(251, 191, 36, 0.08);
     }
 
     .snooze-details {
@@ -1920,40 +1922,48 @@
     @media (max-width: 768px) {
       .task-header-bar {
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.75rem;
         align-items: flex-start;
+        padding: 0.75rem 1rem;
       }
 
       .header-main-content {
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.75rem;
         width: 100%;
       }
 
       .header-controls {
         width: 100%;
         justify-content: space-between;
+        gap: 0.5rem;
       }
 
       .quick-actions-bar {
         flex-wrap: wrap;
         gap: 0.5rem;
+        padding: 0.75rem 1rem;
       }
 
       .action-btn {
         flex: 1;
-        min-width: 120px;
+        min-width: 100px;
         justify-content: center;
+        padding: 0.375rem 0.75rem;
       }
 
       .info-grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
-        padding: 1.5rem;
+        gap: 1rem;
+        padding: 1rem;
       }
 
       .tab-content {
-        padding: 1rem;
+        padding: 0.75rem;
+      }
+
+      .task-title {
+        font-size: 1.25rem;
       }
     }
 
