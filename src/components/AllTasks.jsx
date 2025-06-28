@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import TaskDetail from './TaskDetail'
+import CreateTask from './CreateTask'
 
 export default function AllTasks() {
   const [searchTerm, setSearchTerm] = useState('')
