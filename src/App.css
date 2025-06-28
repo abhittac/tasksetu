@@ -1081,206 +1081,43 @@
     .subtask-item {
       position: relative;
       transition: all 0.2s ease-in-out;
-      border-radius: 8px;
-      margin-bottom: 2px;
     }
 
     .subtask-item:hover {
-      transform: translateX(4px);
-      background-color: #f8fafc;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transform: translateX(2px);
     }
 
     .subtask-item.selected {
       background: linear-gradient(90deg, #eff6ff, #dbeafe);
       border-left: 4px solid #3b82f6;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
     }
 
-    /* Enhanced Visual Hierarchy */
+    /* Visual Hierarchy Indicators */
     .subtask-indent {
       margin-left: 1.5rem;
       padding-left: 1rem;
-      border-left: 3px solid #e2e8f0;
+      border-left: 2px solid #e5e7eb;
       position: relative;
-      background: linear-gradient(90deg, transparent, #f8fafc 50%);
     }
 
     .subtask-indent::before {
       content: '';
       position: absolute;
-      left: -2px;
+      left: -1px;
       top: 0;
       bottom: 0;
-      width: 3px;
-      background: linear-gradient(to bottom, #3b82f6, #6366f1, #8b5cf6);
-      opacity: 0.6;
-      border-radius: 2px;
-    }
-
-    /* Sub-task Row Styling */
-    .subtask-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(226, 232, 240, 0.5);
-    }
-
-    .subtask-row:hover {
-      background: rgba(255, 255, 255, 0.9);
-      border-color: #cbd5e1;
-    }
-
-    /* Sub-task Status Icons */
-    .subtask-status-icon {
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      flex-shrink: 0;
-    }
-
-    /* Sub-task Content */
-    .subtask-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .subtask-title {
-      font-weight: 600;
-      color: #1f2937;
-      font-size: 14px;
-      margin-bottom: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .subtask-meta {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 12px;
-      color: #6b7280;
-    }
-
-    /* Assignee Avatar in Sub-tasks */
-    .subtask-assignee {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .subtask-avatar {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      font-weight: 600;
-      color: #374151;
-      flex-shrink: 0;
-    }
-
-    .subtask-assignee-name {
-      font-size: 11px;
-      color: #6b7280;
-      white-space: nowrap;
-    }
-
-    /* Due Date in Sub-tasks */
-    .subtask-due-date {
-      font-size: 11px;
-      color: #6b7280;
-      white-space: nowrap;
-    }
-
-    .subtask-due-date.overdue {
-      color: #dc2626;
-      font-weight: 600;
-    }
-
-    /* Priority Badge in Sub-tasks */
-    .subtask-priority {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .subtask-priority.low {
-      background: #f3f4f6;
-      color: #6b7280;
-    }
-
-    .subtask-priority.medium {
-      background: #fef3c7;
-      color: #d97706;
-    }
-
-    .subtask-priority.high {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-
-    .subtask-priority.critical {
-      background: #fde2e8;
-      color: #be185d;
-    }
-
-    /* Actions */
-    .subtask-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .subtask-item:hover .subtask-actions {
-      opacity: 1;
-    }
-
-    .subtask-action-btn {
-      padding: 4px;
-      border-radius: 4px;
-      border: none;
-      background: transparent;
-      color: #9ca3af;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 12px;
-    }
-
-    .subtask-action-btn:hover {
-      background: #f3f4f6;
-      color: #374151;
-    }
-
-    .subtask-action-btn.delete:hover {
-      background: #fef2f2;
-      color: #dc2626;
+      width: 2px;
+      background: linear-gradient(to bottom, #3b82f6, #6366f1);
+      opacity: 0.5;
     }
 
     /* Progress Indicators */
     .subtask-progress-bar {
-      height: 3px;
+      height: 4px;
       background: #e5e7eb;
       border-radius: 2px;
       overflow: hidden;
       transition: all 0.3s ease;
-      margin-top: 8px;
     }
 
     .subtask-progress-fill {
@@ -1288,36 +1125,6 @@
       background: linear-gradient(90deg, #10b981, #059669);
       border-radius: 2px;
       transition: width 0.3s ease;
-    }
-
-    /* Parent Task Indicator */
-    .parent-task-indicator {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2px 6px;
-      background: #eff6ff;
-      color: #2563eb;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 500;
-      margin-left: 8px;
-    }
-
-    .parent-task-indicator:hover {
-      background: #dbeafe;
-      cursor: pointer;
-    }
-
-    /* Sticky Add Button */
-    .sticky-add-subtask {
-      position: sticky;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
-      padding: 12px 16px;
-      border-top: 1px solid #e5e7eb;
-      margin-top: 8px;
     }
 
     /* Responsive Sub-task Layout */
@@ -1329,15 +1136,5 @@
       .subtask-indent {
         margin-left: 0.75rem;
         padding-left: 0.75rem;
-      }
-
-      .subtask-meta {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
-
-      .subtask-assignee-name {
-        display: none;
       }
     }

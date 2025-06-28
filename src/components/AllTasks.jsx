@@ -312,18 +312,11 @@ export default function AllTasks() {
                               </span>
                               {task.subtaskCount > 0 && (
                                 <span 
-                                  className="parent-task-indicator"
-                                  title={`${task.subtaskCount} sub-tasks - Click to view`}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    console.log(`Opening task ${task.id} with sub-tasks focused`);
-                                    // In real implementation, this would open TaskDetail with subtasks tab active
-                                  }}
+                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200 transition-colors"
+                                  title={`${task.subtaskCount} sub-tasks`}
+                                  onClick={() => console.log(`View sub-tasks for task ${task.id}`)}
                                 >
-                                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                                  </svg>
-                                  {task.subtaskCount}
+                                  ⋗ {task.subtaskCount}
                                 </span>
                               )}
                             </>
