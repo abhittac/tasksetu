@@ -24,6 +24,7 @@ export default function TaskDetail({ taskId, onClose }) {
   const [showReassignModal, setShowReassignModal] = useState(false)
   const [showRiskModal, setShowRiskModal] = useState(false)
   const [showCreateSubtaskDrawer, setShowCreateSubtaskDrawer] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'assignee' })
 
   // Mock task data - in real app this would come from props or API
@@ -169,6 +170,18 @@ export default function TaskDetail({ taskId, onClose }) {
     console.log(`Notification sent to ${subtaskData.assignee}: New sub-task "${subtaskData.title}" assigned to you`)
   }
 
+  const handleDeleteTask = (deleteOptions) => {
+    // Log the deletion
+    console.log(`Task "${task.title}" deleted by ${currentUser.name}`, deleteOptions);
+    
+    // Close the modal and task detail
+    setShowDeleteModal(false);
+    onClose();
+    
+    // In a real app, this would update the parent component's task list
+    // and send the deletion request to the backend
+  }
+
   const handleExportTask = () => {
     console.log('Exporting task:', task)
   }
@@ -282,7 +295,7 @@ export default function TaskDetail({ taskId, onClose }) {
 
         <button 
           className="action-btn danger"
-          onClick={() => console.log('Delete task')}
+          onClick={() => setShowDeleteModal(true)}
           disabled={!permissions.canDelete}
         >
           ❌ Delete
@@ -421,6 +434,169 @@ export default function TaskDetail({ taskId, onClose }) {
           onClose={() => setShowCreateSubtaskDrawer(false)}
         />
       )}
+
+      {showDeleteModal && (
+        <TaskDeleteModal
+          task={task}
+          onConfirm={handleDeleteTask}
+          onClose={() => setShowDeleteModal(false)}
+          currentUser={currentUser}
+        />
+      )}
+    </div>
+  )
+}
+
+// Task Delete Modal Component for TaskDetail
+function TaskDeleteModal({ task, onConfirm, onClose, currentUser }) {
+  const [deleteOptions, setDeleteOptions] = useState({
+    deleteSubtasks: false,
+    deleteAttachments: false,
+    confirmed: false
+  })
+
+  const hasSubtasks = task?.subtasks && task.subtasks.length > 0
+  const hasAttachments = task?.attachments && task.attachments.length > 0
+  const hasLinkedItems = task?.linkedItems && task.linkedItems.length > 0
+
+  const handleSubmit = () => {
+    if (!deleteOptions.confirmed) {
+      alert('Please confirm you understand this action is irreversible')
+      return
+    }
+    onConfirm(deleteOptions)
+  }
+
+  const getWarningMessages = () => {
+    const warnings = []
+    
+    if (hasSubtasks) {
+      warnings.push(`This task has ${task.subtasks.length} subtask(s). Deleting it will ${deleteOptions.deleteSubtasks ? 'delete all subtasks' : 'orphan them'}.`)
+    }
+    
+    if (hasLinkedItems || hasAttachments) {
+      warnings.push('All linked forms and files will also be affected.')
+    }
+
+    if (task.createdBy !== currentUser.name && task.assigneeId !== currentUser.id) {
+      warnings.push('This task was created by another user.')
+    }
+
+    return warnings
+  }
+
+  const warnings = getWarningMessages()
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+        <div className="p-6">
+          <div className="flex items-center mb-4">
+            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">🗑️ Delete Task</h3>
+          </div>
+
+          <div className="delete-task-info mb-4">
+            <h4 className="text-gray-900 mb-2">Are you sure you want to delete this task?</h4>
+            <div className="bg-gray-50 p-3 rounded-lg">
+              <div className="font-medium text-gray-900">"{task?.title}"</div>
+              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mt-2 ${
+                task?.status === 'completed' ? 'bg-green-100 text-green-800' :
+                task?.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                'bg-gray-100 text-gray-800'
+              }`}>
+                {getStatusLabel(task?.status)}
+              </span>
+            </div>
+          </div>
+
+          {warnings.length > 0 && (
+            <div className="deletion-warnings mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+              <h4 className="text-orange-800 font-medium mb-2">⚠️ Important Notice:</h4>
+              <ul className="text-sm text-orange-700 space-y-1">
+                {warnings.map((warning, index) => (
+                  <li key={index}>• {warning}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="deletion-options mb-6 space-y-3">
+            {hasSubtasks && (
+              <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={deleteOptions.deleteSubtasks}
+                  onChange={(e) => setDeleteOptions({
+                    ...deleteOptions,
+                    deleteSubtasks: e.target.checked
+                  })}
+                  className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                />
+                <div>
+                  <div className="font-medium text-gray-900">Also delete all {task.subtasks.length} subtask(s)</div>
+                  <div className="text-sm text-gray-600">If unchecked, subtasks will become orphaned</div>
+                </div>
+              </label>
+            )}
+
+            {(hasAttachments || hasLinkedItems) && (
+              <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={deleteOptions.deleteAttachments}
+                  onChange={(e) => setDeleteOptions({
+                    ...deleteOptions,
+                    deleteAttachments: e.target.checked
+                  })}
+                  className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                />
+                <div>
+                  <div className="font-medium text-gray-900">Also delete attached forms and files</div>
+                  <div className="text-sm text-gray-600">This will permanently remove all attachments</div>
+                </div>
+              </label>
+            )}
+
+            <label className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-lg cursor-pointer">
+              <input
+                type="checkbox"
+                checked={deleteOptions.confirmed}
+                onChange={(e) => setDeleteOptions({
+                  ...deleteOptions,
+                  confirmed: e.target.checked
+                })}
+                className="rounded border-red-300 text-red-600 focus:ring-red-500"
+                required
+              />
+              <div>
+                <div className="font-medium text-red-900">I understand this action is irreversible</div>
+                <div className="text-sm text-red-700">This task will be permanently deleted</div>
+              </div>
+            </label>
+          </div>
+
+          <div className="flex gap-3 justify-end">
+            <button
+              className="btn btn-secondary"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+            <button 
+              className="btn btn-danger" 
+              onClick={handleSubmit}
+              disabled={!deleteOptions.confirmed}
+            >
+              Delete Task
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

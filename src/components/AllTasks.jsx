@@ -18,6 +18,7 @@ export default function AllTasks() {
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' });
   const [showStatusConfirmation, setShowStatusConfirmation] = useState(null);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(null);
 
   const [tasks, setTasks] = useState([
     {
@@ -367,6 +368,104 @@ export default function AllTasks() {
     console.log(`✅ Status updated: "${task.title}" changed from "${oldStatus?.label || oldStatusCode}" to "${newStatus.label}"`);
   };
 
+  // Permission check for task deletion
+  const canDeleteTask = (task) => {
+    return (
+      task.creatorId === currentUser.id ||
+      task.assigneeId === currentUser.id ||
+      currentUser.role === 'admin'
+    );
+  };
+
+  // Handle task deletion with integrity checks
+  const handleDeleteTask = (taskId, options = {}) => {
+    const task = tasks.find(t => t.id === taskId);
+    
+    if (!task) {
+      console.error('Task not found');
+      return;
+    }
+
+    // Check permissions
+    if (!canDeleteTask(task)) {
+      alert('You do not have permission to delete this task.');
+      return;
+    }
+
+    // Show confirmation modal with task details
+    setShowDeleteConfirmation({
+      task,
+      options: {
+        deleteSubtasks: false,
+        deleteAttachments: false,
+        deleteLinkedItems: false,
+        ...options
+      }
+    });
+  };
+
+  // Execute task deletion
+  const executeTaskDeletion = (taskId, options) => {
+    const task = tasks.find(t => t.id === taskId);
+    
+    // Remove task from list
+    setTasks(prevTasks => prevTasks.filter(t => t.id !== taskId));
+    
+    // Handle subtasks deletion
+    if (options.deleteSubtasks && task.subtasks && task.subtasks.length > 0) {
+      console.log(`Deleted ${task.subtasks.length} subtasks for task: ${task.title}`);
+    }
+    
+    // Handle attachments/linked items
+    if (options.deleteAttachments && task.linkedItems && task.linkedItems.length > 0) {
+      console.log(`Deleted ${task.linkedItems.length} linked items for task: ${task.title}`);
+    }
+    
+    // Log activity for audit trail
+    logActivity('task_deleted', {
+      taskId: task.id,
+      taskTitle: task.title,
+      deletedBy: currentUser.name,
+      timestamp: new Date().toISOString(),
+      options: options
+    });
+    
+    // Show success notification
+    console.log(`✅ Task "${task.title}" deleted successfully by ${currentUser.name}`);
+    
+    // Close confirmation modal
+    setShowDeleteConfirmation(null);
+  };
+
+  // Handle bulk task deletion
+  const handleBulkDeleteTasks = () => {
+    const selectedTaskObjects = tasks.filter(t => selectedTasks.includes(t.id));
+    const errors = [];
+
+    selectedTaskObjects.forEach(task => {
+      if (!canDeleteTask(task)) {
+        errors.push(`No permission to delete: ${task.title}`);
+      }
+    });
+
+    if (errors.length > 0) {
+      alert(`Cannot delete some tasks:\n${errors.join('\n')}`);
+      return;
+    }
+
+    if (window.confirm(`Are you sure you want to delete ${selectedTasks.length} selected tasks? This action cannot be undone.`)) {
+      setTasks(prevTasks => prevTasks.filter(task => !selectedTasks.includes(task.id)));
+      setSelectedTasks([]);
+      setShowBulkActions(false);
+      console.log(`Bulk deleted ${selectedTaskObjects.length} tasks by ${currentUser.name}`);
+    }
+  };
+
+  const logActivity = (type, details) => {
+    console.log(`🔄 Activity Log:`, details);
+    // In real app, this would be sent to backend for permanent audit trail
+  };
+
   // Handle bulk status update
   const handleBulkStatusUpdate = (newStatusCode) => {
     const selectedTaskObjects = tasks.filter(t => selectedTasks.includes(t.id));
@@ -588,6 +687,13 @@ export default function AllTasks() {
                 ))}
               </select>
               <button
+                className="btn btn-danger btn-sm"
+                onClick={handleBulkDeleteTasks}
+                title="Delete selected tasks"
+              >
+                🗑️ Delete
+              </button>
+              <button
                 className="btn btn-secondary btn-sm"
                 onClick={() => setSelectedTasks([])}
               >
@@ -791,7 +897,18 @@ export default function AllTasks() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 </button>
-                <TaskContextMenu taskId={task.id} />
+                {canDeleteTask(task) && (
+                  <button
+                    className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                    onClick={() => handleDeleteTask(task.id)}
+                    title="Delete task"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                )}
+                <TaskContextMenu taskId={task.id} onDelete={() => handleDeleteTask(task.id)} canDelete={canDeleteTask(task)} />
               </div>
                   </td>
                 </tr>
@@ -887,6 +1004,17 @@ export default function AllTasks() {
             setShowStatusConfirmation(null);
           }}
           onCancel={() => setShowStatusConfirmation(null)}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirmation && (
+        <TaskDeleteConfirmationModal
+          task={showDeleteConfirmation.task}
+          options={showDeleteConfirmation.options}
+          onConfirm={(finalOptions) => executeTaskDeletion(showDeleteConfirmation.task.id, finalOptions)}
+          onCancel={() => setShowDeleteConfirmation(null)}
+          currentUser={currentUser}
         />
       )}
 
@@ -1088,6 +1216,193 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
   );
 }
 
+// Task Delete Confirmation Modal Component
+function TaskDeleteConfirmationModal({ task, options, onConfirm, onCancel, currentUser }) {
+  const [deleteOptions, setDeleteOptions] = useState({
+    deleteSubtasks: false,
+    deleteAttachments: false,
+    deleteLinkedItems: false,
+    confirmed: false,
+    ...options
+  });
+
+  const hasSubtasks = task?.subtasks && task.subtasks.length > 0;
+  const hasAttachments = task?.attachments && task.attachments.length > 0;
+  const hasLinkedItems = task?.linkedItems && task.linkedItems.length > 0;
+
+  const handleSubmit = () => {
+    if (!deleteOptions.confirmed) {
+      alert('Please confirm you understand this action is irreversible');
+      return;
+    }
+    onConfirm(deleteOptions);
+  };
+
+  const getWarningMessages = () => {
+    const warnings = [];
+    
+    if (hasSubtasks) {
+      warnings.push(`This task has ${task.subtasks.length} subtask(s). ${deleteOptions.deleteSubtasks ? 'They will be deleted.' : 'They will be orphaned.'}`);
+    }
+    
+    if (hasLinkedItems || hasAttachments) {
+      warnings.push(`This task has linked items/attachments. ${deleteOptions.deleteAttachments ? 'They will be deleted.' : 'Links will be preserved.'}`);
+    }
+
+    if (task.createdBy !== currentUser.name && task.assigneeId !== currentUser.id) {
+      warnings.push('This task was created by another user.');
+    }
+
+    return warnings;
+  };
+
+  const warnings = getWarningMessages();
+  const isCreator = task.creatorId === currentUser.id;
+  const isAssignee = task.assigneeId === currentUser.id;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          {/* Header */}
+          <div className="flex items-center mb-4">
+            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">Delete Task</h3>
+          </div>
+
+          {/* Task Info */}
+          <div className="mb-6">
+            <p className="text-gray-600 mb-3">
+              Are you sure you want to delete this task?
+            </p>
+            <div className="bg-gray-50 p-3 rounded-lg">
+              <div className="font-medium text-gray-900 mb-1">"{task.title}"</div>
+              <div className="text-sm text-gray-600">
+                <div>Created by: {task.createdBy}</div>
+                <div>Assigned to: {task.assignee}</div>
+                <div>Status: {getStatusLabel(task.status)}</div>
+                <div>Priority: {task.priority}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Permission Info */}
+          <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+            <div className="text-sm text-blue-800">
+              <div className="font-medium mb-1">Your permissions:</div>
+              <div className="flex flex-wrap gap-2">
+                {isCreator && <span className="bg-blue-200 px-2 py-1 rounded text-xs">Creator</span>}
+                {isAssignee && <span className="bg-green-200 px-2 py-1 rounded text-xs">Assignee</span>}
+                {currentUser.role === 'admin' && <span className="bg-purple-200 px-2 py-1 rounded text-xs">Admin</span>}
+              </div>
+            </div>
+          </div>
+
+          {/* Warnings */}
+          {warnings.length > 0 && (
+            <div className="mb-6 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+              <h4 className="text-orange-800 font-medium mb-2">⚠️ Important:</h4>
+              <ul className="text-sm text-orange-700 space-y-1">
+                {warnings.map((warning, index) => (
+                  <li key={index}>• {warning}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Deletion Options */}
+          <div className="mb-6 space-y-3">
+            <h4 className="font-medium text-gray-900">Deletion Options:</h4>
+            
+            {hasSubtasks && (
+              <label className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={deleteOptions.deleteSubtasks}
+                  onChange={(e) => setDeleteOptions({
+                    ...deleteOptions,
+                    deleteSubtasks: e.target.checked
+                  })}
+                  className="mt-1 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                />
+                <div>
+                  <div className="font-medium text-gray-900">Delete all subtasks</div>
+                  <div className="text-sm text-gray-600">
+                    This will permanently delete {task.subtasks.length} subtask(s). 
+                    If unchecked, subtasks will become orphaned.
+                  </div>
+                </div>
+              </label>
+            )}
+
+            {(hasAttachments || hasLinkedItems) && (
+              <label className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={deleteOptions.deleteAttachments}
+                  onChange={(e) => setDeleteOptions({
+                    ...deleteOptions,
+                    deleteAttachments: e.target.checked
+                  })}
+                  className="mt-1 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                />
+                <div>
+                  <div className="font-medium text-gray-900">Delete attachments & linked items</div>
+                  <div className="text-sm text-gray-600">
+                    This will delete all files, forms, and linked items.
+                    If unchecked, they will remain accessible from other locations.
+                  </div>
+                </div>
+              </label>
+            )}
+
+            {/* Confirmation Checkbox */}
+            <label className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg cursor-pointer">
+              <input
+                type="checkbox"
+                checked={deleteOptions.confirmed}
+                onChange={(e) => setDeleteOptions({
+                  ...deleteOptions,
+                  confirmed: e.target.checked
+                })}
+                className="mt-1 rounded border-red-300 text-red-600 focus:ring-red-500"
+                required
+              />
+              <div>
+                <div className="font-medium text-red-900">I understand this action is irreversible</div>
+                <div className="text-sm text-red-700">
+                  This task will be permanently deleted and cannot be recovered.
+                </div>
+              </div>
+            </label>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 justify-end">
+            <button
+              className="btn btn-secondary"
+              onClick={onCancel}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn btn-danger"
+              onClick={handleSubmit}
+              disabled={!deleteOptions.confirmed}
+            >
+              Delete Task
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Status Confirmation Modal Component
 function StatusConfirmationModal({ taskTitle, statusLabel, onConfirm, onCancel }) {
   return (
@@ -1127,7 +1442,7 @@ function StatusConfirmationModal({ taskTitle, statusLabel, onConfirm, onCancel }
   );
 }
 
-function TaskContextMenu({ taskId }) {
+function TaskContextMenu({ taskId, onDelete, canDelete }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleAddSubtask = () => {
@@ -1137,6 +1452,11 @@ function TaskContextMenu({ taskId }) {
 
   const handleViewSubtasks = () => {
     console.log(`View sub-tasks for task ${taskId}`);
+    setIsOpen(false);
+  };
+
+  const handleDeleteTask = () => {
+    onDelete();
     setIsOpen(false);
   };
 
@@ -1174,6 +1494,20 @@ function TaskContextMenu({ taskId }) {
               </svg>
               View Sub-tasks
             </button>
+            {canDelete && (
+              <>
+                <div className="border-t border-gray-200 my-1"></div>
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  onClick={handleDeleteTask}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Delete Task
+                </button>
+              </>
+            )}
           </div>
         </>
       )}
