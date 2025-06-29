@@ -287,23 +287,6 @@ export default function PriorityManager() {
   )
 }
 
-// Helper functions moved outside component
-const getTaskCount = (priorityCode) => {
-  const mockCounts = {
-    'LOW': 89,
-    'MEDIUM': 156,
-    'HIGH': 67,
-    'CRITICAL': 23,
-    'URGENT': 8
-  }
-  return mockCounts[priorityCode] || 0
-}
-
-const getSystemPriorityLabel = (systemCode, systemPriorities) => {
-  const systemPriority = systemPriorities.find(p => p.code === systemCode)
-  return systemPriority ? systemPriority.label : systemCode
-}
-
 export default function PriorityManager() {
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' })
 
