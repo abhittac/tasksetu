@@ -157,15 +157,15 @@ export default function AllTasks() {
   const getStatusBadge = (statusCode) => {
     const status = companyStatuses.find(s => s.code === statusCode);
     const baseClass = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium";
-    
+
     if (!status) return `${baseClass} bg-gray-100 text-gray-800`;
-    
+
     // Convert hex to RGB for background opacity
     const hex = status.color.replace('#', '');
     const r = parseInt(hex.substr(0, 2), 16);
     const g = parseInt(hex.substr(2, 2), 16);
     const b = parseInt(hex.substr(4, 2), 16);
-    
+
     return {
       className: `${baseClass} text-white`,
       style: { backgroundColor: status.color }
@@ -185,11 +185,11 @@ export default function AllTasks() {
   // Check if task can be marked as completed
   const canMarkAsCompleted = (task) => {
     if (!task.subtasks || task.subtasks.length === 0) return true;
-    
+
     const incompleteSubtasks = task.subtasks.filter(subtask => 
       subtask.status !== 'completed' && subtask.status !== 'cancelled'
     );
-    
+
     return incompleteSubtasks.length === 0;
   };
 
@@ -197,21 +197,21 @@ export default function AllTasks() {
   const handleStatusChange = (taskId, newStatusCode, requiresConfirmation = false) => {
     const task = tasks.find(t => t.id === taskId);
     const newStatus = companyStatuses.find(s => s.code === newStatusCode);
-    
+
     if (!task || !newStatus) return;
-    
+
     // Check permissions
     if (!canEditTaskStatus(task)) {
       alert('You do not have permission to edit this task status.');
       return;
     }
-    
+
     // Check sub-task dependencies for completion
     if (newStatusCode === 'DONE' && !canMarkAsCompleted(task)) {
       alert(`Cannot mark task as completed. There are ${task.subtasks.filter(s => s.status !== 'completed' && s.status !== 'cancelled').length} incomplete sub-tasks.`);
       return;
     }
-    
+
     // Show confirmation for final statuses
     if (newStatus.isFinal && requiresConfirmation) {
       setShowStatusConfirmation({
@@ -222,7 +222,7 @@ export default function AllTasks() {
       });
       return;
     }
-    
+
     // Update task status
     const oldStatus = companyStatuses.find(s => s.code === task.status);
     setTasks(prevTasks => 
@@ -232,7 +232,7 @@ export default function AllTasks() {
           : t
       )
     );
-    
+
     // Log activity (in real app, this would be sent to backend)
     console.log(`Status changed from ${oldStatus?.label || task.status} to ${newStatus.label} by ${currentUser.name}`);
   };
@@ -241,25 +241,25 @@ export default function AllTasks() {
   const handleBulkStatusUpdate = (newStatusCode) => {
     const selectedTaskObjects = tasks.filter(t => selectedTasks.includes(t.id));
     const errors = [];
-    
+
     selectedTaskObjects.forEach(task => {
       if (!canEditTaskStatus(task)) {
         errors.push(`No permission to edit: ${task.title}`);
         return;
       }
-      
+
       if (newStatusCode === 'DONE' && !canMarkAsCompleted(task)) {
         const incompleteCount = task.subtasks.filter(s => s.status !== 'completed' && s.status !== 'cancelled').length;
         errors.push(`"${task.title}" has ${incompleteCount} incomplete sub-tasks`);
         return;
       }
     });
-    
+
     if (errors.length > 0) {
       alert(`Cannot update some tasks:\n${errors.join('\n')}`);
       return;
     }
-    
+
     // Update all selected tasks
     setTasks(prevTasks => 
       prevTasks.map(task => 
@@ -268,11 +268,11 @@ export default function AllTasks() {
           : task
       )
     );
-    
+
     // Clear selection
     setSelectedTasks([]);
     setShowBulkActions(false);
-    
+
     const newStatus = companyStatuses.find(s => s.code === newStatusCode);
     console.log(`Bulk updated ${selectedTasks.length} tasks to ${newStatus.label} by ${currentUser.name}`);
   };
@@ -464,8 +464,7 @@ export default function AllTasks() {
                 Clear Selection
               </button>
             </div>
-          )}</div>
-      )}
+          )}
 
           <div className="flex flex-col sm:flex-row gap-3">
             <select
@@ -829,7 +828,7 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
           <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
             {statuses.map(status => {
               const isDisabled = status.code === 'DONE' && !canMarkCompleted;
-              
+
               return (
                 <button
                   key={status.code}
@@ -884,11 +883,11 @@ function StatusConfirmationModal({ taskTitle, statusLabel, onConfirm, onCancel }
             </div>
             <h3 className="text-lg font-semibold text-gray-900">Confirm Status Change</h3>
           </div>
-          
+
           <p className="text-gray-600 mb-6">
             Are you sure you want to mark "<strong>{taskTitle}</strong>" as <strong>{statusLabel}</strong>?
           </p>
-          
+
           <div className="flex gap-3 justify-end">
             <button
               className="btn btn-secondary"
