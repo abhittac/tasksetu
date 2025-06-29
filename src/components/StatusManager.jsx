@@ -21,56 +21,76 @@ const getSystemStatusLabel = (systemCode, systemStatuses) => {
 export default function StatusManager() {
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' })
 
-  // System-defined statuses (Core Layer - cannot be deleted)
+  // System-defined priorities (Core Layer - cannot be deleted)
   const [systemStatuses] = useState([
     {
-      id: 'SYS_OPEN',
+      id: 'sys1',
       code: 'SYS_OPEN',
       label: 'Open',
       description: 'Task is created but not yet started',
       color: '#6c757d',
       isFinal: false,
-      isSystem: true
+      isDefault: true,
+      active: true,
+      order: 1,
+      isSystem: true,
+      createdAt: '2024-01-01T00:00:00Z'
     },
     {
-      id: 'SYS_INPROGRESS',
+      id: 'sys2',
       code: 'SYS_INPROGRESS',
       label: 'In Progress',
-      description: 'Task is being worked on',
+      description: 'Task is being actively worked on',
       color: '#3498db',
       isFinal: false,
-      isSystem: true
+      isDefault: false,
+      active: true,
+      order: 2,
+      isSystem: true,
+      createdAt: '2024-01-01T00:00:00Z'
     },
     {
-      id: 'SYS_ONHOLD',
+      id: 'sys3',
       code: 'SYS_ONHOLD',
       label: 'On Hold',
-      description: 'Task is paused',
+      description: 'Task is temporarily paused',
       color: '#f39c12',
       isFinal: false,
-      isSystem: true
+      isDefault: false,
+      active: true,
+      order: 3,
+      isSystem: true,
+      createdAt: '2024-01-01T00:00:00Z'
     },
     {
-      id: 'SYS_DONE',
+      id: 'sys4',
       code: 'SYS_DONE',
       label: 'Completed',
-      description: 'Task has been completed',
+      description: 'Task has been completed successfully',
       color: '#28a745',
       isFinal: true,
-      isSystem: true
+      isDefault: false,
+      active: true,
+      order: 4,
+      isSystem: true,
+      createdAt: '2024-01-01T00:00:00Z'
     },
     {
-      id: 'SYS_CANCELLED',
+      id: 'sys5',
       code: 'SYS_CANCELLED',
       label: 'Cancelled',
-      description: 'Task was terminated intentionally',
+      description: 'Task was cancelled and will not be completed',
       color: '#dc3545',
       isFinal: true,
-      isSystem: true
+      isDefault: false,
+      active: true,
+      order: 5,
+      isSystem: true,
+      createdAt: '2024-01-01T00:00:00Z'
     }
   ])
 
-  // Company-defined statuses (Custom Layer) - Default Status Flow
+  // Company-defined statuses (configurable by admin)
   const [companyStatuses, setCompanyStatuses] = useState([
     {
       id: 1,
@@ -84,13 +104,14 @@ export default function StatusManager() {
       order: 1,
       systemMapping: 'SYS_OPEN',
       allowedTransitions: ['INPROGRESS', 'ONHOLD', 'CANCELLED'],
-      isSystem: false
+      isSystem: false,
+      createdAt: '2024-01-01T00:00:00Z'
     },
     {
       id: 2,
       code: 'INPROGRESS',
       label: 'In Progress',
-      description: 'Task is being worked on',
+      description: 'Task is being actively worked on',
       color: '#3498db',
       isFinal: false,
       isDefault: false,
@@ -98,13 +119,14 @@ export default function StatusManager() {
       order: 2,
       systemMapping: 'SYS_INPROGRESS',
       allowedTransitions: ['ONHOLD', 'DONE', 'CANCELLED'],
-      isSystem: false
+      isSystem: false,
+      createdAt: '2024-01-01T00:00:00Z'
     },
     {
       id: 3,
       code: 'ONHOLD',
       label: 'On Hold',
-      description: 'Task is paused',
+      description: 'Task is temporarily paused',
       color: '#f39c12',
       isFinal: false,
       isDefault: false,
@@ -112,13 +134,14 @@ export default function StatusManager() {
       order: 3,
       systemMapping: 'SYS_ONHOLD',
       allowedTransitions: ['INPROGRESS', 'CANCELLED'],
-      isSystem: false
+      isSystem: false,
+      createdAt: '2024-01-01T00:00:00Z'
     },
     {
       id: 4,
       code: 'DONE',
       label: 'Completed',
-      description: 'Task has been completed',
+      description: 'Task has been completed successfully',
       color: '#28a745',
       isFinal: true,
       isDefault: false,
@@ -126,13 +149,14 @@ export default function StatusManager() {
       order: 4,
       systemMapping: 'SYS_DONE',
       allowedTransitions: [],
-      isSystem: false
+      isSystem: false,
+      createdAt: '2024-01-01T00:00:00Z'
     },
     {
       id: 5,
       code: 'CANCELLED',
       label: 'Cancelled',
-      description: 'Task was terminated intentionally',
+      description: 'Task was cancelled and will not be completed',
       color: '#dc3545',
       isFinal: true,
       isDefault: false,
@@ -140,13 +164,13 @@ export default function StatusManager() {
       order: 5,
       systemMapping: 'SYS_CANCELLED',
       allowedTransitions: [],
-      isSystem: false
+      isSystem: false,
+      createdAt: '2024-01-01T00:00:00Z'
     }
   ])
 
   const [showSystemStatuses, setShowSystemStatuses] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
-  const [showFormDrawer, setShowFormDrawer] = useState(false)
   const [editingStatus, setEditingStatus] = useState(null)
   const [deleteModal, setDeleteModal] = useState(null)
   const [statusChangeModal, setStatusChangeModal] = useState(null)
@@ -407,75 +431,49 @@ export default function StatusManager() {
             </div>
           )}
         </div>
-
-        {showAddForm && (
-          <div className="status-form-modal-overlay">
-            <div className="status-form-modal">
-              <h2>Create New Status</h2>
-              <StatusFormModal
-                onSubmit={handleAddStatus}
-                onClose={() => setShowAddForm(false)}
-                existingStatuses={companyStatuses}
-                systemStatuses={systemStatuses}
-              />
-            </div>
-          </div>
-        )}
-
-        {editingStatus && (
-          <div className="status-form-modal-overlay">
-            <div className="status-form-modal">
-              <h2>Edit Status</h2>
-              <StatusFormModal
-                status={editingStatus}
-                onSubmit={handleUpdateStatus}
-                onClose={() => setEditingStatus(null)}
-                existingStatuses={companyStatuses}
-                systemStatuses={systemStatuses}
-                isEdit={true}
-              />
-            </div>
-          </div>
-        )}
-
-        {deleteModal && (
-          <DeleteStatusModal
-            status={deleteModal}
-            statuses={companyStatuses.filter(s => s.active && s.id !== deleteModal.id)}
-            onConfirm={handleDeleteStatus}
-            onClose={() => setDeleteModal(null)}
-          />
-        )}
       </div>
 
-      {/* Slide-in Drawer */}
-      {showFormDrawer && (
-        <div className={`task-drawer ${showFormDrawer ? 'open' : ''}`}>
-          <div className="drawer-overlay" onClick={() => setShowFormDrawer(false)}></div>
-          <div className="drawer-content">
-            <div className="drawer-header">
-              <h2 className="text-2xl font-bold text-gray-900">Create New Status</h2>
-              <button 
-                onClick={() => setShowFormDrawer(false)}
-                className="close-btn"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="drawer-body">
-              <StatusFormModal 
-                editingStatus={editingStatus}
-                onClose={() => setShowFormDrawer(false)}
-                onSave={handleAddStatus}
-                existingStatuses={companyStatuses}
-                systemStatuses={systemStatuses}
-              />
-            </div>
+      {showAddForm && (
+        <div className="status-form-modal-overlay">
+          <div className="status-form-modal">
+            <h2>Create New Status</h2>
+            <StatusFormModal
+              onSubmit={handleAddStatus}
+              onClose={() => setShowAddForm(false)}
+              existingStatuses={companyStatuses}
+              systemStatuses={systemStatuses}
+            />
           </div>
         </div>
       )}
+
+      {editingStatus && (
+        <div className="status-form-modal-overlay">
+          <div className="status-form-modal">
+            <h2>Edit Status</h2>
+            <StatusFormModal
+              status={editingStatus}
+              onSubmit={handleUpdateStatus}
+              onClose={() => setEditingStatus(null)}
+              existingStatuses={companyStatuses}
+              systemStatuses={systemStatuses}
+              isEdit={true}
+            />
+          </div>
+        </div>
+      )}
+
+      {deleteModal && (
+        <DeleteStatusModal
+          status={deleteModal}
+          statuses={companyStatuses.filter(s => s.active && s.id !== deleteModal.id)}
+          onConfirm={handleDeleteStatus}
+          onClose={() => setDeleteModal(null)}
+        />
+      )}
+
+      {/* Slide-in Drawer */}
+      
     </div>
   )
 }
@@ -553,7 +551,7 @@ function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefau
 
 function SystemStatusRow({ status, companyStatuses }) {
   const mappedCompanyStatuses = companyStatuses.filter(cs => cs.systemMapping === status.code)
-  
+
   return (
     <div className="table-row system-row">
       <div className="td">
