@@ -276,9 +276,7 @@ export default function StatusManager() {
     return systemStatus ? systemStatus.label : systemCode
   }
 
-  const activeStatuses = showSystemStatuses 
-    ? [...companyStatuses.filter(s => s.active), ...systemStatuses]
-    : companyStatuses.filter(s => s.active)
+  const activeCompanyStatuses = companyStatuses.filter(s => s.active)
 
   return (
     <div className="space-y-8">
@@ -369,7 +367,7 @@ export default function StatusManager() {
                 <div className="th">Actions</div>
               </div>
 
-              {companyStatuses.filter(s => s.active).sort((a, b) => a.order - b.order).map(status => (
+              {activeCompanyStatuses.sort((a, b) => a.order - b.order).map(status => (
                 <CompanyStatusRow
                   key={status.id}
                   status={status}
@@ -387,7 +385,7 @@ export default function StatusManager() {
             <div className="status-list system-statuses">
               <div className="section-header">
                 <h3>System Statuses (Read-Only)</h3>
-                <p>Core statuses used for internal logic and analytics</p>
+                <p>Core statuses used for internal logic and analytics - Required for application consistency</p>
               </div>
               <div className="status-table">
                 <div className="table-header">
@@ -395,12 +393,14 @@ export default function StatusManager() {
                   <div className="th">Code</div>
                   <div className="th">Description</div>
                   <div className="th">Type</div>
+                  <div className="th">Company Mappings</div>
                 </div>
 
                 {systemStatuses.map(status => (
                   <SystemStatusRow
                     key={status.id}
                     status={status}
+                    companyStatuses={activeCompanyStatuses}
                   />
                 ))}
               </div>
@@ -551,7 +551,9 @@ function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefau
   )
 }
 
-function SystemStatusRow({ status }) {
+function SystemStatusRow({ status, companyStatuses }) {
+  const mappedCompanyStatuses = companyStatuses.filter(cs => cs.systemMapping === status.code)
+  
   return (
     <div className="table-row system-row">
       <div className="td">
@@ -574,6 +576,21 @@ function SystemStatusRow({ status }) {
         <span className={`status-type ${status.isFinal ? 'final' : 'active'}`}>
           {status.isFinal ? 'Final' : 'Active'}
         </span>
+      </div>
+      <div className="td">
+        <div className="company-mappings">
+          {mappedCompanyStatuses.length > 0 ? (
+            <div className="mapping-list">
+              {mappedCompanyStatuses.map(cs => (
+                <span key={cs.id} className="mapping-badge" style={{ backgroundColor: cs.color }}>
+                  {cs.label}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <span className="text-gray-400">No mappings</span>
+          )}
+        </div>
       </div>
     </div>
   )
