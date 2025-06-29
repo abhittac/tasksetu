@@ -1,35 +1,45 @@
-import React, { useState } from 'react'
+
+import React, { useState, useRef, useEffect } from 'react'
 
 export default function TaskComments({ taskId }) {
   const [comments, setComments] = useState([
     {
       id: 1,
       author: 'John Smith',
-      content: 'I\'ve started working on the database schema migration. The initial analysis shows we need to handle about 2.5M records.',
+      authorId: 'john_smith',
+      content: 'I\'ve started working on the **database schema migration**. The initial analysis shows we need to handle about 2.5M records.',
       timestamp: '2024-01-22 10:30:00',
       avatar: 'JS',
       mentions: [],
-      attachments: []
+      attachments: [],
+      reactions: { '👍': 2, '🚀': 1 },
+      isEdited: false
     },
     {
       id: 2,
       author: 'Sarah Wilson',
+      authorId: 'sarah_wilson',
       content: '@John Smith - Great! Please make sure to backup the data before starting the migration process. Also, have you considered the downtime window?',
       timestamp: '2024-01-22 11:15:00',
       avatar: 'SW',
       mentions: ['John Smith'],
-      attachments: []
+      attachments: [],
+      reactions: {},
+      isEdited: false
     },
     {
       id: 3,
       author: 'Mike Johnson',
-      content: 'I can help with the testing phase. Let me know when you\'re ready for the staging environment setup.',
+      authorId: 'mike_johnson',
+      content: 'I can help with the testing phase. Let me know when you\'re ready for the staging environment setup.\n\n```sql\nSELECT COUNT(*) FROM users WHERE created_at > \'2024-01-01\';\n```',
       timestamp: '2024-01-22 14:20:00',
       avatar: 'MJ',
       mentions: [],
       attachments: [
         { name: 'test-plan.pdf', size: '245KB', type: 'pdf' }
-      ]
+      ],
+      reactions: { '💯': 1 },
+      isEdited: false
     }
   ])
 
@@ -38,16 +48,38 @@ export default function TaskComments({ taskId }) {
   const [showMentionSuggestions, setShowMentionSuggestions] = useState(false)
   const [mentionQuery, setMentionQuery] = useState('')
   const [mentionPosition, setMentionPosition] = useState({ start: 0, end: 0 })
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [editingComment, setEditingComment] = useState(null)
+  const [editContent, setEditContent] = useState('')
+  const [selectedFiles, setSelectedFiles] = useState([])
+  const [dragActive, setDragActive] = useState(false)
 
-  const currentUser = { id: 1, name: 'Current User', avatar: 'CU' }
+  const textareaRef = useRef(null)
+  const fileInputRef = useRef(null)
+  const emojiPickerRef = useRef(null)
 
-  // Mock team members for mentions
+  const currentUser = { id: 'current_user', name: 'Current User', avatar: 'CU' }
+
+  // Mock team members for mentions (would come from user master for company)
   const teamMembers = [
-    { id: 1, name: 'John Smith', avatar: 'JS' },
-    { id: 2, name: 'Sarah Wilson', avatar: 'SW' },
-    { id: 3, name: 'Mike Johnson', avatar: 'MJ' },
-    { id: 4, name: 'Emily Davis', avatar: 'ED' }
+    { id: 'john_smith', name: 'John Smith', avatar: 'JS', email: 'john@company.com' },
+    { id: 'sarah_wilson', name: 'Sarah Wilson', avatar: 'SW', email: 'sarah@company.com' },
+    { id: 'mike_johnson', name: 'Mike Johnson', avatar: 'MJ', email: 'mike@company.com' },
+    { id: 'emily_davis', name: 'Emily Davis', avatar: 'ED', email: 'emily@company.com' },
+    { id: 'current_user', name: 'Current User', avatar: 'CU', email: 'current@company.com' }
   ]
+
+  const emojis = ['👍', '👎', '❤️', '😂', '😮', '😢', '😡', '🚀', '💯', '🎉', '🔥', '✅']
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+        setShowEmojiPicker(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const handleCommentChange = (e) => {
     const value = e.target.value
@@ -85,6 +117,90 @@ export default function TaskComments({ taskId }) {
     member.name.toLowerCase().includes(mentionQuery.toLowerCase())
   )
 
+  const handleFormatting = (format) => {
+    const textarea = textareaRef.current
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const selectedText = newComment.substring(start, end)
+
+    let formattedText = ''
+    let newCursorPos = start
+
+    switch (format) {
+      case 'bold':
+        formattedText = `**${selectedText}**`
+        newCursorPos = start + 2
+        break
+      case 'italic':
+        formattedText = `*${selectedText}*`
+        newCursorPos = start + 1
+        break
+      case 'code':
+        formattedText = `\`${selectedText}\``
+        newCursorPos = start + 1
+        break
+      case 'codeblock':
+        formattedText = `\n\`\`\`\n${selectedText}\n\`\`\`\n`
+        newCursorPos = start + 4
+        break
+      case 'bullet':
+        formattedText = `\n• ${selectedText}`
+        newCursorPos = start + 3
+        break
+    }
+
+    const newValue = newComment.substring(0, start) + formattedText + newComment.substring(end)
+    setNewComment(newValue)
+
+    setTimeout(() => {
+      textarea.focus()
+      textarea.setSelectionRange(newCursorPos, newCursorPos + selectedText.length)
+    }, 0)
+  }
+
+  const handleFileUpload = (files) => {
+    const fileArray = Array.from(files).map(file => ({
+      id: Date.now() + Math.random(),
+      file: file,
+      name: file.name,
+      size: formatFileSize(file.size),
+      type: file.type
+    }))
+    setSelectedFiles([...selectedFiles, ...fileArray])
+  }
+
+  const handleDrag = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true)
+    } else if (e.type === 'dragleave') {
+      setDragActive(false)
+    }
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragActive(false)
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileUpload(e.dataTransfer.files)
+    }
+  }
+
+  const removeFile = (fileId) => {
+    setSelectedFiles(selectedFiles.filter(f => f.id !== fileId))
+  }
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!newComment.trim() || isSubmitting) return
@@ -102,11 +218,18 @@ export default function TaskComments({ taskId }) {
     const comment = {
       id: Date.now(),
       author: currentUser.name,
+      authorId: currentUser.id,
       content: newComment.trim(),
       timestamp: new Date().toISOString(),
       avatar: currentUser.avatar,
       mentions,
-      attachments: []
+      attachments: selectedFiles.map(f => ({
+        name: f.name,
+        size: f.size,
+        type: f.type
+      })),
+      reactions: {},
+      isEdited: false
     }
 
     try {
@@ -115,6 +238,7 @@ export default function TaskComments({ taskId }) {
 
       setComments([...comments, comment])
       setNewComment('')
+      setSelectedFiles([])
 
       // Log mention notifications
       if (mentions.length > 0) {
@@ -125,6 +249,57 @@ export default function TaskComments({ taskId }) {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleEditComment = (commentId) => {
+    const comment = comments.find(c => c.id === commentId)
+    setEditingComment(commentId)
+    setEditContent(comment.content)
+  }
+
+  const handleSaveEdit = async (commentId) => {
+    if (!editContent.trim()) return
+
+    try {
+      setComments(comments.map(comment => 
+        comment.id === commentId 
+          ? { ...comment, content: editContent.trim(), isEdited: true }
+          : comment
+      ))
+      setEditingComment(null)
+      setEditContent('')
+    } catch (error) {
+      console.error('Error editing comment:', error)
+    }
+  }
+
+  const handleDeleteComment = async (commentId) => {
+    if (!window.confirm('Are you sure you want to delete this comment?')) return
+
+    try {
+      setComments(comments.map(comment => 
+        comment.id === commentId 
+          ? { ...comment, content: 'This comment was deleted.', isDeleted: true }
+          : comment
+      ))
+    } catch (error) {
+      console.error('Error deleting comment:', error)
+    }
+  }
+
+  const handleReaction = (commentId, emoji) => {
+    setComments(comments.map(comment => {
+      if (comment.id === commentId) {
+        const reactions = { ...comment.reactions }
+        if (reactions[emoji]) {
+          reactions[emoji] += 1
+        } else {
+          reactions[emoji] = 1
+        }
+        return { ...comment, reactions }
+      }
+      return comment
+    }))
   }
 
   const formatTimestamp = (timestamp) => {
@@ -143,8 +318,35 @@ export default function TaskComments({ taskId }) {
     }
   }
 
-  const highlightMentions = (content) => {
-    return content.replace(/@(\w+(?:\s+\w+)*)/g, '<span class="mention">@$1</span>')
+  const formatContent = (content) => {
+    if (!content) return ''
+    
+    // Handle deleted comments
+    if (content === 'This comment was deleted.') {
+      return `<span class="deleted-comment">${content}</span>`
+    }
+
+    let formatted = content
+      // Bold text **text**
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      // Italic text *text*
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      // Inline code `code`
+      .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
+      // Code blocks ```code```
+      .replace(/```([\s\S]*?)```/g, '<pre class="code-block"><code>$1</code></pre>')
+      // Mentions @user
+      .replace(/@(\w+(?:\s+\w+)*)/g, '<span class="mention">@$1</span>')
+      // Line breaks
+      .replace(/\n/g, '<br>')
+      // Bullets •
+      .replace(/^• /gm, '<span class="bullet">• </span>')
+
+    return formatted
+  }
+
+  const getExactTimestamp = (timestamp) => {
+    return new Date(timestamp).toLocaleString()
   }
 
   return (
@@ -155,17 +357,68 @@ export default function TaskComments({ taskId }) {
 
       <div className="comments-list">
         {comments.map(comment => (
-          <div key={comment.id} className="comment-item">
+          <div key={comment.id} className={`comment-item ${comment.isDeleted ? 'deleted' : ''}`}>
             <div className="comment-avatar">{comment.avatar}</div>
             <div className="comment-content">
               <div className="comment-header">
                 <span className="comment-author">{comment.author}</span>
-                <span className="comment-timestamp">{formatTimestamp(comment.timestamp)}</span>
+                <span 
+                  className="comment-timestamp"
+                  title={getExactTimestamp(comment.timestamp)}
+                >
+                  {formatTimestamp(comment.timestamp)}
+                  {comment.isEdited && <span className="edited-indicator"> (edited)</span>}
+                </span>
+                {comment.authorId === currentUser.id && !comment.isDeleted && (
+                  <div className="comment-actions">
+                    <button 
+                      className="action-btn edit-btn"
+                      onClick={() => handleEditComment(comment.id)}
+                      title="Edit comment"
+                    >
+                      ✏️
+                    </button>
+                    <button 
+                      className="action-btn delete-btn"
+                      onClick={() => handleDeleteComment(comment.id)}
+                      title="Delete comment"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                )}
               </div>
-              <div 
-                className="comment-text"
-                dangerouslySetInnerHTML={{ __html: highlightMentions(comment.content) }}
-              />
+
+              {editingComment === comment.id ? (
+                <div className="edit-comment-form">
+                  <textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    className="edit-textarea"
+                    rows="3"
+                  />
+                  <div className="edit-actions">
+                    <button 
+                      className="btn-secondary btn-sm"
+                      onClick={() => setEditingComment(null)}
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      className="btn-primary btn-sm"
+                      onClick={() => handleSaveEdit(comment.id)}
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div 
+                  className="comment-text"
+                  dangerouslySetInnerHTML={{ __html: formatContent(comment.content) }}
+                />
+              )}
+
               {comment.attachments.length > 0 && (
                 <div className="comment-attachments">
                   {comment.attachments.map((attachment, index) => (
@@ -177,11 +430,32 @@ export default function TaskComments({ taskId }) {
                   ))}
                 </div>
               )}
-              {comment.mentions.length > 0 && (
-                <div className="comment-mentions">
-                  <span className="mentions-label">Mentioned:</span>
-                  {comment.mentions.map((mention, index) => (
-                    <span key={index} className="mentioned-user">@{mention}</span>
+
+              {Object.keys(comment.reactions).length > 0 && (
+                <div className="comment-reactions">
+                  {Object.entries(comment.reactions).map(([emoji, count]) => (
+                    <button
+                      key={emoji}
+                      className="reaction-btn"
+                      onClick={() => handleReaction(comment.id, emoji)}
+                    >
+                      {emoji} {count}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {!comment.isDeleted && (
+                <div className="reaction-picker">
+                  {emojis.slice(0, 6).map(emoji => (
+                    <button
+                      key={emoji}
+                      className="emoji-btn"
+                      onClick={() => handleReaction(comment.id, emoji)}
+                      title={`React with ${emoji}`}
+                    >
+                      {emoji}
+                    </button>
                   ))}
                 </div>
               )}
@@ -194,14 +468,65 @@ export default function TaskComments({ taskId }) {
         <div className="comment-input-container">
           <div className="comment-avatar">{currentUser.avatar}</div>
           <div className="comment-input-wrapper">
-            <textarea
-              value={newComment}
-              onChange={handleCommentChange}
-              placeholder="Add a comment... Use @ to mention team members"
-              className="comment-input"
-              rows="3"
-              disabled={isSubmitting}
-            />
+            <div className="formatting-toolbar">
+              <button type="button" onClick={() => handleFormatting('bold')} title="Bold">
+                <strong>B</strong>
+              </button>
+              <button type="button" onClick={() => handleFormatting('italic')} title="Italic">
+                <em>I</em>
+              </button>
+              <button type="button" onClick={() => handleFormatting('code')} title="Inline Code">
+                {'</>'}
+              </button>
+              <button type="button" onClick={() => handleFormatting('codeblock')} title="Code Block">
+                📝
+              </button>
+              <button type="button" onClick={() => handleFormatting('bullet')} title="Bullet Point">
+                •
+              </button>
+            </div>
+
+            <div 
+              className={`textarea-container ${dragActive ? 'drag-active' : ''}`}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+            >
+              <textarea
+                ref={textareaRef}
+                value={newComment}
+                onChange={handleCommentChange}
+                placeholder="Leave a comment... Use @ to mention team members"
+                className="comment-input"
+                rows="3"
+                disabled={isSubmitting}
+              />
+              {dragActive && (
+                <div className="drag-overlay">
+                  Drop files here to attach
+                </div>
+              )}
+            </div>
+
+            {selectedFiles.length > 0 && (
+              <div className="selected-files">
+                {selectedFiles.map(file => (
+                  <div key={file.id} className="selected-file">
+                    <span className="file-info">
+                      📎 {file.name} ({file.size})
+                    </span>
+                    <button
+                      type="button"
+                      className="remove-file"
+                      onClick={() => removeFile(file.id)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {showMentionSuggestions && filteredMembers.length > 0 && (
               <div className="mention-suggestions">
@@ -212,7 +537,10 @@ export default function TaskComments({ taskId }) {
                     onClick={() => handleMentionSelect(member)}
                   >
                     <span className="mention-avatar">{member.avatar}</span>
-                    <span className="mention-name">{member.name}</span>
+                    <div className="mention-info">
+                      <span className="mention-name">{member.name}</span>
+                      <span className="mention-email">{member.email}</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -222,12 +550,48 @@ export default function TaskComments({ taskId }) {
 
         <div className="comment-actions">
           <div className="comment-tools">
-            <button type="button" className="tool-button" title="Add attachment">
+            <input
+              type="file"
+              ref={fileInputRef}
+              multiple
+              style={{ display: 'none' }}
+              onChange={(e) => handleFileUpload(e.target.files)}
+            />
+            <button 
+              type="button" 
+              className="tool-button" 
+              onClick={() => fileInputRef.current?.click()}
+              title="Add attachment"
+            >
               📎
             </button>
-            <button type="button" className="tool-button" title="Add emoji">
-              😀
-            </button>
+            <div className="emoji-picker-container" ref={emojiPickerRef}>
+              <button 
+                type="button" 
+                className="tool-button"
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                title="Add emoji"
+              >
+                😀
+              </button>
+              {showEmojiPicker && (
+                <div className="emoji-picker">
+                  {emojis.map(emoji => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      className="emoji-option"
+                      onClick={() => {
+                        setNewComment(newComment + emoji)
+                        setShowEmojiPicker(false)
+                      }}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <button 
             type="submit" 
