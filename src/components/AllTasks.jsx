@@ -14,62 +14,285 @@ export default function AllTasks() {
   const [editingTitle, setEditingTitle] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [selectedTasks, setSelectedTasks] = useState([]);
+  const [showBulkActions, setShowBulkActions] = useState(false);
+  const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' });
+  const [showStatusConfirmation, setShowStatusConfirmation] = useState(null);
 
   const [tasks, setTasks] = useState([
     {
       id: 1,
       title: "Update user authentication system",
       assignee: "John Doe",
-      status: "In Progress",
+      assigneeId: 2,
+      status: "INPROGRESS",
       priority: "High",
       dueDate: "2024-01-25",
       category: "Development",
       progress: 60,
       subtaskCount: 3,
+      collaborators: [1, 3],
+      createdBy: "Current User",
+      creatorId: 1,
+      subtasks: [
+        { id: 101, status: "completed" },
+        { id: 102, status: "in-progress" },
+        { id: 103, status: "pending" }
+      ]
     },
     {
       id: 2,
       title: "Design new landing page",
       assignee: "Jane Smith",
-      status: "To Do",
+      assigneeId: 3,
+      status: "OPEN",
       priority: "Medium",
       dueDate: "2024-01-30",
       category: "Design",
       progress: 0,
       subtaskCount: 0,
+      collaborators: [],
+      createdBy: "Current User",
+      creatorId: 1,
+      subtasks: []
     },
     {
       id: 3,
       title: "Fix mobile responsiveness issues",
       assignee: "Mike Johnson",
-      status: "Completed",
+      assigneeId: 4,
+      status: "DONE",
       priority: "Low",
       dueDate: "2024-01-20",
       category: "Development",
       progress: 100,
       subtaskCount: 2,
+      collaborators: [1],
+      createdBy: "Jane Smith",
+      creatorId: 3,
+      subtasks: [
+        { id: 201, status: "completed" },
+        { id: 202, status: "completed" }
+      ]
     },
     {
       id: 4,
       title: "Conduct user research interviews",
       assignee: "Sarah Wilson",
-      status: "In Review",
+      assigneeId: 5,
+      status: "INPROGRESS",
       priority: "High",
       dueDate: "2024-01-28",
       category: "Research",
       progress: 80,
       subtaskCount: 5,
+      collaborators: [1, 2],
+      createdBy: "Current User",
+      creatorId: 1,
+      subtasks: [
+        { id: 301, status: "completed" },
+        { id: 302, status: "completed" },
+        { id: 303, status: "in-progress" },
+        { id: 304, status: "pending" },
+        { id: 305, status: "pending" }
+      ]
     },
   ]);
 
-  const getStatusBadge = (status) => {
-    const statusClasses = {
-      "To Do": "status-badge status-todo",
-      "In Progress": "status-badge status-progress",
-      "In Review": "status-badge status-review",
-      Completed: "status-badge status-completed",
+  // Company-defined statuses
+  const [companyStatuses] = useState([
+    {
+      id: 1,
+      code: 'OPEN',
+      label: 'Open',
+      color: '#6c757d',
+      isFinal: false,
+      isDefault: true,
+      systemMapping: 'SYS_OPEN'
+    },
+    {
+      id: 2,
+      code: 'INPROGRESS',
+      label: 'In Progress',
+      color: '#3498db',
+      isFinal: false,
+      systemMapping: 'SYS_INPROGRESS'
+    },
+    {
+      id: 3,
+      code: 'ONHOLD',
+      label: 'On Hold',
+      color: '#f39c12',
+      isFinal: false,
+      systemMapping: 'SYS_ONHOLD'
+    },
+    {
+      id: 4,
+      code: 'DONE',
+      label: 'Completed',
+      color: '#28a745',
+      isFinal: true,
+      systemMapping: 'SYS_DONE'
+    },
+    {
+      id: 5,
+      code: 'CANCELLED',
+      label: 'Cancelled',
+      color: '#dc3545',
+      isFinal: true,
+      systemMapping: 'SYS_CANCELLED'
+    }
+  ]);
+
+  const getStatusLabel = (statusCode) => {
+    const status = companyStatuses.find(s => s.code === statusCode);
+    return status ? status.label : statusCode;
+  };
+
+  const getStatusColor = (statusCode) => {
+    const status = companyStatuses.find(s => s.code === statusCode);
+    return status ? status.color : '#6c757d';
+  };
+
+  const getStatusBadge = (statusCode) => {
+    const status = companyStatuses.find(s => s.code === statusCode);
+    const baseClass = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium";
+    
+    if (!status) return `${baseClass} bg-gray-100 text-gray-800`;
+    
+    // Convert hex to RGB for background opacity
+    const hex = status.color.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    
+    return {
+      className: `${baseClass} text-white`,
+      style: { backgroundColor: status.color }
     };
-    return statusClasses[status] || "status-badge status-todo";
+  };
+
+  // Permission check function
+  const canEditTaskStatus = (task) => {
+    return (
+      task.assigneeId === currentUser.id ||
+      task.collaborators?.includes(currentUser.id) ||
+      currentUser.role === 'admin' ||
+      task.creatorId === currentUser.id
+    );
+  };
+
+  // Check if task can be marked as completed
+  const canMarkAsCompleted = (task) => {
+    if (!task.subtasks || task.subtasks.length === 0) return true;
+    
+    const incompleteSubtasks = task.subtasks.filter(subtask => 
+      subtask.status !== 'completed' && subtask.status !== 'cancelled'
+    );
+    
+    return incompleteSubtasks.length === 0;
+  };
+
+  // Handle status change with validation
+  const handleStatusChange = (taskId, newStatusCode, requiresConfirmation = false) => {
+    const task = tasks.find(t => t.id === taskId);
+    const newStatus = companyStatuses.find(s => s.code === newStatusCode);
+    
+    if (!task || !newStatus) return;
+    
+    // Check permissions
+    if (!canEditTaskStatus(task)) {
+      alert('You do not have permission to edit this task status.');
+      return;
+    }
+    
+    // Check sub-task dependencies for completion
+    if (newStatusCode === 'DONE' && !canMarkAsCompleted(task)) {
+      alert(`Cannot mark task as completed. There are ${task.subtasks.filter(s => s.status !== 'completed' && s.status !== 'cancelled').length} incomplete sub-tasks.`);
+      return;
+    }
+    
+    // Show confirmation for final statuses
+    if (newStatus.isFinal && requiresConfirmation) {
+      setShowStatusConfirmation({
+        taskId,
+        newStatusCode,
+        taskTitle: task.title,
+        statusLabel: newStatus.label
+      });
+      return;
+    }
+    
+    // Update task status
+    const oldStatus = companyStatuses.find(s => s.code === task.status);
+    setTasks(prevTasks => 
+      prevTasks.map(t => 
+        t.id === taskId 
+          ? { ...t, status: newStatusCode, progress: newStatusCode === 'DONE' ? 100 : t.progress }
+          : t
+      )
+    );
+    
+    // Log activity (in real app, this would be sent to backend)
+    console.log(`Status changed from ${oldStatus?.label || task.status} to ${newStatus.label} by ${currentUser.name}`);
+  };
+
+  // Handle bulk status update
+  const handleBulkStatusUpdate = (newStatusCode) => {
+    const selectedTaskObjects = tasks.filter(t => selectedTasks.includes(t.id));
+    const errors = [];
+    
+    selectedTaskObjects.forEach(task => {
+      if (!canEditTaskStatus(task)) {
+        errors.push(`No permission to edit: ${task.title}`);
+        return;
+      }
+      
+      if (newStatusCode === 'DONE' && !canMarkAsCompleted(task)) {
+        const incompleteCount = task.subtasks.filter(s => s.status !== 'completed' && s.status !== 'cancelled').length;
+        errors.push(`"${task.title}" has ${incompleteCount} incomplete sub-tasks`);
+        return;
+      }
+    });
+    
+    if (errors.length > 0) {
+      alert(`Cannot update some tasks:\n${errors.join('\n')}`);
+      return;
+    }
+    
+    // Update all selected tasks
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        selectedTasks.includes(task.id)
+          ? { ...task, status: newStatusCode, progress: newStatusCode === 'DONE' ? 100 : task.progress }
+          : task
+      )
+    );
+    
+    // Clear selection
+    setSelectedTasks([]);
+    setShowBulkActions(false);
+    
+    const newStatus = companyStatuses.find(s => s.code === newStatusCode);
+    console.log(`Bulk updated ${selectedTasks.length} tasks to ${newStatus.label} by ${currentUser.name}`);
+  };
+
+  // Handle task selection
+  const handleTaskSelection = (taskId, isSelected) => {
+    if (isSelected) {
+      setSelectedTasks(prev => [...prev, taskId]);
+    } else {
+      setSelectedTasks(prev => prev.filter(id => id !== taskId));
+    }
+  };
+
+  // Handle select all
+  const handleSelectAll = (isSelected) => {
+    if (isSelected) {
+      setSelectedTasks(tasks.map(t => t.id));
+    } else {
+      setSelectedTasks([]);
+    }
   };
 
   const getPriorityBadge = (priority) => {
@@ -184,7 +407,7 @@ export default function AllTasks() {
         </div>
       </div>
 
-      {/* Filters */}
+      {/* Filters and Bulk Actions */}
       <div className="card">
         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
           <div className="flex-1">
@@ -211,6 +434,38 @@ export default function AllTasks() {
               />
             </div>
           </div>
+
+          {selectedTasks.length > 0 && (
+            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+              <span className="text-sm font-medium text-blue-800">
+                {selectedTasks.length} selected
+              </span>
+              <select
+                className="form-select text-sm"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    handleBulkStatusUpdate(e.target.value);
+                    e.target.value = '';
+                  }
+                }}
+                defaultValue=""
+              >
+                <option value="">Bulk Update Status</option>
+                {companyStatuses.map(status => (
+                  <option key={status.code} value={status.code}>
+                    {status.label}
+                  </option>
+                ))}
+              </select>
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => setSelectedTasks([])}
+              >
+                Clear Selection
+              </button>
+            </div>
+          )}</div>
+      )}
 
           <div className="flex flex-col sm:flex-row gap-3">
             <select
@@ -260,6 +515,14 @@ export default function AllTasks() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                  <input
+                    type="checkbox"
+                    checked={selectedTasks.length === tasks.length && tasks.length > 0}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Task
                 </th>
@@ -287,8 +550,18 @@ export default function AllTasks() {
               {tasks.map((task) => (
                 <tr
                   key={task.id}
-                  className="hover:bg-gray-50 transition-colors"
+                  className={`hover:bg-gray-50 transition-colors ${
+                    selectedTasks.includes(task.id) ? 'bg-blue-50' : ''
+                  }`}
                 >
+                  <td className="px-6 py-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedTasks.includes(task.id)}
+                      onChange={(e) => handleTaskSelection(task.id, e.target.checked)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                  </td>
                   <td className="px-6 py-4">
                     <div>
                       <div className="font-medium text-gray-900">
@@ -347,9 +620,14 @@ export default function AllTasks() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-nowrap">
-                    <span className={getStatusBadge(task.status)}>
-                      {task.status}
-                    </span>
+                    <TaskStatusDropdown
+                      task={task}
+                      currentStatus={task.status}
+                      statuses={companyStatuses}
+                      onStatusChange={(newStatus) => handleStatusChange(task.id, newStatus, true)}
+                      canEdit={canEditTaskStatus(task)}
+                      canMarkCompleted={canMarkAsCompleted(task)}
+                    />
                   </td>
                   <td className="px-6 py-4">
                     <span className={getPriorityBadge(task.priority)}>
@@ -466,6 +744,23 @@ export default function AllTasks() {
         />
       )}
 
+      {/* Status Confirmation Modal */}
+      {showStatusConfirmation && (
+        <StatusConfirmationModal
+          taskTitle={showStatusConfirmation.taskTitle}
+          statusLabel={showStatusConfirmation.statusLabel}
+          onConfirm={() => {
+            handleStatusChange(
+              showStatusConfirmation.taskId, 
+              showStatusConfirmation.newStatusCode, 
+              false
+            );
+            setShowStatusConfirmation(null);
+          }}
+          onCancel={() => setShowStatusConfirmation(null)}
+        />
+      )}
+
       {/* Task Detail Modal */}
       {selectedTaskId && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -479,6 +774,139 @@ export default function AllTasks() {
       )}
     </div>
   )
+}
+
+// Task Status Dropdown Component
+function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, canEdit, canMarkCompleted }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  const currentStatusObj = statuses.find(s => s.code === currentStatus);
+  const badgeStyle = currentStatusObj ? {
+    backgroundColor: currentStatusObj.color,
+    color: 'white'
+  } : {};
+
+  if (!canEdit) {
+    return (
+      <div className="relative">
+        <span 
+          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-help"
+          style={badgeStyle}
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+        >
+          {currentStatusObj?.label || currentStatus}
+          <svg className="ml-1 w-3 h-3 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+          </svg>
+        </span>
+        {showTooltip && (
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10">
+            No permission to edit
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative">
+      <button
+        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium hover:opacity-80 transition-opacity"
+        style={badgeStyle}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {currentStatusObj?.label || currentStatus}
+        <svg className="ml-1 w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+            {statuses.map(status => {
+              const isDisabled = status.code === 'DONE' && !canMarkCompleted;
+              
+              return (
+                <button
+                  key={status.code}
+                  disabled={isDisabled}
+                  className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 transition-colors ${
+                    isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                  } ${status.code === currentStatus ? 'bg-blue-50 text-blue-700' : ''}`}
+                  onClick={() => {
+                    if (!isDisabled) {
+                      onStatusChange(status.code);
+                      setIsOpen(false);
+                    }
+                  }}
+                  title={isDisabled ? 'Cannot mark as completed - incomplete sub-tasks' : ''}
+                >
+                  <span 
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: status.color }}
+                  />
+                  {status.label}
+                  {status.code === currentStatus && (
+                    <svg className="ml-auto w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                  {isDisabled && (
+                    <svg className="ml-auto w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// Status Confirmation Modal Component
+function StatusConfirmationModal({ taskTitle, statusLabel, onConfirm, onCancel }) {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+        <div className="p-6">
+          <div className="flex items-center mb-4">
+            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">Confirm Status Change</h3>
+          </div>
+          
+          <p className="text-gray-600 mb-6">
+            Are you sure you want to mark "<strong>{taskTitle}</strong>" as <strong>{statusLabel}</strong>?
+          </p>
+          
+          <div className="flex gap-3 justify-end">
+            <button
+              className="btn btn-secondary"
+              onClick={onCancel}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={onConfirm}
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function TaskContextMenu({ taskId }) {

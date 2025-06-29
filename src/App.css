@@ -1664,6 +1664,169 @@
       transform: scale(1.1);
     }
 
+    /* Status Management Styles */
+    .status-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: capitalize;
+    }
+
+    .status-todo {
+      background-color: #f3f4f6;
+      color: #374151;
+    }
+
+    .status-progress {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+
+    .status-review {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-completed {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    /* Bulk Actions */
+    .bulk-actions-bar {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      color: white;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+    }
+
+    /* Task Selection */
+    .task-row-selected {
+      background-color: #eff6ff !important;
+      border-left: 4px solid #3b82f6;
+    }
+
+    /* Status Confirmation Modal */
+    .status-confirmation-modal {
+      backdrop-filter: blur(8px);
+    }
+
+    /* Hover Effects */
+    .status-dropdown-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Animation for status changes */
+    .status-change-animation {
+      transition: all 0.3s ease;
+      animation: statusPulse 0.6s ease-in-out;
+    }
+
+    @keyframes statusPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* Enhanced Status Pills */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.375rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: capitalize;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .status-pill:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      filter: brightness(1.05);
+    }
+
+    .status-pill.readonly {
+      cursor: default;
+      opacity: 0.8;
+    }
+
+    .status-pill.readonly:hover {
+      transform: none;
+      box-shadow: none;
+      filter: none;
+    }
+
+    /* Status Colors */
+    .status-open {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .status-inprogress {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .status-onhold {
+      background-color: #f39c12;
+      color: white;
+    }
+
+    .status-done {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .status-cancelled {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    /* Permission indicators */
+    .readonly-indicator {
+      opacity: 0.6;
+      font-size: 0.75rem;
+    }
+
+    /* Tooltips */
+    .status-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #1f2937;
+      color: white;
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 50;
+    }
+
+    .status-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid transparent;
+      border-top-color: #1f2937;
+    }
+
     .editable-title-input {
       background: white;
       color: #1f2937;

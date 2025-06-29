@@ -210,6 +210,8 @@ export default function TaskDetail({ taskId, onClose }) {
               status={task.status}
               onChange={handleStatusChange}
               canEdit={permissions.canChangeStatus}
+              task={task}
+              currentUser={currentUser}
             />
 
             <PriorityDropdown
@@ -619,57 +621,183 @@ function FormsPanel({ forms, taskId }) {
   )
 }
 
-function StatusDropdown({ status, onChange, canEdit }) {
+function StatusDropdown({ status, onChange, canEdit, task, currentUser }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(null)
 
   const statuses = [
-    { value: 'OPEN', label: 'Open', color: '#ffc107' },
-    { value: 'INPROGRESS', label: 'In Progress', color: '#17a2b8' },
-    { value: 'ONHOLD', label: 'On Hold', color: '#6c757d' },
-    { value: 'DONE', label: 'Completed', color: '#28a745' },
-    { value: 'CANCELLED', label: 'Cancelled', color: '#dc3545' }
+    { value: 'OPEN', label: 'Open', color: '#6c757d', isFinal: false },
+    { value: 'INPROGRESS', label: 'In Progress', color: '#3498db', isFinal: false },
+    { value: 'ONHOLD', label: 'On Hold', color: '#f39c12', isFinal: false },
+    { value: 'DONE', label: 'Completed', color: '#28a745', isFinal: true },
+    { value: 'CANCELLED', label: 'Cancelled', color: '#dc3545', isFinal: true }
   ]
 
   const currentStatus = statuses.find(s => s.value === status) || statuses[0]
 
+  const canMarkAsCompleted = () => {
+    if (!task?.subtasks || task.subtasks.length === 0) return true;
+    
+    const incompleteSubtasks = task.subtasks.filter(subtask => 
+      subtask.status !== 'DONE' && subtask.status !== 'CANCELLED'
+    );
+    
+    return incompleteSubtasks.length === 0;
+  };
+
+  const handleStatusClick = (statusOption) => {
+    // Check sub-task dependencies for completion
+    if (statusOption.value === 'DONE' && !canMarkAsCompleted()) {
+      const incompleteCount = task.subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED').length;
+      alert(`Cannot mark task as completed. There are ${incompleteCount} incomplete sub-tasks.`);
+      return;
+    }
+
+    // Show confirmation for final statuses
+    if (statusOption.isFinal && statusOption.value !== status) {
+      setShowConfirmation({
+        newStatus: statusOption.value,
+        newLabel: statusOption.label
+      });
+      setIsOpen(false);
+      return;
+    }
+
+    // Direct update for non-final statuses
+    onChange(statusOption.value);
+    setIsOpen(false);
+    
+    // Log activity
+    logActivity('status_changed', {
+      oldStatus: getStatusLabel(status),
+      newStatus: statusOption.label,
+      user: currentUser.name
+    });
+  };
+
+  const confirmStatusChange = () => {
+    onChange(showConfirmation.newStatus);
+    
+    // Log activity
+    logActivity('status_changed', {
+      oldStatus: getStatusLabel(status),
+      newStatus: showConfirmation.newLabel,
+      user: currentUser.name
+    });
+    
+    setShowConfirmation(null);
+  };
+
+  const logActivity = (type, details) => {
+    console.log(`Activity: ${type}`, details);
+    // In real app, this would be sent to backend for activity feed
+  };
+
   if (!canEdit) {
     return (
       <div className="status-display readonly">
-        <span className={`status-badge ${status.toLowerCase()}`}>
+        <span 
+          className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white"
+          style={{ backgroundColor: currentStatus.color }}
+        >
           {getStatusLabel(status)}
         </span>
-        <span className="readonly-indicator">🔒</span>
+        <span className="readonly-indicator ml-2">🔒</span>
       </div>
     )
   }
 
   return (
-    <div className="status-dropdown">
-      <button 
-        className={`status-button ${status.toLowerCase()}`}
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {getStatusLabel(status)}
-        <span className="dropdown-arrow">▼</span>
-      </button>
+    <>
+      <div className="status-dropdown relative">
+        <button 
+          className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white hover:opacity-80 transition-opacity"
+          style={{ backgroundColor: currentStatus.color }}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {getStatusLabel(status)}
+          <svg className="ml-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+          </svg>
+        </button>
 
-      {isOpen && (
-        <div className="status-options">
-          {statuses.map(statusOption => (
-            <button
-              key={statusOption.value}
-              className={`status-option ${statusOption.value === status ? 'selected' : ''}`}
-              onClick={() => {
-                onChange(statusOption.value)
-                setIsOpen(false)
-              }}
-            >
-              {statusOption.label}
-            </button>
-          ))}
+        {isOpen && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+            <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+              {statuses.map(statusOption => {
+                const isDisabled = statusOption.value === 'DONE' && !canMarkAsCompleted();
+                
+                return (
+                  <button
+                    key={statusOption.value}
+                    disabled={isDisabled}
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 flex items-center gap-2 transition-colors ${
+                      isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+                    } ${statusOption.value === status ? 'bg-blue-50 text-blue-700' : ''}`}
+                    onClick={() => handleStatusClick(statusOption)}
+                    title={isDisabled ? 'Cannot mark as completed - incomplete sub-tasks' : ''}
+                  >
+                    <span 
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: statusOption.color }}
+                    />
+                    {statusOption.label}
+                    {statusOption.value === status && (
+                      <svg className="ml-auto w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                    {isDisabled && (
+                      <svg className="ml-auto w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Status Confirmation Modal */}
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.314 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">Confirm Status Change</h3>
+              </div>
+              
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to mark this task as <strong>{showConfirmation.newLabel}</strong>? This action will finalize the task status.
+              </p>
+              
+              <div className="flex gap-3 justify-end">
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setShowConfirmation(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={confirmStatusChange}
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
-    </div>
+    </>
   )
 }
 
