@@ -246,6 +246,12 @@ export default function TaskDetail({ taskId, onClose }) {
               <span key={tag} className="tag-badge">#{tag}</span>
             ))}
 
+            {task.isRecurring && (
+              <span className="status-indicator recurring" title="This is a recurring task instance">
+                🔁 Recurring
+              </span>
+            )}
+
             {isSnoozed && (
               <span className="status-indicator snoozed" title={`Snoozed until ${snoozedUntil.toLocaleString()}`}>
                 😴 Snoozed
@@ -500,6 +506,18 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
             <div className="info-field">
               <label>Parent Task:</label>
               <span className="linked-task">Task #{task.parentTaskId}</span>
+            </div>
+          )}
+          {task.isRecurring && task.recurringFromTaskId && (
+            <div className="info-field">
+              <label>Recurring from:</label>
+              <button 
+                className="linked-task cursor-pointer text-blue-600 hover:text-blue-800 hover:underline"
+                onClick={() => console.log(`Open master task ${task.recurringFromTaskId}`)}
+                title="Click to view the master recurring task pattern"
+              >
+                Task #{task.recurringFromTaskId} 🔁
+              </button>
             </div>
           )}
           <div className="info-field">

@@ -35,6 +35,7 @@ export default function AllTasks() {
       collaborators: [1, 3],
       createdBy: "Current User",
       creatorId: 1,
+      isRecurring: false,
       subtasks: [
         { id: 101, status: "completed" },
         { id: 102, status: "in-progress" },
@@ -97,6 +98,42 @@ export default function AllTasks() {
         { id: 304, status: "pending" },
         { id: 305, status: "pending" }
       ]
+    },
+    {
+      id: 5,
+      title: "Weekly Team Standup",
+      assignee: "Current User",
+      assigneeId: 1,
+      status: "OPEN",
+      priority: "Medium",
+      dueDate: "2024-01-29",
+      category: "Meeting",
+      progress: 0,
+      subtaskCount: 0,
+      collaborators: [],
+      createdBy: "System",
+      creatorId: 0,
+      isRecurring: true,
+      recurringFromTaskId: 1001,
+      subtasks: []
+    },
+    {
+      id: 6,
+      title: "Daily Code Backup",
+      assignee: "DevOps Team",
+      assigneeId: 6,
+      status: "OPEN",
+      priority: "Low",
+      dueDate: "2024-01-29",
+      category: "DevOps",
+      progress: 0,
+      subtaskCount: 0,
+      collaborators: [],
+      createdBy: "System",
+      creatorId: 0,
+      isRecurring: true,
+      recurringFromTaskId: 1002,
+      subtasks: []
     },
   ]);
 
@@ -814,6 +851,14 @@ export default function AllTasks() {
                             />
                           ) : (
                             <>
+                              {task.isRecurring && (
+                                <span 
+                                  className="text-green-600 cursor-help"
+                                  title="Recurring Task – generated from a pattern"
+                                >
+                                  🔁
+                                </span>
+                              )}
                               <span
                                 className="cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-all duration-200 inline-block flex-1 editable-task-title"
                                 onClick={() => handleTaskTitleClick(task)}
@@ -828,6 +873,15 @@ export default function AllTasks() {
                                   onClick={() => console.log(`View sub-tasks for task ${task.id}`)}
                                 >
                                   ⋗ {task.subtaskCount}
+                                </span>
+                              )}
+                              {task.recurringFromTaskId && (
+                                <span 
+                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 cursor-pointer hover:bg-green-200 transition-colors"
+                                  title={`Recurring from Task #${task.recurringFromTaskId}`}
+                                  onClick={() => console.log(`View master task ${task.recurringFromTaskId}`)}
+                                >
+                                  📋 #{task.recurringFromTaskId}
                                 </span>
                               )}
                             </>

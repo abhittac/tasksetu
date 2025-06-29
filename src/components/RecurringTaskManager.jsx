@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Calendar from './Calendar'
 
 export default function RecurringTaskManager({ onClose }) {
   // If onClose is provided, we're being used as a form component
@@ -9,6 +10,7 @@ export default function RecurringTaskManager({ onClose }) {
   // Otherwise, we're being used as a standalone manager
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' })
   const [showCreateRecurringDrawer, setShowCreateRecurringDrawer] = useState(false)
+  const [showCalendarView, setShowCalendarView] = useState(false)
   const [recurringTasks, setRecurringTasks] = useState([
     {
       id: 1,
@@ -139,15 +141,26 @@ export default function RecurringTaskManager({ onClose }) {
           <h1 className="text-3xl font-bold text-gray-900">Recurring Tasks</h1>
           <p className="mt-2 text-lg text-gray-600">Manage automated recurring tasks and schedules</p>
         </div>
-        <button 
-          className="mt-4 lg:mt-0 btn btn-primary"
-          onClick={() => setShowCreateRecurringDrawer(true)}
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Create Recurring Task
-        </button>
+        <div className="mt-4 lg:mt-0 flex gap-3">
+          <button 
+            className="btn btn-secondary"
+            onClick={() => setShowCalendarView(!showCalendarView)}
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            {showCalendarView ? 'Hide Calendar' : 'Calendar View'}
+          </button>
+          <button 
+            className="btn btn-primary"
+            onClick={() => setShowCreateRecurringDrawer(true)}
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Create Recurring Task
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -177,6 +190,13 @@ export default function RecurringTaskManager({ onClose }) {
           </select>
         </div>
       </div>
+
+      {/* Calendar View Section */}
+      {showCalendarView && (
+        <div className="card">
+          <Calendar onClose={() => setShowCalendarView(false)} />
+        </div>
+      )}
 
       {/* Recurring Tasks List */}
       <div className="space-y-4">
