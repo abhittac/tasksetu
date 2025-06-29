@@ -1664,7 +1664,7 @@
       transform: scale(1.1);
     }
 
-    /* Status Management Styles */
+    /* Enhanced Status Management Styles */
     .status-dropdown {
       position: relative;
       display: inline-block;
@@ -1678,8 +1678,46 @@
       font-size: 0.75rem;
       font-weight: 500;
       text-transform: capitalize;
+      transition: all 0.2s ease;
     }
 
+    .status-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Status-specific styles with enhanced colors */
+    .status-open {
+      background-color: #6c757d;
+      color: white;
+      border: 1px solid #5a6169;
+    }
+
+    .status-inprogress {
+      background-color: #3498db;
+      color: white;
+      border: 1px solid #2980b9;
+    }
+
+    .status-onhold {
+      background-color: #f39c12;
+      color: white;
+      border: 1px solid #e67e22;
+    }
+
+    .status-done {
+      background-color: #28a745;
+      color: white;
+      border: 1px solid #1e7e34;
+    }
+
+    .status-cancelled {
+      background-color: #dc3545;
+      color: white;
+      border: 1px solid #c82333;
+    }
+
+    /* Legacy status support */
     .status-todo {
       background-color: #f3f4f6;
       color: #374151;
@@ -1698,6 +1736,165 @@
     .status-completed {
       background-color: #d1fae5;
       color: #065f46;
+    }
+
+    /* Status transition animations */
+    .status-transition {
+      animation: statusPulse 0.3s ease-in-out;
+    }
+
+    @keyframes statusPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* Status history and audit trail */
+    .status-history-item {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem;
+      border-left: 3px solid #e5e7eb;
+      margin-bottom: 0.5rem;
+      background: #f9fafb;
+      border-radius: 0 0.375rem 0.375rem 0;
+    }
+
+    .status-history-item.status-changed {
+      border-left-color: #3b82f6;
+    }
+
+    .status-history-item.status-final {
+      border-left-color: #f59e0b;
+      background: #fffbeb;
+    }
+
+    /* Enhanced tooltips */
+    .status-tooltip {
+      position: absolute;
+      z-index: 50;
+      padding: 0.5rem 0.75rem;
+      background: #1f2937;
+      color: white;
+      font-size: 0.75rem;
+      border-radius: 0.375rem;
+      white-space: nowrap;
+      max-width: 250px;
+      white-space: normal;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1f2937 transparent transparent transparent;
+    }
+
+    /* Workflow visualization */
+    .status-workflow {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 0.5rem;
+      border: 1px dashed #cbd5e1;
+    }
+
+    .status-workflow-step {
+      display: flex;
+      align-items: center;
+      padding: 0.25rem 0.5rem;
+      background: white;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      border: 1px solid #e2e8f0;
+    }
+
+    .status-workflow-step.current {
+      background: #3b82f6;
+      color: white;
+      border-color: #2563eb;
+    }
+
+    .status-workflow-arrow {
+      color: #64748b;
+      font-size: 0.875rem;
+    }
+
+    /* Autosave indicator */
+    .autosave-indicator {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.75rem;
+      color: #10b981;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .autosave-indicator.visible {
+      opacity: 1;
+    }
+
+    .autosave-indicator::before {
+      content: '✓';
+      margin-right: 0.25rem;
+    }
+
+    /* Status confirmation modal enhancements */
+    .status-confirmation-modal .modal-content {
+      max-width: 400px;
+    }
+
+    .status-confirmation-warning {
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .status-confirmation-warning .warning-icon {
+      color: #d97706;
+      font-size: 1.25rem;
+      margin-right: 0.5rem;
+    }
+
+    /* Retroactive status handling */
+    .status-mapping-notice {
+      background: #dbeafe;
+      border: 1px solid #3b82f6;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .status-mapping-notice .info-icon {
+      color: #3b82f6;
+      font-size: 1.25rem;
+      margin-right: 0.5rem;
+    }
+
+    /* Sub-task blocking indicator */
+    .subtask-blocking-indicator {
+      display: inline-flex;
+      align-items: center;
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.75rem;
+      border: 1px solid #fecaca;
+    }
+
+    .subtask-blocking-indicator::before {
+      content: '🚫';
+      margin-right: 0.25rem;
     }
 
     /* Bulk Actions */
