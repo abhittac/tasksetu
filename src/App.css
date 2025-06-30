@@ -1990,16 +1990,45 @@
     }
 
     .task-header-bar {
-      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
       color: white;
-      padding: 1rem 1.5rem;
+      padding: 1.5rem 2rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
       position: relative;
       z-index: 10;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 2px solid rgba(255,255,255,0.1);
+      min-height: 5rem;
+    }
+
+    .task-header-bar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, 
+        rgba(59, 130, 246, 0.1) 0%, 
+        transparent 25%, 
+        transparent 75%, 
+        rgba(139, 92, 246, 0.1) 100%);
+      pointer-events: none;
+    }
+
+    .task-header-bar::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent);
     }
 
     .header-main-content {
@@ -2012,13 +2041,30 @@
     .task-type-indicator {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      gap: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+      border-radius: 16px;
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .task-type-indicator::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.8s ease;
+    }
+
+    .task-type-indicator:hover::before {
+      left: 100%;
     }
 
     .task-type-icon {
@@ -2033,25 +2079,44 @@
     }
 
     .task-title {
-      font-size: 1.5rem;
-      font-weight: 700;
+      font-size: 1.75rem;
+      font-weight: 800;
       margin: 0;
       color: white;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      text-shadow: 0 3px 12px rgba(0,0,0,0.3);
       line-height: 1.2;
+      letter-spacing: -0.025em;
+      max-width: 600px;
     }
 
     .task-title.editable {
       cursor: pointer;
-      padding: 0.5rem 0.75rem;
-      border-radius: 12px;
-      transition: all 0.3s ease;
+      padding: 0.75rem 1rem;
+      border-radius: 16px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
+      overflow: hidden;
+    }
+
+    .task-title.editable::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .task-title.editable:hover::before {
+      left: 100%;
     }
 
     .task-title.editable:hover {
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.1);
     }
 
     .edit-icon {
@@ -2552,15 +2617,40 @@
     }
 
     .tag-badge {
-      background: rgba(255, 255, 255, 0.15);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(99, 102, 241, 0.8) 100%);
       color: white;
       padding: 0.5rem 1rem;
       border-radius: 24px;
       font-size: 0.75rem;
       font-weight: 700;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(16px);
       letter-spacing: 0.025em;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tag-badge::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .tag-badge:hover::before {
+      left: 100%;
+    }
+
+    .tag-badge:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
     }
 
     .status-indicator {
@@ -2577,27 +2667,47 @@
     }
 
     .status-indicator.snoozed {
-      background: rgba(251, 191, 36, 0.2);
-      color: #f59e0b;
-      border-color: rgba(251, 191, 36, 0.4);
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.9) 0%, rgba(245, 158, 11, 0.9) 100%);
+      color: white;
+      border-color: rgba(251, 191, 36, 0.6);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+      animation: gentle-pulse 2s ease-in-out infinite;
     }
 
     .status-indicator.risky {
-      background: rgba(239, 68, 68, 0.2);
-      color: #ef4444;
-      border-color: rgba(239, 68, 68, 0.4);
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%);
+      color: white;
+      border-color: rgba(239, 68, 68, 0.6);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+      animation: urgent-pulse 1.5s ease-in-out infinite;
     }
 
     .status-indicator.milestone {
-      background: rgba(16, 185, 129, 0.2);
-      color: #10b981;
-      border-color: rgba(16, 185, 129, 0.4);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.9) 100%);
+      color: white;
+      border-color: rgba(16, 185, 129, 0.6);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
     }
 
     .status-indicator.approval {
-      background: rgba(139, 92, 246, 0.2);
-      color: #8b5cf6;
-      border-color: rgba(139, 92, 246, 0.4);
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(124, 58, 237, 0.9) 100%);
+      color: white;
+      border-color: rgba(139, 92, 246, 0.6);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+    }
+
+    @keyframes gentle-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.02); }
+    }
+
+    @keyframes urgent-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.9; transform: scale(1.05); }
     }
 
     .close-button {
@@ -2622,6 +2732,56 @@
       background: rgba(255, 255, 255, 0.25);
       transform: rotate(90deg) scale(1.1);
       box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    /* Enhanced Go Back Button */
+    .go-back-button {
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      color: #334155;
+      padding: 0.75rem 1.5rem;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      letter-spacing: 0.025em;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .go-back-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(51, 65, 85, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .go-back-button:hover::before {
+      left: 100%;
+    }
+
+    .go-back-button:hover {
+      background: rgba(255, 255, 255, 1);
+      border-color: #3b82f6;
+      color: #1e40af;
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 32px rgba(59, 130, 246, 0.25);
+    }
+
+    .go-back-button:active {
+      transform: translateY(-1px) scale(0.98);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
     }
 
     .quick-actions-bar {
