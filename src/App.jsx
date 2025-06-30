@@ -13,17 +13,31 @@ import MilestoneManager from './components/MilestoneManager'
 import NotificationCenter from './components/NotificationCenter'
 import ActivityFeed from './components/ActivityFeed'
 import Deadlines from './components/Deadlines'
+import TaskDetail from './components/TaskDetail'
 
 export default function App() {
   const [currentView, setCurrentView] = useState('dashboard')
   const [showCreateTaskDrawer, setShowCreateTaskDrawer] = useState(false)
+  const [selectedTaskId, setSelectedTaskId] = useState(null)
+
+  const handleNavigateToTask = (taskId) => {
+    setSelectedTaskId(taskId)
+    setCurrentView('task-detail')
+  }
+
+  const handleBackToTasks = () => {
+    setSelectedTaskId(null)
+    setCurrentView('all-tasks')
+  }
 
   const renderContent = () => {
     switch (currentView) {
       case 'dashboard':
         return <Dashboard onCreateTask={() => setShowCreateTaskDrawer(true)} />
       case 'all-tasks':
-        return <AllTasks onCreateTask={() => setShowCreateTaskDrawer(true)} />
+        return <AllTasks onCreateTask={() => setShowCreateTaskDrawer(true)} onNavigateToTask={handleNavigateToTask} />
+      case 'task-detail':
+        return selectedTaskId ? <TaskDetail taskId={selectedTaskId} onClose={handleBackToTasks} /> : <AllTasks onCreateTask={() => setShowCreateTaskDrawer(true)} onNavigateToTask={handleNavigateToTask} />
       case 'create-task':
         setShowCreateTaskDrawer(true)
         setCurrentView('dashboard')
@@ -55,17 +69,7 @@ export default function App() {
     <div className="app-layout">
       <Sidebar currentView={currentView} onViewChange={setCurrentView} onCreateTask={() => setShowCreateTaskDrawer(true)} />
       <main className="main-content">
-        {currentView === 'dashboard' && <Dashboard key="dashboard" />}
-        {currentView === 'all-tasks' && <AllTasks key="all-tasks" />}
-        {currentView === 'deadlines' && <Deadlines key="deadlines" />}
-        {currentView === 'recurring-tasks' && <RecurringTaskManager key="recurring-tasks" />}
-        {currentView === 'approvals' && <ApprovalManager key="approvals" />}
-        {currentView === 'milestones' && <MilestoneManager key="milestones" />}
-        {currentView === 'status-manager' && <StatusManager key="status-manager" />}
-        {currentView === 'priority-manager' && <PriorityManager key="priority-manager" />}
-        {currentView === 'analytics' && <TaskAnalytics key="analytics" />}
-        {currentView === 'activity' && <ActivityFeed key="activity" />}
-        {currentView === 'notifications' && <NotificationCenter key="notifications" />}
+        {renderContent()}
       </main>
 
       {/* Slide-in Drawer */}

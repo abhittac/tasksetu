@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import TaskDetail from './TaskDetail'
 import CreateTask from './CreateTask'
 
-export default function AllTasks() {
+export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
@@ -355,7 +354,7 @@ export default function AllTasks() {
 
     // Check sub-task completion logic
     if (newStatusCode === 'DONE' && !canMarkAsCompleted(task)) {
-      const incompleteCount = task.subtasks.filter(s => s.status !== 'DONE' && s.status !== 'CANCELLED').length;
+      const incompleteCount = task.subtasks.filter(s => s.status !== 'completed' && s.status !== 'cancelled').length;
       alert(`Cannot mark task as completed. There are ${incompleteCount} incomplete sub-tasks that must be completed or cancelled first.`);
       return;
     }
@@ -417,7 +416,7 @@ export default function AllTasks() {
   // Handle task deletion with integrity checks
   const handleDeleteTask = (taskId, options = {}) => {
     const task = tasks.find(t => t.id === taskId);
-    
+
     if (!task) {
       console.error('Task not found');
       return;
@@ -444,20 +443,20 @@ export default function AllTasks() {
   // Execute task deletion
   const executeTaskDeletion = (taskId, options) => {
     const task = tasks.find(t => t.id === taskId);
-    
+
     // Remove task from list
     setTasks(prevTasks => prevTasks.filter(t => t.id !== taskId));
-    
+
     // Handle subtasks deletion
     if (options.deleteSubtasks && task.subtasks && task.subtasks.length > 0) {
       console.log(`Deleted ${task.subtasks.length} subtasks for task: ${task.title}`);
     }
-    
+
     // Handle attachments/linked items
     if (options.deleteAttachments && task.linkedItems && task.linkedItems.length > 0) {
       console.log(`Deleted ${task.linkedItems.length} linked items for task: ${task.title}`);
     }
-    
+
     // Log activity for audit trail
     logActivity('task_deleted', {
       taskId: task.id,
@@ -466,10 +465,10 @@ export default function AllTasks() {
       timestamp: new Date().toISOString(),
       options: options
     });
-    
+
     // Show success notification
     console.log(`✅ Task "${task.title}" deleted successfully by ${currentUser.name}`);
-    
+
     // Close confirmation modal
     setShowDeleteConfirmation(null);
   };
@@ -620,6 +619,13 @@ export default function AllTasks() {
     setShowEditModal(false);
     setEditingTask(null);
   };
+
+  const handleViewTask = (taskId) => {
+    // Navigate to task detail page
+    if (onNavigateToTask) {
+      onNavigateToTask(taskId)
+    }
+  }
 
   return (
     <div className="space-y-6 px-4">
@@ -943,7 +949,7 @@ export default function AllTasks() {
                     <div className="flex items-center space-x-3">
                 <button
                   className="text-gray-400 hover:text-blue-600 transition-colors p-1"
-                  onClick={() => setSelectedTaskId(task.id)}
+                  onClick={() => handleViewTask(task.id)}
                   title="View task details"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1071,18 +1077,6 @@ export default function AllTasks() {
           currentUser={currentUser}
         />
       )}
-
-      {/* Task Detail Modal */}
-      {selectedTaskId && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
-            <TaskDetail 
-              taskId={selectedTaskId}
-              onClose={() => setSelectedTaskId(null)}
-            />
-          </div>
-        </div>
-      )}
     </div>
   )
 }
@@ -1104,10 +1098,10 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
     if (isOpen && currentStatusObj) {
       const transitions = currentStatusObj.allowedTransitions.filter(transitionCode => {
         const targetStatus = statuses.find(s => s.code === transitionCode && s.active);
-        
+
         // Check if target status exists and is active
         if (!targetStatus) return false;
-        
+
         // Check sub-task completion logic for DONE status
         if (transitionCode === 'DONE' && task.subtasks && task.subtasks.length > 0) {
           const hasIncompleteSubtasks = task.subtasks.some(subtask => 
@@ -1115,10 +1109,10 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
           );
           return !hasIncompleteSubtasks;
         }
-        
+
         return true;
       });
-      
+
       setValidTransitions(transitions);
     }
   }, [isOpen, currentStatusObj, task.subtasks, statuses]);
@@ -1294,11 +1288,11 @@ function TaskDeleteConfirmationModal({ task, options, onConfirm, onCancel, curre
 
   const getWarningMessages = () => {
     const warnings = [];
-    
+
     if (hasSubtasks) {
       warnings.push(`This task has ${task.subtasks.length} subtask(s). ${deleteOptions.deleteSubtasks ? 'They will be deleted.' : 'They will be orphaned.'}`);
     }
-    
+
     if (hasLinkedItems || hasAttachments) {
       warnings.push(`This task has linked items/attachments. ${deleteOptions.deleteAttachments ? 'They will be deleted.' : 'Links will be preserved.'}`);
     }
@@ -1371,7 +1365,7 @@ function TaskDeleteConfirmationModal({ task, options, onConfirm, onCancel, curre
           {/* Deletion Options */}
           <div className="mb-6 space-y-3">
             <h4 className="font-medium text-gray-900">Deletion Options:</h4>
-            
+
             {hasSubtasks && (
               <label className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                 <input
