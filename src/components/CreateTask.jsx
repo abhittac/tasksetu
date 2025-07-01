@@ -61,7 +61,7 @@ export default function CreateTask({ onClose }) {
   }
 
   return (
-    <div className="space-y-6 mt-0">
+    <div className="create-task-container">
 
       {/* Task Type Selector */}
       <div className="card">
