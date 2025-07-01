@@ -358,7 +358,7 @@ export default function CreateTask({ onClose }) {
             Create Task
           </button>
         </div>
-      </form>
+        </form>
       )}
 
       {/* Recurring Task Form */}

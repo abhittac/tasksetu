@@ -3433,6 +3433,260 @@
       }
     }
 
+    /* Enhanced TaskAttachments Styles */
+    .files-section, .links-section {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 24px;
+      padding: 2rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .files-section::before, .links-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+    }
+
+    .section-header {
+      position: relative;
+      z-index: 10;
+    }
+
+    .upload-area {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border: 2px dashed #cbd5e1;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upload-area::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+      transition: left 0.8s ease;
+    }
+
+    .upload-area:hover::before {
+      left: 100%;
+    }
+
+    .upload-area.drag-active {
+      border-color: #3b82f6;
+      background: linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%);
+      transform: scale(1.02);
+      box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2);
+    }
+
+    .upload-icon {
+      transition: transform 0.3s ease;
+    }
+
+    .upload-area:hover .upload-icon {
+      transform: translateY(-4px) scale(1.05);
+    }
+
+    .file-card, .link-card {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid #e5e7eb;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .file-card::before, .link-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .file-card:hover::before, .link-card:hover::before {
+      left: 100%;
+    }
+
+    .file-card:hover, .link-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+      border-color: #3b82f6;
+    }
+
+    .file-icon, .link-favicon {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      border: 1px solid #e5e7eb;
+      transition: all 0.3s ease;
+    }
+
+    .file-card:hover .file-icon, .link-card:hover .link-favicon {
+      background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+      border-color: #3b82f6;
+      transform: scale(1.1);
+    }
+
+    .add-link-modal {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid #e5e7eb;
+      animation: modalSlideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .add-link-modal::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
+      background-size: 200% 100%;
+      animation: shimmer 2s linear infinite;
+    }
+
+    @keyframes modalSlideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .empty-state {
+      background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+      border-radius: 20px;
+      padding: 3rem 2rem;
+      border: 1px solid #e5e7eb;
+      position: relative;
+    }
+
+    .empty-state::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(156, 163, 175, 0.3), transparent);
+    }
+
+    .files-grid {
+      gap: 1.5rem;
+    }
+
+    .links-list .link-card + .link-card {
+      margin-top: 1rem;
+    }
+
+    /* Action button enhancements */
+    .file-card button, .link-card button {
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .file-card button:hover, .link-card button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Enhanced responsive design */
+    @media (max-width: 768px) {
+      .files-section, .links-section {
+        padding: 1.5rem;
+        border-radius: 20px;
+      }
+
+      .files-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .upload-area {
+        padding: 2rem 1rem;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .section-header .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* File type specific colors */
+    .file-card[data-type="pdf"] .file-icon {
+      background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%);
+      color: #92400e;
+    }
+
+    .file-card[data-type="xlsx"] .file-icon,
+    .file-card[data-type="xls"] .file-icon {
+      background: linear-gradient(135deg, #d1fae5 0%, #34d399 100%);
+      color: #065f46;
+    }
+
+    .file-card[data-type="sql"] .file-icon {
+      background: linear-gradient(135deg, #dbeafe 0%, #60a5fa 100%);
+      color: #1e40af;
+    }
+
+    .file-card[data-type="jpg"] .file-icon,
+    .file-card[data-type="png"] .file-icon,
+    .file-card[data-type="gif"] .file-icon {
+      background: linear-gradient(135deg, #fce7f3 0%, #f472b6 100%);
+      color: #be185d;
+    }
+
+    /* Link hover effects */
+    .link-card a:hover {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
+
+    /* Progress indicators for file uploads */
+    .upload-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      border-radius: 0 0 16px 16px;
+      animation: uploadProgress 2s ease-in-out;
+    }
+
+    @keyframes uploadProgress {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+
 /* Applying the changes to compact task detail page by reducing padding, margins, and section sizes. */
 
 /* TaskComments styles */
