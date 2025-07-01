@@ -759,35 +759,260 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
 }
 
 function FormsPanel({ forms, taskId }) {
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [filter, setFilter] = useState('all');
+
+  const filteredForms = forms.filter(form => {
+    if (filter === 'all') return true;
+    return form.status === filter;
+  });
+
+  const getFormIcon = (type) => {
+    const icons = {
+      checklist: '✅',
+      survey: '📊',
+      approval: '👍',
+      feedback: '💬',
+      assessment: '📝'
+    };
+    return icons[type] || '📄';
+  };
+
+  const getStatusColor = (status) => {
+    const colors = {
+      'not-started': 'bg-gray-100 text-gray-800',
+      'in-progress': 'bg-blue-100 text-blue-800',
+      'completed': 'bg-green-100 text-green-800',
+      'overdue': 'bg-red-100 text-red-800'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getFormTypeColor = (type) => {
+    const colors = {
+      checklist: 'bg-green-100 text-green-800',
+      survey: 'bg-blue-100 text-blue-800',
+      approval: 'bg-purple-100 text-purple-800',
+      feedback: 'bg-orange-100 text-orange-800',
+      assessment: 'bg-indigo-100 text-indigo-800'
+    };
+    return colors[type] || 'bg-gray-100 text-gray-800';
+  };
+
   return (
-    <div className="forms-panel">
-      <div className="forms-header">
-        <h3>Attached Forms ({forms.length})</h3>
-        <button className="btn-primary">+ Add Form</button>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
+            <span className="text-white text-lg">📋</span>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Attached Forms ({filteredForms.length})</h2>
+            <p className="text-sm text-gray-600">Forms, checklists, and interactive documents</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <select 
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="form-select text-sm"
+          >
+            <option value="all">All Status</option>
+            <option value="not-started">Not Started</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="overdue">Overdue</option>
+          </select>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="btn btn-primary flex items-center gap-2 px-4 py-2"
+          >
+            <span className="text-sm">📋</span>
+            <span>Add Form</span>
+          </button>
+        </div>
       </div>
 
-      <div className="forms-list">
-        {forms.map((form) => (
-          <div key={form.id} className="form-item">
-            <div className="form-icon">📄</div>
-            <div className="form-info">
-              <h4>{form.title}</h4>
-              <span className="form-type">{form.type}</span>
-              <span className={`form-status ${form.status}`}>
-                {form.status}
-              </span>
+      {/* Forms Grid */}
+      {filteredForms.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredForms.map((form) => (
+            <div 
+              key={form.id} 
+              className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 group"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-xl flex items-center justify-center text-xl">
+                    {getFormIcon(form.type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-gray-900 mb-2 truncate group-hover:text-emerald-600 transition-colors">
+                      {form.title}
+                    </h4>
+                    <div className="flex flex-col gap-1">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-fit ${getFormTypeColor(form.type)}`}>
+                        {form.type}
+                      </span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-fit ${getStatusColor(form.status)}`}>
+                        {form.status.replace('-', ' ')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Progress Bar for in-progress forms */}
+              {form.status === 'in-progress' && (
+                <div className="mb-4">
+                  <div className="flex justify-between text-xs text-gray-600 mb-1">
+                    <span>Progress</span>
+                    <span>65%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-emerald-500 h-2 rounded-full" style={{ width: '65%' }}></div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Form Actions */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => console.log('View form:', form.id)}
+                  className="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
+                >
+                  <span>👁️</span>
+                  <span>View</span>
+                </button>
+                <button
+                  onClick={() => console.log('Edit form:', form.id)}
+                  className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
+                >
+                  <span>✏️</span>
+                  <span>Edit</span>
+                </button>
+                <button
+                  onClick={() => console.log('Remove form:', form.id)}
+                  className="w-10 h-10 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm transition-colors flex items-center justify-center"
+                  title="Remove Form"
+                >
+                  <span>🗑️</span>
+                </button>
+              </div>
+              
+              {/* Additional Form Info */}
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>Created: Today</span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    Active
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="form-actions">
-              <button className="btn-action">View</button>
-              <button className="btn-action">Edit</button>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">📋</span>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No forms attached</h3>
+          <p className="text-gray-600 mb-4">Add forms, checklists, or surveys to collect structured data</p>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="btn btn-secondary"
+          >
+            Add First Form
+          </button>
+        </div>
+      )}
+
+      {/* Add Form Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Add New Form</h3>
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center text-gray-600 transition-colors"
+                >
+                  <span className="text-sm">✕</span>
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Form Type</label>
+                  <select className="form-select w-full">
+                    <option value="checklist">Checklist</option>
+                    <option value="survey">Survey</option>
+                    <option value="approval">Approval Form</option>
+                    <option value="feedback">Feedback Form</option>
+                    <option value="assessment">Assessment</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Form Name</label>
+                  <input
+                    type="text"
+                    className="form-input w-full"
+                    placeholder="Enter form name..."
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <textarea
+                    className="form-textarea w-full"
+                    rows="3"
+                    placeholder="Brief description of the form purpose..."
+                  />
+                </div>
+                
+                <div className="bg-emerald-50 p-4 rounded-lg">
+                  <h4 className="text-sm font-medium text-emerald-800 mb-2">Quick Templates</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button className="bg-white border border-emerald-200 text-emerald-700 px-3 py-2 rounded-lg text-sm hover:bg-emerald-50 transition-colors">
+                      Project Checklist
+                    </button>
+                    <button className="bg-white border border-emerald-200 text-emerald-700 px-3 py-2 rounded-lg text-sm hover:bg-emerald-50 transition-colors">
+                      Quality Review
+                    </button>
+                    <button className="bg-white border border-emerald-200 text-emerald-700 px-3 py-2 rounded-lg text-sm hover:bg-emerald-50 transition-colors">
+                      Team Feedback
+                    </button>
+                    <button className="bg-white border border-emerald-200 text-emerald-700 px-3 py-2 rounded-lg text-sm hover:bg-emerald-50 transition-colors">
+                      Custom Form
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => setShowAddModal(false)}
+                    className="btn btn-secondary flex-1"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log('Create form');
+                      setShowAddModal(false);
+                    }}
+                    className="btn btn-primary flex-1"
+                  >
+                    Create Form
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-
-      {forms.length === 0 && (
-        <div className="empty-forms">
-          <p>No forms attached to this task.</p>
         </div>
       )}
     </div>
@@ -2566,27 +2791,217 @@ function SubtaskDetailView({
 }
 
 function LinkedItemsPanel({ linkedItems }) {
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [filter, setFilter] = useState('all');
+
+  const filteredItems = linkedItems.filter(item => {
+    if (filter === 'all') return true;
+    return item.type === filter;
+  });
+
+  const getItemIcon = (type) => {
+    const icons = {
+      task: '📋',
+      document: '📄',
+      form: '📝',
+      link: '🔗'
+    };
+    return icons[type] || '🔗';
+  };
+
+  const getItemTypeColor = (type) => {
+    const colors = {
+      task: 'bg-blue-100 text-blue-800',
+      document: 'bg-green-100 text-green-800',
+      form: 'bg-purple-100 text-purple-800',
+      link: 'bg-gray-100 text-gray-800'
+    };
+    return colors[type] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-800',
+      'in-progress': 'bg-blue-100 text-blue-800',
+      completed: 'bg-green-100 text-green-800',
+      cancelled: 'bg-red-100 text-red-800'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
   return (
-    <div className="linked-items-panel">
-      <h3>Linked Items ({linkedItems.length})</h3>
-      <div className="linked-items-list">
-        {linkedItems.map((item) => (
-          <div key={item.id} className="linked-item">
-            <div className="item-icon">
-              {item.type === "form"
-                ? "📋"
-                : item.type === "document"
-                  ? "📄"
-                  : "🔗"}
-            </div>
-            <div className="item-info">
-              <h4>{item.title}</h4>
-              <span className="item-type">{item.type}</span>
-            </div>
-            <span className={`status-badge ${item.status}`}>{item.status}</span>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
+            <span className="text-white text-lg">🔗</span>
           </div>
-        ))}
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Linked Items ({filteredItems.length})</h2>
+            <p className="text-sm text-gray-600">Connected tasks, documents, and resources</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <select 
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="form-select text-sm"
+          >
+            <option value="all">All Types</option>
+            <option value="task">Tasks</option>
+            <option value="document">Documents</option>
+            <option value="form">Forms</option>
+            <option value="link">Links</option>
+          </select>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="btn btn-primary flex items-center gap-2 px-4 py-2"
+          >
+            <span className="text-sm">➕</span>
+            <span>Link Item</span>
+          </button>
+        </div>
       </div>
+
+      {/* Linked Items Grid */}
+      {filteredItems.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredItems.map((item) => (
+            <div 
+              key={item.id} 
+              className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 group cursor-pointer"
+              onClick={() => console.log(`Open ${item.type}:`, item.id)}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-xl">
+                    {getItemIcon(item.type)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-gray-900 mb-1 truncate group-hover:text-blue-600 transition-colors">
+                      {item.title}
+                    </h4>
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getItemTypeColor(item.type)}`}>
+                        {item.type}
+                      </span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
+                        {item.status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log('View item:', item.id);
+                    }}
+                    className="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-lg flex items-center justify-center text-blue-600 transition-colors"
+                    title="View"
+                  >
+                    <span className="text-sm">👁️</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log('Unlink item:', item.id);
+                    }}
+                    className="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-lg flex items-center justify-center text-red-600 transition-colors"
+                    title="Unlink"
+                  >
+                    <span className="text-sm">🔗⛔</span>
+                  </button>
+                </div>
+              </div>
+              
+              {/* Additional info */}
+              <div className="text-sm text-gray-500">
+                <div className="flex items-center justify-between">
+                  <span>Type: {item.type}</span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                    Connected
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">🔗</span>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No linked items</h3>
+          <p className="text-gray-600 mb-4">Connect related tasks, documents, or resources</p>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="btn btn-secondary"
+          >
+            Link First Item
+          </button>
+        </div>
+      )}
+
+      {/* Add Link Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Link New Item</h3>
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center text-gray-600 transition-colors"
+                >
+                  <span className="text-sm">✕</span>
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Item Type</label>
+                  <select className="form-select w-full">
+                    <option value="task">Task</option>
+                    <option value="document">Document</option>
+                    <option value="form">Form</option>
+                    <option value="link">External Link</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Search & Select</label>
+                  <input
+                    type="text"
+                    className="form-input w-full"
+                    placeholder="Search for items to link..."
+                  />
+                </div>
+                
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => setShowAddModal(false)}
+                    className="btn btn-secondary flex-1"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log('Link item');
+                      setShowAddModal(false);
+                    }}
+                    className="btn btn-primary flex-1"
+                  >
+                    Link Item
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
