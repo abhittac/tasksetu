@@ -206,228 +206,349 @@ export default function NotificationCenter() {
 
   if (showSettings) {
     return (
-      <div className="notification-settings">
-        <div className="settings-header">
-          <h2>Notification Settings</h2>
-          <button 
-            className="btn-secondary"
-            onClick={() => setShowSettings(false)}
-          >
-            Back to Notifications
-          </button>
-        </div>
-
-        <div className="settings-content">
-          <div className="settings-section">
-            <h3>Delivery Preferences</h3>
-            <div className="setting-item">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={settings.emailNotifications}
-                  onChange={(e) => handleSettingChange('emailNotifications', e.target.checked)}
-                />
-                <span className="checkmark"></span>
-                Email notifications
-              </label>
+      <div className="space-y-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                <span className="text-white text-lg">⚙️</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Notification Settings</h1>
+                <p className="text-sm text-gray-500">Customize how and when you receive notifications</p>
+              </div>
             </div>
-            <div className="setting-item">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={settings.pushNotifications}
-                  onChange={(e) => handleSettingChange('pushNotifications', e.target.checked)}
-                />
-                <span className="checkmark"></span>
-                Push notifications
-              </label>
-            </div>
+            <button 
+              className="btn btn-secondary flex items-center space-x-2"
+              onClick={() => setShowSettings(false)}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span>Back to Notifications</span>
+            </button>
           </div>
 
-          <div className="settings-section">
-            <h3>Due Date Reminders</h3>
-            <div className="setting-item">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={settings.dueDateReminders.enabled}
-                  onChange={(e) => handleSettingChange('dueDateReminders.enabled', e.target.checked)}
-                />
-                <span className="checkmark"></span>
-                Enable due date reminders
-              </label>
-            </div>
-            
-            {settings.dueDateReminders.enabled && (
-              <>
-                <div className="setting-item">
-                  <label>Remind me:</label>
-                  <div className="reminder-days">
-                    {[7, 3, 1].map(days => (
-                      <label key={days} className="checkbox-label">
-                        <input
-                          type="checkbox"
-                          checked={settings.dueDateReminders.daysBeforeDue.includes(days)}
-                          onChange={() => handleDueDateReminderChange(days)}
-                        />
-                        <span className="checkmark"></span>
-                        {days} day{days > 1 ? 's' : ''} before
-                      </label>
-                    ))}
+          <div className="p-6 space-y-8">
+            {/* Delivery Preferences */}
+            <div className="notification-settings-section">
+              <div className="notification-settings-section-header">
+                <div className="notification-settings-section-icon">
+                  📧
+                </div>
+                <div>
+                  <h3 className="notification-settings-section-title">Delivery Preferences</h3>
+                  <p className="notification-settings-section-description">Choose how you want to receive notifications</p>
+                </div>
+              </div>
+              <div className="notification-settings-section-content">
+                <div className="notification-setting-item">
+                  <div className="notification-setting-info">
+                    <label className="notification-setting-label">Email notifications</label>
+                    <p className="notification-setting-description">Receive notifications via email</p>
                   </div>
+                  <label className="notification-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.emailNotifications}
+                      onChange={(e) => handleSettingChange('emailNotifications', e.target.checked)}
+                    />
+                    <span className="notification-slider"></span>
+                  </label>
+                </div>
+                <div className="notification-setting-item">
+                  <div className="notification-setting-info">
+                    <label className="notification-setting-label">Push notifications</label>
+                    <p className="notification-setting-description">Receive browser push notifications</p>
+                  </div>
+                  <label className="notification-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.pushNotifications}
+                      onChange={(e) => handleSettingChange('pushNotifications', e.target.checked)}
+                    />
+                    <span className="notification-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Due Date Reminders */}
+            <div className="notification-settings-section">
+              <div className="notification-settings-section-header">
+                <div className="notification-settings-section-icon">
+                  ⏰
+                </div>
+                <div>
+                  <h3 className="notification-settings-section-title">Due Date Reminders</h3>
+                  <p className="notification-settings-section-description">Get reminded before tasks are due</p>
+                </div>
+              </div>
+              <div className="notification-settings-section-content">
+                <div className="notification-setting-item">
+                  <div className="notification-setting-info">
+                    <label className="notification-setting-label">Enable due date reminders</label>
+                    <p className="notification-setting-description">Receive reminders before tasks are due</p>
+                  </div>
+                  <label className="notification-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.dueDateReminders.enabled}
+                      onChange={(e) => handleSettingChange('dueDateReminders.enabled', e.target.checked)}
+                    />
+                    <span className="notification-slider"></span>
+                  </label>
                 </div>
                 
-                <div className="setting-item">
-                  <label>Reminder time:</label>
-                  <input
-                    type="time"
-                    value={settings.dueDateReminders.time}
-                    onChange={(e) => handleSettingChange('dueDateReminders.time', e.target.value)}
-                    className="time-input"
-                  />
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className="settings-section">
-            <h3>Overdue Reminders</h3>
-            <div className="setting-item">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={settings.overdueReminders.enabled}
-                  onChange={(e) => handleSettingChange('overdueReminders.enabled', e.target.checked)}
-                />
-                <span className="checkmark"></span>
-                Enable overdue reminders
-              </label>
-            </div>
-            
-            {settings.overdueReminders.enabled && (
-              <div className="setting-item">
-                <label>Frequency:</label>
-                <select
-                  value={settings.overdueReminders.frequency}
-                  onChange={(e) => handleSettingChange('overdueReminders.frequency', e.target.value)}
-                  className="form-select"
-                >
-                  <option value="daily">Daily</option>
-                  <option value="every3days">Every 3 days</option>
-                  <option value="weekly">Weekly</option>
-                </select>
+                {settings.dueDateReminders.enabled && (
+                  <div className="notification-subsection">
+                    <div className="notification-subsection-content">
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-3">Remind me:</label>
+                        <div className="space-y-2">
+                          {[7, 3, 1].map(days => (
+                            <label key={days} className="notification-checkbox-item">
+                              <input
+                                type="checkbox"
+                                checked={settings.dueDateReminders.daysBeforeDue.includes(days)}
+                                onChange={() => handleDueDateReminderChange(days)}
+                                className="notification-checkbox"
+                              />
+                              <span className="notification-checkbox-label">
+                                {days} day{days > 1 ? 's' : ''} before due date
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Reminder time:</label>
+                        <input
+                          type="time"
+                          value={settings.dueDateReminders.time}
+                          onChange={(e) => handleSettingChange('dueDateReminders.time', e.target.value)}
+                          className="notification-time-input"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
 
-          <div className="settings-section">
-            <h3>Activity Notifications</h3>
-            <div className="setting-item">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={settings.assignmentNotifications}
-                  onChange={(e) => handleSettingChange('assignmentNotifications', e.target.checked)}
-                />
-                <span className="checkmark"></span>
-                Task assignments
-              </label>
-            </div>
-            <div className="setting-item">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={settings.mentionNotifications}
-                  onChange={(e) => handleSettingChange('mentionNotifications', e.target.checked)}
-                />
-                <span className="checkmark"></span>
-                @Mentions in comments
-              </label>
-            </div>
-            <div className="setting-item">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={settings.statusChangeNotifications}
-                  onChange={(e) => handleSettingChange('statusChangeNotifications', e.target.checked)}
-                />
-                <span className="checkmark"></span>
-                Task status changes
-              </label>
-            </div>
-            <div className="setting-item">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={settings.snoozeWakeupNotifications}
-                  onChange={(e) => handleSettingChange('snoozeWakeupNotifications', e.target.checked)}
-                />
-                <span className="checkmark"></span>
-                Snooze wake-up alerts
-              </label>
-            </div>
-          </div>
-
-          <div className="settings-section">
-            <h3>Quiet Hours</h3>
-            <div className="setting-item">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={settings.quietHours.enabled}
-                  onChange={(e) => handleSettingChange('quietHours.enabled', e.target.checked)}
-                />
-                <span className="checkmark"></span>
-                Enable quiet hours (no notifications)
-              </label>
-            </div>
-            
-            {settings.quietHours.enabled && (
-              <div className="quiet-hours-times">
-                <div className="setting-item">
-                  <label>From:</label>
-                  <input
-                    type="time"
-                    value={settings.quietHours.start}
-                    onChange={(e) => handleSettingChange('quietHours.start', e.target.value)}
-                    className="time-input"
-                  />
+            {/* Overdue Reminders */}
+            <div className="notification-settings-section">
+              <div className="notification-settings-section-header">
+                <div className="notification-settings-section-icon">
+                  🚨
                 </div>
-                <div className="setting-item">
-                  <label>To:</label>
-                  <input
-                    type="time"
-                    value={settings.quietHours.end}
-                    onChange={(e) => handleSettingChange('quietHours.end', e.target.value)}
-                    className="time-input"
-                  />
+                <div>
+                  <h3 className="notification-settings-section-title">Overdue Reminders</h3>
+                  <p className="notification-settings-section-description">Get notified about overdue tasks</p>
                 </div>
               </div>
-            )}
-          </div>
+              <div className="notification-settings-section-content">
+                <div className="notification-setting-item">
+                  <div className="notification-setting-info">
+                    <label className="notification-setting-label">Enable overdue reminders</label>
+                    <p className="notification-setting-description">Receive alerts for overdue tasks</p>
+                  </div>
+                  <label className="notification-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.overdueReminders.enabled}
+                      onChange={(e) => handleSettingChange('overdueReminders.enabled', e.target.checked)}
+                    />
+                    <span className="notification-slider"></span>
+                  </label>
+                </div>
+                
+                {settings.overdueReminders.enabled && (
+                  <div className="notification-subsection">
+                    <div className="notification-subsection-content">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Frequency:</label>
+                      <select
+                        value={settings.overdueReminders.frequency}
+                        onChange={(e) => handleSettingChange('overdueReminders.frequency', e.target.value)}
+                        className="notification-select"
+                      >
+                        <option value="daily">Daily</option>
+                        <option value="every3days">Every 3 days</option>
+                        <option value="weekly">Weekly</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
 
-          <div className="settings-section">
-            <h3>Weekend Settings</h3>
-            <div className="setting-item">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={settings.weekendNotifications}
-                  onChange={(e) => handleSettingChange('weekendNotifications', e.target.checked)}
-                />
-                <span className="checkmark"></span>
-                Send notifications on weekends
-              </label>
+            {/* Activity Notifications */}
+            <div className="notification-settings-section">
+              <div className="notification-settings-section-header">
+                <div className="notification-settings-section-icon">
+                  🔔
+                </div>
+                <div>
+                  <h3 className="notification-settings-section-title">Activity Notifications</h3>
+                  <p className="notification-settings-section-description">Stay updated on task activity</p>
+                </div>
+              </div>
+              <div className="notification-settings-section-content">
+                <div className="notification-setting-item">
+                  <div className="notification-setting-info">
+                    <label className="notification-setting-label">Task assignments</label>
+                    <p className="notification-setting-description">When tasks are assigned to you</p>
+                  </div>
+                  <label className="notification-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.assignmentNotifications}
+                      onChange={(e) => handleSettingChange('assignmentNotifications', e.target.checked)}
+                    />
+                    <span className="notification-slider"></span>
+                  </label>
+                </div>
+                <div className="notification-setting-item">
+                  <div className="notification-setting-info">
+                    <label className="notification-setting-label">@Mentions in comments</label>
+                    <p className="notification-setting-description">When someone mentions you in a comment</p>
+                  </div>
+                  <label className="notification-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.mentionNotifications}
+                      onChange={(e) => handleSettingChange('mentionNotifications', e.target.checked)}
+                    />
+                    <span className="notification-slider"></span>
+                  </label>
+                </div>
+                <div className="notification-setting-item">
+                  <div className="notification-setting-info">
+                    <label className="notification-setting-label">Task status changes</label>
+                    <p className="notification-setting-description">When task status is updated</p>
+                  </div>
+                  <label className="notification-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.statusChangeNotifications}
+                      onChange={(e) => handleSettingChange('statusChangeNotifications', e.target.checked)}
+                    />
+                    <span className="notification-slider"></span>
+                  </label>
+                </div>
+                <div className="notification-setting-item">
+                  <div className="notification-setting-info">
+                    <label className="notification-setting-label">Snooze wake-up alerts</label>
+                    <p className="notification-setting-description">When snoozed tasks become active again</p>
+                  </div>
+                  <label className="notification-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.snoozeWakeupNotifications}
+                      onChange={(e) => handleSettingChange('snoozeWakeupNotifications', e.target.checked)}
+                    />
+                    <span className="notification-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Quiet Hours */}
+            <div className="notification-settings-section">
+              <div className="notification-settings-section-header">
+                <div className="notification-settings-section-icon">
+                  🌙
+                </div>
+                <div>
+                  <h3 className="notification-settings-section-title">Quiet Hours</h3>
+                  <p className="notification-settings-section-description">Set times when notifications are paused</p>
+                </div>
+              </div>
+              <div className="notification-settings-section-content">
+                <div className="notification-setting-item">
+                  <div className="notification-setting-info">
+                    <label className="notification-setting-label">Enable quiet hours</label>
+                    <p className="notification-setting-description">Pause notifications during specified hours</p>
+                  </div>
+                  <label className="notification-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.quietHours.enabled}
+                      onChange={(e) => handleSettingChange('quietHours.enabled', e.target.checked)}
+                    />
+                    <span className="notification-slider"></span>
+                  </label>
+                </div>
+                
+                {settings.quietHours.enabled && (
+                  <div className="notification-subsection">
+                    <div className="notification-subsection-content">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">From:</label>
+                          <input
+                            type="time"
+                            value={settings.quietHours.start}
+                            onChange={(e) => handleSettingChange('quietHours.start', e.target.value)}
+                            className="notification-time-input"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">To:</label>
+                          <input
+                            type="time"
+                            value={settings.quietHours.end}
+                            onChange={(e) => handleSettingChange('quietHours.end', e.target.value)}
+                            className="notification-time-input"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Weekend Settings */}
+            <div className="notification-settings-section">
+              <div className="notification-settings-section-header">
+                <div className="notification-settings-section-icon">
+                  🏖️
+                </div>
+                <div>
+                  <h3 className="notification-settings-section-title">Weekend Settings</h3>
+                  <p className="notification-settings-section-description">Control weekend notifications</p>
+                </div>
+              </div>
+              <div className="notification-settings-section-content">
+                <div className="notification-setting-item">
+                  <div className="notification-setting-info">
+                    <label className="notification-setting-label">Send notifications on weekends</label>
+                    <p className="notification-setting-description">Receive notifications on Saturday and Sunday</p>
+                  </div>
+                  <label className="notification-toggle">
+                    <input
+                      type="checkbox"
+                      checked={settings.weekendNotifications}
+                      onChange={(e) => handleSettingChange('weekendNotifications', e.target.checked)}
+                    />
+                    <span className="notification-slider"></span>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="settings-actions">
-            <button className="btn-primary">Save Settings</button>
+          <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl">
             <button 
-              className="btn-secondary"
+              className="btn btn-secondary"
               onClick={() => setShowSettings(false)}
             >
               Cancel
+            </button>
+            <button className="btn btn-primary">
+              Save Settings
             </button>
           </div>
         </div>
