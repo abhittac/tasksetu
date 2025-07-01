@@ -64,96 +64,65 @@ export default function CreateTask({ onClose }) {
     <div className="space-y-6 mt-0">
 
       {/* Task Type Selector */}
-      <div className="card">
-        <div className="card-header">
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Task Type</h3>
-          <p className="text-gray-600">Choose the type of task you want to create</p>
-        </div>
-        <div className="grid grid-cols-3 md:grid-cols-3 gap-3">
-          <button
-            onClick={() => setTaskType('regular')}
-            className={`p-3 border-2 rounded-xl text-left transition-all duration-300 group ${
-              taskType === 'regular' 
-                ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-md transform scale-102' 
-                : 'border-gray-200 hover:border-blue-300 hover:shadow-sm hover:transform hover:scale-101'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                taskType === 'regular' 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-blue-100 text-blue-600 group-hover:bg-blue-200'
-              }`}>
-                <span className="text-sm">📋</span>
+      <div className="create-task-form">
+        <div className="task-type-selector">
+          <div className="form-section-header">
+            <h3 className="form-section-title">Task Type</h3>
+            <p className="form-section-description">Choose the type of task you want to create</p>
+          </div>
+          <div className="task-type-grid">
+            <button
+              type="button"
+              onClick={() => setTaskType('regular')}
+              className={`task-type-option ${taskType === 'regular' ? 'selected' : ''}`}
+            >
+              <div className="task-type-header">
+                <div className="task-type-icon-large">📋</div>
+                <div className="task-type-title">Regular Task</div>
               </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-semibold text-gray-900 group-hover:text-blue-700">Regular Task</h4>
-                <p className="text-xs text-gray-500 group-hover:text-gray-600 truncate">Standard one-time task</p>
-              </div>
-            </div>
-          </button>
+              <div className="task-type-description">Standard one-time task</div>
+            </button>
 
-          <button
-            onClick={() => setTaskType('recurring')}
-            className={`p-3 border-2 rounded-xl text-left transition-all duration-300 group ${
-              taskType === 'recurring' 
-                ? 'border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 shadow-md transform scale-102' 
-                : 'border-gray-200 hover:border-green-300 hover:shadow-sm hover:transform hover:scale-101'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                taskType === 'recurring' 
-                  ? 'bg-green-500 text-white' 
-                  : 'bg-green-100 text-green-600 group-hover:bg-green-200'
-              }`}>
-                <span className="text-sm">🔄</span>
+            <button
+              type="button"
+              onClick={() => setTaskType('recurring')}
+              className={`task-type-option ${taskType === 'recurring' ? 'selected' : ''}`}
+            >
+              <div className="task-type-header">
+                <div className="task-type-icon-large">🔄</div>
+                <div className="task-type-title">Recurring Task</div>
               </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-semibold text-gray-900 group-hover:text-green-700">Recurring Task</h4>
-                <p className="text-xs text-gray-500 group-hover:text-gray-600 truncate">Repeats on schedule</p>
-              </div>
-            </div>
-          </button>
+              <div className="task-type-description">Repeats on schedule</div>
+            </button>
 
-          <button
-            onClick={() => setTaskType('milestone')}
-            className={`p-3 border-2 rounded-xl text-left transition-all duration-300 group ${
-              taskType === 'milestone' 
-                ? 'border-purple-500 bg-gradient-to-br from-purple-50 to-violet-50 shadow-md transform scale-102' 
-                : 'border-gray-200 hover:border-purple-300 hover:shadow-sm hover:transform hover:scale-101'
-            }`}
-          >
-            <div className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                taskType === 'milestone' 
-                  ? 'bg-purple-500 text-white' 
-                  : 'bg-purple-100 text-purple-600 group-hover:bg-purple-200'
-              }`}>
-                <span className="text-sm">🎯</span>
+            <button
+              type="button"
+              onClick={() => setTaskType('milestone')}
+              className={`task-type-option ${taskType === 'milestone' ? 'selected' : ''}`}
+            >
+              <div className="task-type-header">
+                <div className="task-type-icon-large">🎯</div>
+                <div className="task-type-title">Milestone</div>
               </div>
-              <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-semibold text-gray-900 group-hover:text-purple-700">Milestone</h4>
-                <p className="text-xs text-gray-500 group-hover:text-gray-600 truncate">Project checkpoint</p>
-              </div>
-            </div>
-          </button>
+              <div className="task-type-description">Project checkpoint</div>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Conditional Task Forms */}
       {taskType === 'regular' && (
         <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="card">
-          <div className="card-header">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Task Details</h3>
-            <p className="text-gray-600">Fill in the basic information for your task</p>
+        <div className="form-section">
+          <div className="form-section-header">
+            <h3 className="form-section-title">Task Details</h3>
+            <p className="form-section-description">Fill in the basic information for your task</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="form-grid">
             {/* Title */}
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-field full-width">
+              <label className="form-label">
                 Task Title *
               </label>
               <input
@@ -167,8 +136,8 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Description */}
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-field full-width">
+              <label className="form-label">
                 Description
               </label>
               <textarea
@@ -181,8 +150,8 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Assignee */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-field">
+              <label className="form-label">
                 Assign to
               </label>
               <select
@@ -199,8 +168,8 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Priority */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-field">
+              <label className="form-label">
                 Priority
               </label>
               <select
@@ -217,8 +186,8 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Status */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-field">
+              <label className="form-label">
                 Initial Status
               </label>
               <select
@@ -233,8 +202,8 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Due Date */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-field">
+              <label className="form-label">
                 Due Date
                 {!isManualDueDate && (
                   <span className="text-xs text-blue-600 ml-2">(Auto-calculated from priority)</span>
@@ -247,13 +216,13 @@ export default function CreateTask({ onClose }) {
                 className="form-input"
               />
               {!isManualDueDate && (
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="form-help-text">
                   Due date automatically calculated based on selected priority. Change manually to override.
                 </p>
               )}
               {isManualDueDate && (
                 <div className="flex items-center mt-1">
-                  <p className="text-xs text-gray-500">Manual override active.</p>
+                  <p className="form-help-text">Manual override active.</p>
                   <button
                     type="button"
                     onClick={() => {
@@ -273,8 +242,8 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Category */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-field">
+              <label className="form-label">
                 Category
               </label>
               <select
@@ -292,8 +261,8 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Tags */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="form-field">
+              <label className="form-label">
                 Tags
               </label>
               <input
@@ -303,7 +272,7 @@ export default function CreateTask({ onClose }) {
                 className="form-input"
                 placeholder="Enter tags separated by commas..."
               />
-              <p className="mt-1 text-xs text-gray-500">Separate multiple tags with commas</p>
+              <p className="form-help-text">Separate multiple tags with commas</p>
             </div>
           </div>
         </div>
@@ -311,18 +280,18 @@ export default function CreateTask({ onClose }) {
         
 
         {/* File Attachments */}
-        <div className="card">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Attachments</h3>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <div className="mt-4">
-              <label className="cursor-pointer">
-                <span className="text-primary-600 hover:text-primary-500">Upload files</span>
-                <input type="file" className="sr-only" multiple />
-              </label>
-              <p className="text-gray-500"> or drag and drop</p>
+        <div className="form-section">
+          <div className="form-section-header">
+            <h3 className="form-section-title">Attachments</h3>
+          </div>
+          <div className="file-upload-area">
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📁</div>
+            <div>
+              <p>
+                <strong>Drag and drop files here or </strong>
+                <button type="button" className="text-blue-600 hover:text-blue-800 underline">Choose Files</button>
+              </p>
+              <p className="text-gray-500">No file chosen</p>
             </div>
             <p className="text-xs text-gray-500 mt-2">PNG, JPG, PDF up to 10MB</p>
           </div>
