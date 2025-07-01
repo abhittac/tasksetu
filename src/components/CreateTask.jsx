@@ -61,7 +61,7 @@ export default function CreateTask({ onClose }) {
   }
 
   return (
-    <div className="space-y-6 mt-0">
+    <div className="create-task-container">
 
       {/* Task Type Selector */}
       <div className="card">
@@ -181,7 +181,7 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Assignee */}
-            <div>
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Assign to
               </label>
@@ -199,7 +199,7 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Priority */}
-            <div>
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Priority
               </label>
@@ -217,7 +217,7 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Status */}
-            <div>
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Initial Status
               </label>
@@ -233,7 +233,7 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Due Date */}
-            <div>
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Due Date
                 {!isManualDueDate && (
@@ -273,7 +273,7 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Category */}
-            <div>
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category
               </label>
@@ -292,7 +292,7 @@ export default function CreateTask({ onClose }) {
             </div>
 
             {/* Tags */}
-            <div>
+            <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Tags
               </label>
