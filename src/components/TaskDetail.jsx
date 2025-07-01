@@ -514,7 +514,7 @@ export default function TaskDetail({ taskId, onClose }) {
 
           {activeTab === "comments" && <TaskComments taskId={taskId} />}
           {activeTab === "activity" && <ActivityFeed taskId={taskId} />}
-          {activeTab === "attachments" && <FilesAndLinksPanel taskId={taskId} />}
+          {activeTab === "attachments" && <TaskAttachments taskId={taskId} />}
 
           {activeTab === "linked" && (
             <LinkedItemsPanel linkedItems={task.linkedItems} />
@@ -763,7 +763,7 @@ function FormsPanel({ forms, taskId }) {
     <div className="forms-panel">
       <div className="forms-header">
         <h3>Attached Forms ({forms.length})</h3>
-        <button className="btn btn-primary">+ Add Form</button>
+        <button className="btn-primary">+ Add Form</button>
       </div>
 
       <div className="forms-list">
@@ -772,7 +772,7 @@ function FormsPanel({ forms, taskId }) {
             <div className="form-icon">📄</div>
             <div className="form-info">
               <h4>{form.title}</h4>
-              <div className="form-type">{form.type}</div>
+              <span className="form-type">{form.type}</span>
               <span className={`form-status ${form.status}`}>
                 {form.status}
               </span>
@@ -787,11 +787,7 @@ function FormsPanel({ forms, taskId }) {
 
       {forms.length === 0 && (
         <div className="empty-forms">
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📋</div>
           <p>No forms attached to this task.</p>
-          <button className="btn btn-secondary" style={{ marginTop: '1rem' }}>
-            + Create First Form
-          </button>
         </div>
       )}
     </div>
@@ -2569,144 +2565,25 @@ function SubtaskDetailView({
   );
 }
 
-function FilesAndLinksPanel({ taskId }) {
-  // Mock data - in real app would come from API
-  const files = [
-    {
-      id: 1,
-      name: "database-schema.sql",
-      size: "45KB",
-      uploadedBy: "John Smith",
-      uploadedAt: "1/20/2024 at 02:30 PM",
-      type: "sql"
-    },
-    {
-      id: 2,
-      name: "migration-plan.pdf",
-      size: "1.2MB",
-      uploadedBy: "Sarah Wilson",
-      uploadedAt: "1/21/2024 at 09:15 AM",
-      type: "pdf"
-    },
-    {
-      id: 3,
-      name: "test-results.xlsx",
-      size: "856KB",
-      uploadedBy: "Mike Johnson",
-      uploadedAt: "1/22/2024 at 11:45 AM",
-      type: "xlsx"
-    }
-  ];
-
-  const links = [
-    {
-      id: 1,
-      title: "Update Documentation",
-      type: "task",
-      status: "pending"
-    },
-    {
-      id: 2,
-      title: "Migration Plan",
-      type: "document", 
-      status: "completed"
-    }
-  ];
-
-  const getFileIcon = (type) => {
-    switch (type) {
-      case 'sql': return '🗄️';
-      case 'pdf': return '📄';
-      case 'xlsx': return '📊';
-      default: return '📎';
-    }
-  };
-
-  return (
-    <div className="files-links-section">
-      {/* Files Section */}
-      <div className="files-header">
-        <h3>Files ({files.length})</h3>
-      </div>
-      
-      <div className="file-upload-area">
-        <div className="upload-icon">📁</div>
-        <p className="upload-text">
-          <strong>Drag and drop files here or </strong>
-          <button className="upload-link">Choose Files</button>
-        </p>
-        <p className="upload-help">No file chosen</p>
-        <p className="upload-limit">Maximum file size: 10MB per file</p>
-      </div>
-
-      <div className="file-list">
-        {files.map((file) => (
-          <div key={file.id} className="file-item">
-            <div className="file-info">
-              <div className="file-icon">{getFileIcon(file.type)}</div>
-              <div className="file-details">
-                <h4>{file.name}</h4>
-                <div className="file-meta">
-                  {file.size} • Uploaded by {file.uploadedBy} • {file.uploadedAt}
-                </div>
-              </div>
-            </div>
-            <div className="file-actions">
-              <button className="file-action-btn">Download</button>
-              <button className="file-action-btn">🗑️</button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Links Section */}
-      <div className="linked-items-section">
-        <div className="files-header">
-          <h3>Links ({links.length})</h3>
-        </div>
-        
-        <div className="file-list">
-          {links.map((link) => (
-            <div key={link.id} className="linked-item">
-              <div className="linked-item-icon">
-                {link.type === "form" ? "📋" : link.type === "document" ? "📄" : "🔗"}
-              </div>
-              <div className="linked-item-info">
-                <h4>{link.title}</h4>
-                <div className="linked-item-type">{link.type}</div>
-              </div>
-              <span className={`linked-item-status ${link.status}`}>
-                {link.status}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function LinkedItemsPanel({ linkedItems }) {
   return (
-    <div className="linked-items-section">
-      <div className="files-header">
-        <h3>Linked Items ({linkedItems.length})</h3>
-      </div>
-      <div className="file-list">
+    <div className="linked-items-panel">
+      <h3>Linked Items ({linkedItems.length})</h3>
+      <div className="linked-items-list">
         {linkedItems.map((item) => (
           <div key={item.id} className="linked-item">
-            <div className="linked-item-icon">
+            <div className="item-icon">
               {item.type === "form"
                 ? "📋"
                 : item.type === "document"
                   ? "📄"
                   : "🔗"}
             </div>
-            <div className="linked-item-info">
+            <div className="item-info">
               <h4>{item.title}</h4>
-              <div className="linked-item-type">{item.type}</div>
+              <span className="item-type">{item.type}</span>
             </div>
-            <span className={`linked-item-status ${item.status}`}>{item.status}</span>
+            <span className={`status-badge ${item.status}`}>{item.status}</span>
           </div>
         ))}
       </div>
