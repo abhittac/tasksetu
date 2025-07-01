@@ -8,7 +8,7 @@ export default function Sidebar({ currentView, onViewChange, onCreateTask }) {
       items: [
         { id: 'dashboard', label: 'Dashboard', icon: '📊' },
         { id: 'all-tasks', label: 'All Tasks', icon: '📋' },
-        { id: 'create-task', label: 'Create Task', icon: '➕' },
+        // { id: 'create-task', label: 'Create Task', icon: '➕' },
         { id: 'deadlines', label: 'Deadlines', icon: '⏰' },
       ]
     },
