@@ -628,7 +628,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   }
 
   return (
-    <div className="space-y-6 px-4">
+    <div className="space-y-6 px-4 py-6">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
@@ -782,18 +782,18 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       </div>
 
       {/* Export Options */}
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2 ">
         <button className="btn btn-secondary btn-sm">Export as CSV</button>
         <button className="btn btn-secondary btn-sm">Export as Excel</button>
       </div>
 
       {/* Tasks Table */}
-      <div className="card p-0 overflow-hidden ">
+      <div className="card p-0 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12 text-nowrap">
                   <input
                     type="checkbox"
                     checked={selectedTasks.length === tasks.length && tasks.length > 0}
@@ -801,25 +801,25 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-nowrap">
                   Task
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-nowrap">
                   Assignee
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-nowrap">
                   Status
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-nowrap">
                   Priority
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-nowrap">
                   Due Date
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-nowrap">
                   Progress
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-nowrap">
                   Actions
                 </th>
               </tr>
@@ -832,7 +832,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                     selectedTasks.includes(task.id) ? 'bg-blue-50' : ''
                   }`}
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-nowrap">
                     <input
                       type="checkbox"
                       checked={selectedTasks.includes(task.id)}
@@ -840,7 +840,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-nowrap">
                     <div>
                       <div className="font-medium text-gray-900">
                         <div className="flex items-center gap-2">
@@ -899,7 +899,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-nowrap">
                     <div className="flex items-center">
                       <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mr-3">
                         <span className="text-xs font-medium text-gray-600">
@@ -924,7 +924,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                       canMarkCompleted={canMarkAsCompleted(task)}
                     />
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-nowrap">
                     <span className={getPriorityBadge(task.priority)}>
                       {task.priority}
                     </span>
@@ -932,7 +932,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                   <td className="px-6 py-4 text-sm text-gray-900 text-nowrap">
                     {task.dueDate}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-nowrap">
                     <div className="flex items-center">
                       <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
                         <div
@@ -945,7 +945,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 text-nowrap">
                     <div className="flex items-center space-x-3">
                 <button
                   className="text-gray-400 hover:text-blue-600 transition-colors p-1"
