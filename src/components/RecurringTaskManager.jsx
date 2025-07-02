@@ -717,64 +717,113 @@ function EditRecurrenceModal({ task, onClose, onSave }) {
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-container edit-recurrence-modal">
-        <div className="modal-header">
-          <h3>Edit Recurrence: {task.title}</h3>
-          <button className="close-button" onClick={onClose}>×</button>
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4 overlay-animate">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-animate-slide-right">
+        {/* Enhanced Header */}
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 rounded-t-2xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-bold text-white">Edit Recurrence</h3>
+              <p className="text-indigo-100 text-sm mt-1">{task.title}</p>
+            </div>
+            <button 
+              className="text-white/80 hover:text-white hover:bg-white/20 rounded-lg p-2 transition-all duration-200"
+              onClick={onClose}
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="modal-content">
-          <div className="form-grid">
-            <div className="form-group">
-              <label htmlFor="frequency">Frequency</label>
-              <select
-                id="frequency"
-                name="frequency"
-                value={formData.frequency}
-                onChange={handleChange}
-              >
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-                <option value="custom">Custom</option>
-              </select>
-            </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Frequency Section */}
+          <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+            <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
+                <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              Frequency Settings
+            </h4>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label htmlFor="frequency" className="block text-sm font-medium text-gray-700 mb-2">
+                  Frequency
+                </label>
+                <select
+                  id="frequency"
+                  name="frequency"
+                  value={formData.frequency}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                >
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="repeatEvery">Repeat Every</label>
-              <input
-                type="number"
-                id="repeatEvery"
-                name="repeatEvery"
-                value={formData.repeatEvery}
-                onChange={handleChange}
-                min="1"
-                max="365"
-              />
-            </div>
+              <div>
+                <label htmlFor="repeatEvery" className="block text-sm font-medium text-gray-700 mb-2">
+                  Repeat Every
+                </label>
+                <input
+                  type="number"
+                  id="repeatEvery"
+                  name="repeatEvery"
+                  value={formData.repeatEvery}
+                  onChange={handleChange}
+                  min="1"
+                  max="365"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                />
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="time">Time</label>
-              <input
-                type="time"
-                id="time"
-                name="time"
-                value={formData.time}
-                onChange={handleChange}
-              />
+              <div>
+                <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-2">
+                  Time
+                  <svg className="w-4 h-4 text-gray-400 inline ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </label>
+                <input
+                  type="time"
+                  id="time"
+                  name="time"
+                  value={formData.time}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                />
+              </div>
             </div>
           </div>
 
+          {/* Weekly Days Selection */}
           {formData.frequency === 'weekly' && (
-            <div className="form-group full-width">
-              <label>Repeat On Days</label>
-              <div className="days-selector">
+            <div className="bg-blue-50 rounded-xl p-5 border border-blue-200">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                Repeat On Days
+              </h4>
+              <div className="grid grid-cols-7 gap-2">
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
                   <button
                     key={day}
                     type="button"
-                    className={`day-button ${formData.repeatOnDays.includes(day) ? 'selected' : ''}`}
+                    className={`px-3 py-3 text-sm font-medium rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
+                      formData.repeatOnDays.includes(day)
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-lg'
+                        : 'bg-white border-gray-300 text-gray-700 hover:border-blue-300 hover:bg-blue-50'
+                    }`}
                     onClick={() => handleDayToggle(day)}
                   >
                     {day}
@@ -784,63 +833,111 @@ function EditRecurrenceModal({ task, onClose, onSave }) {
             </div>
           )}
 
-          <div className="form-group">
-            <label>End Condition</label>
-            <div className="radio-group">
-              <label className="radio-label">
+          {/* End Condition Section */}
+          <div className="bg-orange-50 rounded-xl p-5 border border-orange-200">
+            <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mr-3">
+                <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              End Condition
+            </h4>
+            
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white transition-colors">
                 <input
                   type="radio"
+                  id="never"
                   name="endConditionType"
                   value="never"
                   checked={formData.endConditionType === 'never'}
                   onChange={handleChange}
+                  className="w-4 h-4 text-orange-600 focus:ring-orange-500"
                 />
-                Never
-              </label>
-              <label className="radio-label">
+                <label htmlFor="never" className="text-sm font-medium text-gray-700 flex items-center">
+                  <svg className="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Never end (Continue indefinitely)
+                </label>
+              </div>
+              
+              <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white transition-colors">
                 <input
                   type="radio"
+                  id="after"
                   name="endConditionType"
                   value="after"
                   checked={formData.endConditionType === 'after'}
                   onChange={handleChange}
+                  className="w-4 h-4 text-orange-600 focus:ring-orange-500"
                 />
-                After occurrences
-              </label>
-              <label className="radio-label">
+                <label htmlFor="after" className="text-sm font-medium text-gray-700 flex items-center">
+                  <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                  </svg>
+                  After occurrences
+                </label>
+              </div>
+              
+              <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white transition-colors">
                 <input
                   type="radio"
+                  id="on"
                   name="endConditionType"
                   value="on"
                   checked={formData.endConditionType === 'on'}
                   onChange={handleChange}
+                  className="w-4 h-4 text-orange-600 focus:ring-orange-500"
                 />
-                On date
-              </label>
+                <label htmlFor="on" className="text-sm font-medium text-gray-700 flex items-center">
+                  <svg className="w-4 h-4 text-purple-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  On date
+                </label>
+              </div>
             </div>
+
+            {formData.endConditionType !== 'never' && (
+              <div className="mt-4 p-4 bg-white rounded-lg border border-gray-200">
+                <label htmlFor="endValue" className="block text-sm font-medium text-gray-700 mb-2">
+                  {formData.endConditionType === 'after' ? 'Number of Occurrences' : 'End Date'}
+                </label>
+                <input
+                  type={formData.endConditionType === 'after' ? 'number' : 'date'}
+                  id="endValue"
+                  name="endValue"
+                  value={formData.endValue}
+                  onChange={handleChange}
+                  min={formData.endConditionType === 'after' ? '1' : undefined}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                  placeholder={formData.endConditionType === 'after' ? 'Enter number of times' : ''}
+                />
+              </div>
+            )}
           </div>
 
-          {formData.endConditionType !== 'never' && (
-            <div className="form-group">
-              <label htmlFor="endValue">
-                {formData.endConditionType === 'after' ? 'Number of Occurrences' : 'End Date'}
-              </label>
-              <input
-                type={formData.endConditionType === 'after' ? 'number' : 'date'}
-                id="endValue"
-                name="endValue"
-                value={formData.endValue}
-                onChange={handleChange}
-                min={formData.endConditionType === 'after' ? '1' : undefined}
-              />
-            </div>
-          )}
-
-          <div className="modal-actions">
-            <button type="button" className="btn-secondary" onClick={onClose}>
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:justify-end pt-4 border-t border-gray-200">
+            <button 
+              type="button" 
+              className="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center"
+              onClick={onClose}
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
               Cancel
             </button>
-            <button type="submit" className="btn-primary">
+            <button 
+              type="submit" 
+              className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
               Update Recurrence
             </button>
           </div>
