@@ -162,7 +162,7 @@ export default function MilestoneManager() {
                   type="text"
                   id="title"
                   placeholder="Enter milestone title"
-                  className="w-full"
+                  className="w-full form-input"
                 />
               </div>
 
@@ -172,7 +172,7 @@ export default function MilestoneManager() {
                   id="description"
                   placeholder="Describe the milestone..."
                   rows="3"
-                  className="w-full"
+                  className="w-full form-input"
                 />
               </div>
 
@@ -182,13 +182,13 @@ export default function MilestoneManager() {
                   <input
                     type="date"
                     id="dueDate"
-                    className="w-full"
+                    className="w-full form-input"
                   />
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="priority">Priority</label>
-                  <select id="priority" className="w-full">
+                  <select id="priority" className="w-full form-input">
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
                     <option value="high">High</option>
@@ -198,10 +198,10 @@ export default function MilestoneManager() {
               </div>
 
               <div className="modal-actions">
-                <button type="button" className="btn-secondary" onClick={() => setShowAddForm(false)}>
+                <button type="button" className="btn-secondary rounded-sm" onClick={() => setShowAddForm(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary">
+                <button type="submit" className="btn-primary px-4 rounded-sm">
                   Create Milestone
                 </button>
               </div>
