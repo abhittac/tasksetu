@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './App.css'
 import Sidebar from './components/Sidebar'
 import Dashboard from './components/Dashboard'
@@ -19,6 +19,19 @@ export default function App() {
   const [currentView, setCurrentView] = useState('dashboard')
   const [showCreateTaskDrawer, setShowCreateTaskDrawer] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState(null)
+
+  // Handle body lock for drawer
+  useEffect(() => {
+    if (showCreateTaskDrawer) {
+      document.body.classList.add('modal-open')
+    } else {
+      document.body.classList.remove('modal-open')
+    }
+    
+    return () => {
+      document.body.classList.remove('modal-open')
+    }
+  }, [showCreateTaskDrawer])
 
   const handleNavigateToTask = (taskId) => {
     setSelectedTaskId(taskId)

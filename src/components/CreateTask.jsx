@@ -373,17 +373,36 @@ export default function CreateTask({ onClose }) {
 
       {/* More Options Modal */}
       {showMoreOptions && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4 overlay-animate">
-          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-animate-slide-right">
-            <MoreOptionsModal
-              data={moreOptionsData}
-              onChange={handleMoreOptionsChange}
-              onClose={() => setShowMoreOptions(false)}
-              onSave={() => setShowMoreOptions(false)}
-            />
-          </div>
-        </div>
+        <MoreOptionsModalWrapper 
+          data={moreOptionsData}
+          onChange={handleMoreOptionsChange}
+          onClose={() => setShowMoreOptions(false)}
+          onSave={() => setShowMoreOptions(false)}
+        />
       )}
+    </div>
+  )
+}
+
+// More Options Modal Wrapper Component
+function MoreOptionsModalWrapper({ data, onChange, onClose, onSave }) {
+  useEffect(() => {
+    document.body.classList.add('modal-open')
+    return () => {
+      document.body.classList.remove('modal-open')
+    }
+  }, [])
+
+  return (
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center z-50 p-4 overlay-animate">
+      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-animate-slide-right">
+        <MoreOptionsModal
+          data={data}
+          onChange={onChange}
+          onClose={onClose}
+          onSave={onSave}
+        />
+      </div>
     </div>
   )
 }
