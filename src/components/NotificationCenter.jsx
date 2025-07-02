@@ -353,19 +353,7 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
     });
   };
 
-  const handleReminderDaysChange = (days) => {
-    onSettingsChange({
-      ...settings,
-      reminderDays: days,
-    });
-  };
-
-  const handleTimeChange = (time) => {
-    onSettingsChange({
-      ...settings,
-      reminderTime: time,
-    });
-  };
+  
 
   const sections = [
     { id: "delivery", label: "Delivery", icon: "📨", count: 2 },
@@ -606,21 +594,30 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                                 <label key={days} className="relative">
                                   <input
                                     type="checkbox"
-                                    checked={settings.reminderDays.includes(
+                                    checked={settings.dueDateReminders.daysBeforeDue.includes(
                                       days,
                                     )}
                                     onChange={(e) => {
                                       if (e.target.checked) {
-                                        handleReminderDaysChange([
-                                          ...settings.reminderDays,
-                                          days,
-                                        ]);
+                                        const newDays = [...settings.dueDateReminders.daysBeforeDue, days].sort((a, b) => b - a);
+                                        onSettingsChange({
+                                          ...settings,
+                                          dueDateReminders: {
+                                            ...settings.dueDateReminders,
+                                            daysBeforeDue: newDays
+                                          }
+                                        });
                                       } else {
-                                        handleReminderDaysChange(
-                                          settings.reminderDays.filter(
-                                            (d) => d !== days,
-                                          ),
+                                        const newDays = settings.dueDateReminders.daysBeforeDue.filter(
+                                          (d) => d !== days,
                                         );
+                                        onSettingsChange({
+                                          ...settings,
+                                          dueDateReminders: {
+                                            ...settings.dueDateReminders,
+                                            daysBeforeDue: newDays
+                                          }
+                                        });
                                       }
                                     }}
                                     className="sr-only peer"
@@ -636,7 +633,7 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                                         </div>
                                       </div>
                                       <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:border-orange-500 peer-checked:bg-orange-500 flex items-center justify-center">
-                                        {settings.reminderDays.includes(
+                                        {settings.dueDateReminders.daysBeforeDue.includes(
                                           days,
                                         ) && (
                                           <svg
@@ -667,9 +664,15 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                             <div className="bg-white rounded-xl border-2 border-gray-200 p-4 max-w-xs">
                               <input
                                 type="time"
-                                value={settings.reminderTime}
+                                value={settings.dueDateReminders.time}
                                 onChange={(e) =>
-                                  handleTimeChange(e.target.value)
+                                  onSettingsChange({
+                                    ...settings,
+                                    dueDateReminders: {
+                                      ...settings.dueDateReminders,
+                                      time: e.target.value
+                                    }
+                                  })
                                 }
                                 className="w-full text-lg font-medium text-gray-900 bg-transparent border-none outline-none"
                               />
