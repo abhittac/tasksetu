@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 
 export default function ApprovalTaskCreator({ onClose, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -19,14 +19,6 @@ export default function ApprovalTaskCreator({ onClose, onSubmit }) {
   })
 
   const [dragActive, setDragActive] = useState(false)
-
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    document.body.classList.add('modal-open')
-    return () => {
-      document.body.classList.remove('modal-open')
-    }
-  }, [])
 
   const availableApprovers = [
     { id: 1, name: 'Current User', role: 'manager' },
@@ -136,7 +128,7 @@ export default function ApprovalTaskCreator({ onClose, onSubmit }) {
   }
 
   return (
-    <div className="modal-overlay-blur">
+    <div className="modal-overlay">
       <div className="modal-container approval-task-creator">
         <div className="modal-header">
           <h2>Create Approval Task</h2>
