@@ -2406,133 +2406,174 @@ function SubtaskSlideUpPanel({
     setIsEditing(false);
   };
 
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case "completed":
+        return "✅";
+      case "in-progress":
+        return "🔄";
+      case "to-do":
+        return "⭕";
+      default:
+        return "📝";
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "completed":
+        return "bg-emerald-100 text-emerald-800 border-emerald-200";
+      case "in-progress":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "to-do":
+        return "bg-gray-100 text-gray-800 border-gray-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case "critical":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "high":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "low":
+        return "bg-green-100 text-green-800 border-green-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-4 overlay-animate"
-      style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-    >
-      <div className="absolute inset-0" onClick={onClose} />
-      <div
-        className="relative bg-white rounded-t-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden panel-animate"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">
-              {subtask.status === "completed"
-                ? "✅"
-                : subtask.status === "in-progress"
-                  ? "🔄"
-                  : "⭕"}
-            </span>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                Sub-task Details
-              </h3>
-              <p className="text-sm text-gray-600">Part of parent task</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overlay-animate">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden modal-animate-slide-right" style={{boxShadow: '0 25px 50px rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.2)'}}>
+        
+        {/* Enhanced Header */}
+        <div className="relative p-6 border-b border-gray-200/50 bg-gradient-to-r from-blue-50 to-indigo-50 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-600/10"></div>
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <span className="text-2xl">{getStatusIcon(subtask.status)}</span>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-1">
+                  Sub-task Details
+                </h3>
+                <p className="text-sm text-gray-600 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                  Part of parent task #{subtask.parentTaskId}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            {canEdit && (
+            <div className="flex items-center gap-3">
+              {canEdit && (
+                <button
+                  className="px-4 py-2 bg-white/80 backdrop-blur-sm text-blue-600 border border-blue-200 rounded-xl font-semibold hover:bg-blue-50 transition-all duration-300 shadow-sm"
+                  onClick={() => setIsEditing(!isEditing)}
+                >
+                  {isEditing ? (
+                    <>
+                      <span className="mr-2">✕</span>
+                      Cancel Edit
+                    </>
+                  ) : (
+                    <>
+                      <span className="mr-2">✏️</span>
+                      Edit
+                    </>
+                  )}
+                </button>
+              )}
               <button
-                className="btn btn-primary btn-sm"
-                onClick={() => setIsEditing(!isEditing)}
+                className="w-10 h-10 bg-white/80 backdrop-blur-sm text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-300 flex items-center justify-center shadow-sm"
+                onClick={onClose}
               >
-                {isEditing ? "Cancel" : "Edit"}
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
-            )}
-            <button
-              className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100"
-              onClick={onClose}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+            </div>
           </div>
         </div>
 
-        {/* Content */}
-        <div
-          className="p-6 overflow-y-auto"
-          style={{ maxHeight: "calc(80vh - 140px)" }}
-        >
-          <div className="space-y-6">
-            {/* Title */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Title
-              </label>
+        {/* Enhanced Content */}
+        <div className="p-6 overflow-y-auto" style={{ maxHeight: "calc(90vh - 200px)" }}>
+          <div className="space-y-8">
+            
+            {/* Title Section */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <span className="text-blue-600 text-sm font-bold">T</span>
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900">Task Title</h4>
+              </div>
               {isEditing ? (
                 <input
                   type="text"
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="form-input w-full"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                   maxLength={100}
+                  placeholder="Enter task title..."
                 />
               ) : (
-                <p className="text-gray-900 font-medium bg-gray-50 p-3 rounded-lg">
-                  {subtask.title}
-                </p>
+                <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-xl border border-gray-200">
+                  <p className="text-gray-900 font-semibold text-lg">{subtask.title}</p>
+                </div>
               )}
             </div>
 
-            {/* Two Column Layout */}
+            {/* Status & Priority Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Status */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Status
-                </label>
+              
+              {/* Status Card */}
+              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                    <span className="text-emerald-600 text-sm">🎯</span>
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900">Status</h4>
+                </div>
                 {isEditing ? (
                   <select
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    className="form-select w-full"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                   >
                     <option value="to-do">To Do</option>
                     <option value="in-progress">In Progress</option>
                     <option value="completed">Completed</option>
                   </select>
                 ) : (
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                      subtask.status === "completed"
-                        ? "bg-green-100 text-green-800"
-                        : subtask.status === "in-progress"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {subtask.status.replace("-", " ")}
-                  </span>
+                  <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-semibold ${getStatusColor(subtask.status)}`}>
+                    <span className="text-lg">{getStatusIcon(subtask.status)}</span>
+                    <span className="capitalize">{subtask.status.replace("-", " ")}</span>
+                  </div>
                 )}
               </div>
 
-              {/* Priority */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Priority
-                </label>
+              {/* Priority Card */}
+              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <span className="text-orange-600 text-sm">⚡</span>
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900">Priority</h4>
+                </div>
                 {isEditing ? (
                   <select
                     name="priority"
                     value={formData.priority}
                     onChange={handleChange}
-                    className="form-select w-full"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -2540,33 +2581,30 @@ function SubtaskSlideUpPanel({
                     <option value="critical">Critical</option>
                   </select>
                 ) : (
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                      subtask.priority === "high"
-                        ? "bg-red-100 text-red-800"
-                        : subtask.priority === "medium"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : subtask.priority === "critical"
-                            ? "bg-purple-100 text-purple-800"
-                            : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {subtask.priority}
-                  </span>
+                  <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-semibold ${getPriorityColor(subtask.priority)}`}>
+                    <span className="capitalize">{subtask.priority}</span>
+                  </div>
                 )}
               </div>
+            </div>
 
-              {/* Assignee */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Assignee
-                </label>
+            {/* Assignee & Due Date Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* Assignee Card */}
+              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <span className="text-purple-600 text-sm">👤</span>
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900">Assignee</h4>
+                </div>
                 {isEditing ? (
                   <select
                     name="assignee"
                     value={formData.assignee}
                     onChange={handleChange}
-                    className="form-select w-full"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                   >
                     <option value="John Smith">John Smith</option>
                     <option value="Sarah Wilson">Sarah Wilson</option>
@@ -2574,105 +2612,128 @@ function SubtaskSlideUpPanel({
                     <option value="Emily Davis">Emily Davis</option>
                   </select>
                 ) : (
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                      <span className="text-xs font-medium text-gray-600">
+                  <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-gray-50 to-purple-50 rounded-xl border border-gray-200">
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm">
+                      <span className="text-white font-bold text-sm">
                         {subtask.assignee?.charAt(0) || "U"}
                       </span>
                     </div>
-                    <span className="text-gray-900">{subtask.assignee}</span>
+                    <div>
+                      <p className="font-semibold text-gray-900">{subtask.assignee}</p>
+                      <p className="text-sm text-gray-500">Task Assignee</p>
+                    </div>
                   </div>
                 )}
               </div>
 
-              {/* Due Date */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Due Date
-                </label>
+              {/* Due Date Card */}
+              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                    <span className="text-red-600 text-sm">📅</span>
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900">Due Date</h4>
+                </div>
                 {isEditing ? (
                   <input
                     type="date"
                     name="dueDate"
                     value={formData.dueDate}
                     onChange={handleChange}
-                    className="form-input w-full"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
                   />
                 ) : (
-                  <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
-                    {subtask.dueDate}
-                  </p>
+                  <div className="p-3 bg-gradient-to-r from-gray-50 to-red-50 rounded-xl border border-gray-200">
+                    <p className="font-semibold text-gray-900">{subtask.dueDate}</p>
+                    <p className="text-sm text-gray-500">Target completion</p>
+                  </div>
                 )}
               </div>
             </div>
 
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
+            {/* Description Section */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+                  <span className="text-indigo-600 text-sm">📝</span>
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900">Description</h4>
+              </div>
               {isEditing ? (
                 <textarea
                   name="description"
                   value={formData.description || ""}
                   onChange={handleChange}
-                  className="form-textarea w-full"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 resize-none"
                   rows="4"
-                  placeholder="Add description..."
+                  placeholder="Add a detailed description of this sub-task..."
                 />
               ) : (
-                <div className="bg-gray-50 p-4 rounded-lg min-h-[100px]">
-                  <p className="text-gray-900">
-                    {subtask.description || "No description provided."}
-                  </p>
+                <div className="bg-gradient-to-br from-gray-50 to-indigo-50 p-4 rounded-xl border border-gray-200 min-h-[120px]">
+                  {subtask.description ? (
+                    <p className="text-gray-900 leading-relaxed">{subtask.description}</p>
+                  ) : (
+                    <p className="text-gray-500 italic">No description provided for this sub-task.</p>
+                  )}
                 </div>
               )}
             </div>
 
-            {/* Metadata */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">
-                Task Information
-              </h4>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-500">Created by:</span>
-                  <span className="ml-2 text-gray-900">
-                    {subtask.createdBy}
-                  </span>
+            {/* Metadata Section */}
+            <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl p-6 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-slate-200 rounded-lg flex items-center justify-center">
+                  <span className="text-slate-600 text-sm">ℹ️</span>
                 </div>
-                <div>
-                  <span className="text-gray-500">Created:</span>
-                  <span className="ml-2 text-gray-900">
-                    {new Date(subtask.createdAt).toLocaleDateString()}
-                  </span>
+                <h4 className="text-lg font-semibold text-gray-900">Task Information</h4>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-white/50">
+                  <span className="text-gray-500 text-sm font-medium">Created by:</span>
+                  <p className="text-gray-900 font-semibold">{subtask.createdBy}</p>
                 </div>
-                <div>
-                  <span className="text-gray-500">Visibility:</span>
-                  <span className="ml-2 text-gray-900">
-                    {subtask.visibility || "Private"}
-                  </span>
+                <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-white/50">
+                  <span className="text-gray-500 text-sm font-medium">Created on:</span>
+                  <p className="text-gray-900 font-semibold">
+                    {new Date(subtask.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </p>
                 </div>
-                <div>
-                  <span className="text-gray-500">Parent Task:</span>
-                  <span className="ml-2 text-gray-900">
-                    #{subtask.parentTaskId}
-                  </span>
+                <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-white/50">
+                  <span className="text-gray-500 text-sm font-medium">Visibility:</span>
+                  <p className="text-gray-900 font-semibold">{subtask.visibility || "Private"}</p>
+                </div>
+                <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-white/50">
+                  <span className="text-gray-500 text-sm font-medium">Parent Task ID:</span>
+                  <p className="text-gray-900 font-semibold">#{subtask.parentTaskId}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Enhanced Action Buttons */}
         {isEditing && (
-          <div className="flex justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
-            <button className="btn btn-secondary" onClick={handleCancel}>
-              Cancel
-            </button>
-            <button className="btn btn-primary" onClick={handleSave}>
-              Save Changes
-            </button>
+          <div className="p-6 border-t border-gray-200/50 bg-gradient-to-r from-gray-50 to-blue-50">
+            <div className="flex justify-end gap-4">
+              <button 
+                className="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 shadow-sm"
+                onClick={handleCancel}
+              >
+                <span className="mr-2">↩️</span>
+                Cancel Changes
+              </button>
+              <button 
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-lg"
+                onClick={handleSave}
+              >
+                <span className="mr-2">💾</span>
+                Save Changes
+              </button>
+            </div>
           </div>
         )}
       </div>
