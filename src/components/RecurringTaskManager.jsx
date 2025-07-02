@@ -295,22 +295,230 @@ export default function RecurringTaskManager({ onClose }) {
       )}
 
       {showEditModal && editingTask && (
-        <EditRecurrenceModal
-          task={editingTask}
-          onClose={() => {
-            setShowEditModal(false)
-            setEditingTask(null)
-          }}
-          onSave={(updatedTask) => {
-            setRecurringTasks(tasks =>
-              tasks.map(task =>
-                task.id === updatedTask.id ? updatedTask : task
-              )
-            )
-            setShowEditModal(false)
-            setEditingTask(null)
-          }}
-        />
+        /* Edit Recurring Task Modal */
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4 overlay-animate">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto modal-animate-slide-right">
+            {/* Header */}
+            <div className="sticky top-0 bg-gradient-to-r from-green-500 to-emerald-600 text-white p-6 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                    <span className="text-xl">🔄</span>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold">Edit Recurrence</h2>
+                    <p className="text-green-100 text-sm truncate max-w-xs">{editingTask.title}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setEditingTask(null)}
+                  className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg p-2 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <form onSubmit={handleUpdateRecurring} className="p-6 space-y-6">
+              {/* Frequency */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Frequency
+                </label>
+                <select
+                  value={editingTask.frequency}
+                  onChange={(e) => setEditingTask({...editingTask, frequency: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                >
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+              </div>
+
+              {/* Repeat Every */}
+              {editingTask.frequency !== 'daily' && (
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Repeat Every
+                  </label>
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="number"
+                      min="1"
+                      max="365"
+                      value={editingTask.interval}
+                      onChange={(e) => setEditingTask({...editingTask, interval: parseInt(e.target.value)})}
+                      className="w-20 px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                    />
+                    <span className="text-gray-600 font-medium">
+                      {editingTask.frequency === 'weekly' ? 'week(s)' : 
+                       editingTask.frequency === 'monthly' ? 'month(s)' : 'year(s)'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Time */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Time
+                </label>
+                <div className="relative">
+                  <input
+                    type="time"
+                    value={editingTask.time}
+                    onChange={(e) => setEditingTask({...editingTask, time: e.target.value})}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                  />
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Repeat On Days */}
+              {(editingTask.frequency === 'weekly' || editingTask.frequency === 'monthly') && (
+                <div className="space-y-3">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Repeat On Days
+                  </label>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div className="grid grid-cols-7 gap-2">
+                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                        <button
+                          key={day}
+                          type="button"
+                          onClick={() => {
+                            const days = editingTask.daysOfWeek || []
+                            const newDays = days.includes(day)
+                              ? days.filter(d => d !== day)
+                              : [...days, day]
+                            setEditingTask({...editingTask, daysOfWeek: newDays})
+                          }}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                            (editingTask.daysOfWeek || []).includes(day)
+                              ? 'bg-green-500 text-white shadow-md transform scale-105'
+                              : 'bg-white text-gray-700 hover:bg-green-50 hover:text-green-700 border border-gray-200'
+                          }`}
+                        >
+                          {day}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-3">Click days to toggle selection</p>
+                  </div>
+                </div>
+              )}
+
+              {/* End Condition */}
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-gray-700">
+                  End Condition
+                </label>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
+                  <label className="flex items-center space-x-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="endCondition"
+                      value="never"
+                      checked={editingTask.endCondition === 'never'}
+                      onChange={(e) => setEditingTask({...editingTask, endCondition: e.target.value})}
+                      className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                    />
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm font-medium text-gray-900 group-hover:text-green-700">Never</span>
+                      <span className="text-xs text-gray-500">∞</span>
+                    </div>
+                  </label>
+                  <label className="flex items-center space-x-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="endCondition"
+                      value="after"
+                      checked={editingTask.endCondition === 'after'}
+                      onChange={(e) => setEditingTask({...editingTask, endCondition: e.target.value})}
+                      className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                    />
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm font-medium text-gray-900 group-hover:text-green-700">After occurrences</span>
+                      <span className="text-xs text-gray-500">#</span>
+                    </div>
+                  </label>
+                  <label className="flex items-center space-x-3 cursor-pointer group">
+                    <input
+                      type="radio"
+                      name="endCondition"
+                      value="on"
+                      checked={editingTask.endCondition === 'on'}
+                      onChange={(e) => setEditingTask({...editingTask, endCondition: e.target.value})}
+                      className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                    />
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm font-medium text-gray-900 group-hover:text-green-700">On date</span>
+                      <span className="text-xs text-gray-500">📅</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Additional Input Fields for End Conditions */}
+              {editingTask.endCondition === 'after' && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Number of occurrences
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="999"
+                    value={editingTask.occurrences || ''}
+                    onChange={(e) => setEditingTask({...editingTask, occurrences: parseInt(e.target.value)})}
+                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="10"
+                  />
+                </div>
+              )}
+
+              {editingTask.endCondition === 'on' && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    End date
+                  </label>
+                  <input
+                    type="date"
+                    value={editingTask.endDate || ''}
+                    onChange={(e) => setEditingTask({...editingTask, endDate: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+              )}
+
+              {/* Form Actions */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:justify-end pt-6 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => setEditingTask(null)}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  Update Recurrence
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {/* Calendar View Section */}
@@ -515,7 +723,7 @@ function RecurringTaskForm({ onClose }) {
               className="form-select"
               required
             >
-              <option value="daily">Daily</option>
+              <option value="daily">Dailyoption>
               <option value="weekly">Weekly</option>
               <option value="monthly">Monthly</option>
               <option value="custom">Custom</option>
