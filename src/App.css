@@ -1512,6 +1512,17 @@
         }
       }
 
+      @keyframes slideRightIn {
+        from {
+          opacity: 0;
+          transform: translateX(100%);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
       /* Base Modal Animation Classes */
       .modal-animate-fade {
         animation: modalFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1535,6 +1546,10 @@
 
       .overlay-animate {
         animation: overlayFadeIn 0.3s ease-out;
+      }
+
+      .modal-animate-slide-right {
+        animation: slideRightIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       /* Common modal container styles */
