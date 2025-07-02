@@ -25,6 +25,7 @@ export default function TaskDetail({ taskId, onClose }) {
   const [showRiskModal, setShowRiskModal] = useState(false);
   const [showCreateSubtaskDrawer, setShowCreateSubtaskDrawer] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [currentUser] = useState({
     id: 1,
     name: "Current User",
@@ -413,7 +414,7 @@ export default function TaskDetail({ taskId, onClose }) {
 
         <button
           className="action-btn"
-          onClick={() => console.log("Edit task")}
+          onClick={() => setShowEditModal(true)}
           disabled={!permissions.canEdit}
         >
           ✏️ Edit
@@ -566,6 +567,18 @@ export default function TaskDetail({ taskId, onClose }) {
           onConfirm={handleDeleteTask}
           onClose={() => setShowDeleteModal(false)}
           currentUser={currentUser}
+        />
+      )}
+
+      {showEditModal && (
+        <TaskEditModal
+          task={task}
+          onSave={(updatedTask) => {
+            setTask(updatedTask);
+            setShowEditModal(false);
+          }}
+          onClose={() => setShowEditModal(false)}
+          permissions={permissions}
         />
       )}
     </div>
@@ -3781,6 +3794,356 @@ function RiskModal({ task, onSubmit, onClose }) {
             </button>
             <button type="submit" className="btn-primary">
               Mark as At Risk
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function TaskEditModal({ task, onSave, onClose, permissions }) {
+  const [formData, setFormData] = useState({
+    title: task.title,
+    description: task.description,
+    status: task.status,
+    priority: task.priority,
+    assignee: task.assignee,
+    assigneeId: task.assigneeId,
+    category: task.category,
+    dueDate: task.dueDate,
+    startDate: task.startDate,
+    timeEstimate: task.timeEstimate,
+    tags: task.tags.join(', '),
+    taskType: task.taskType,
+    isRisky: task.isRisky,
+    riskNote: task.riskNote || '',
+  });
+
+  const [tagInput, setTagInput] = useState(task.tags.join(', '));
+
+  const teamMembers = [
+    { id: 1, name: "John Smith" },
+    { id: 2, name: "Sarah Wilson" },
+    { id: 3, name: "Mike Johnson" },
+    { id: 4, name: "Emily Davis" },
+  ];
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Process tags
+    const tagsArray = tagInput
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag.length > 0);
+
+    const updatedTask = {
+      ...task,
+      ...formData,
+      tags: tagsArray,
+      updatedAt: new Date().toISOString().slice(0, 16),
+    };
+
+    onSave(updatedTask);
+  };
+
+  const handleAssigneeChange = (assigneeId) => {
+    const assignee = teamMembers.find(member => member.id === parseInt(assigneeId));
+    if (assignee) {
+      handleChange('assignee', assignee.name);
+      handleChange('assigneeId', assignee.id);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 overlay-animate">
+      <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto modal-animate-slide-right" style={{boxShadow: '0 25px 50px rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.2)'}}>
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+              <span className="text-white text-lg">✏️</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Edit Task</h2>
+              <p className="text-sm text-gray-600">Modify task details and properties</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Form Content */}
+        <form onSubmit={handleSubmit} className="p-6">
+          <div className="space-y-6">
+            {/* Basic Information */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Title */}
+                <div className="lg:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Task Title *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => handleChange('title', e.target.value)}
+                    className="form-input w-full"
+                    placeholder="Enter task title..."
+                    required
+                    maxLength={100}
+                  />
+                </div>
+
+                {/* Description */}
+                <div className="lg:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => handleChange('description', e.target.value)}
+                    className="form-textarea w-full"
+                    placeholder="Describe the task..."
+                    rows={4}
+                  />
+                </div>
+
+                {/* Task Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Task Type
+                  </label>
+                  <select
+                    value={formData.taskType}
+                    onChange={(e) => handleChange('taskType', e.target.value)}
+                    className="form-select w-full"
+                    disabled={!permissions.canEdit}
+                  >
+                    <option value="normal">Normal Task</option>
+                    <option value="milestone">Milestone</option>
+                    <option value="approval">Approval Task</option>
+                  </select>
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Category
+                  </label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => handleChange('category', e.target.value)}
+                    className="form-select w-full"
+                  >
+                    <option value="">Select category...</option>
+                    <option value="Backend">Backend</option>
+                    <option value="Frontend">Frontend</option>
+                    <option value="Design">Design</option>
+                    <option value="Research">Research</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Support">Support</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Assignment & Priority */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Assignment & Priority</h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Assignee */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Assignee
+                  </label>
+                  <select
+                    value={formData.assigneeId}
+                    onChange={(e) => handleAssigneeChange(e.target.value)}
+                    className="form-select w-full"
+                    disabled={!permissions.canReassign}
+                  >
+                    {teamMembers.map((member) => (
+                      <option key={member.id} value={member.id}>
+                        {member.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Status */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => handleChange('status', e.target.value)}
+                    className="form-select w-full"
+                    disabled={!permissions.canChangeStatus}
+                  >
+                    <option value="OPEN">Open</option>
+                    <option value="INPROGRESS">In Progress</option>
+                    <option value="ONHOLD">On Hold</option>
+                    <option value="DONE">Completed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                  </select>
+                </div>
+
+                {/* Priority */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Priority
+                  </label>
+                  <select
+                    value={formData.priority}
+                    onChange={(e) => handleChange('priority', e.target.value)}
+                    className="form-select w-full"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Timeline */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Timeline</h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Start Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.startDate}
+                    onChange={(e) => handleChange('startDate', e.target.value)}
+                    className="form-input w-full"
+                  />
+                </div>
+
+                {/* Due Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Due Date
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.dueDate}
+                    onChange={(e) => handleChange('dueDate', e.target.value)}
+                    className="form-input w-full"
+                  />
+                </div>
+
+                {/* Time Estimate */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Time Estimate
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.timeEstimate}
+                    onChange={(e) => handleChange('timeEstimate', e.target.value)}
+                    className="form-input w-full"
+                    placeholder="e.g., 40 hours, 3 days"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Tags & Risk */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Tags & Risk Management</h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Tags */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tags
+                  </label>
+                  <input
+                    type="text"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    className="form-input w-full"
+                    placeholder="Enter tags separated by commas..."
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Separate multiple tags with commas</p>
+                </div>
+
+                {/* Risk Status */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Risk Status
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.isRisky}
+                        onChange={(e) => handleChange('isRisky', e.target.checked)}
+                        className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                      />
+                      <span className="ml-2 text-sm text-gray-700">Mark as at risk</span>
+                    </label>
+                  </div>
+                  
+                  {formData.isRisky && (
+                    <div className="mt-3">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Risk Note
+                      </label>
+                      <textarea
+                        value={formData.riskNote}
+                        onChange={(e) => handleChange('riskNote', e.target.value)}
+                        className="form-textarea w-full"
+                        placeholder="Describe the risk..."
+                        rows={2}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 mt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary px-6 py-2"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary px-6 py-2"
+              disabled={!formData.title.trim()}
+            >
+              Save Changes
             </button>
           </div>
         </form>
