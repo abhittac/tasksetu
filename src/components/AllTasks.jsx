@@ -948,7 +948,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                   <td className="px-6 py-4 text-nowrap">
                     <div className="flex items-center space-x-3">
                 <button
-                  className="text-gray-400 hover:text-blue-600 transition-colors p-1"
+                  className="text-gray-400 cursor-pointer hover:text-blue-600 transition-colors p-1"
                   onClick={() => handleViewTask(task.id)}
                   title="View task details"
                 >
@@ -959,7 +959,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                 </button>
                 {canDeleteTask(task) && (
                   <button
-                    className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                    className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
                     onClick={() => handleDeleteTask(task.id)}
                     title="Delete task"
                   >
@@ -1002,7 +1002,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
       {/* Slide-in Drawer */}
       {showCreateTaskDrawer && (
-        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate">
+        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
           <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreateTaskDrawer(false)}></div>
           <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 600px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
             <div className="drawer-header">
