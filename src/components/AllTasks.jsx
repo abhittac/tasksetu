@@ -968,7 +968,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                     </svg>
                   </button>
                 )}
-                <TaskContextMenu taskId={task.id} onDelete={() => handleDeleteTask(task.id)} canDelete={canDeleteTask(task)} />
+             
               </div>
                   </td>
                 </tr>
