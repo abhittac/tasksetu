@@ -303,7 +303,7 @@ export default function StatusManager() {
   const activeCompanyStatuses = companyStatuses.filter(s => s.active)
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-5">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div className="relative">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">

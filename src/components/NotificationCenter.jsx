@@ -219,7 +219,7 @@ export default function NotificationCenter() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-5">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center space-x-3">
           <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>

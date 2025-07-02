@@ -469,7 +469,7 @@ export default function ActivityFeed({ taskId }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-5">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Activity Feed</h1>
