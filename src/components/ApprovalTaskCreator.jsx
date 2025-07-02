@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export default function ApprovalTaskCreator({ onClose, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -19,6 +19,14 @@ export default function ApprovalTaskCreator({ onClose, onSubmit }) {
   })
 
   const [dragActive, setDragActive] = useState(false)
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    document.body.classList.add('modal-open')
+    return () => {
+      document.body.classList.remove('modal-open')
+    }
+  }, [])
 
   const availableApprovers = [
     { id: 1, name: 'Current User', role: 'manager' },
@@ -128,226 +136,310 @@ export default function ApprovalTaskCreator({ onClose, onSubmit }) {
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-container approval-task-creator">
-        <div className="modal-header">
-          <h2>Create Approval Task</h2>
-          <button className="close-button" onClick={onClose}>×</button>
+    <div className="modal-overlay-blur">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[95vh] overflow-hidden modal-animate-slide-right">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6 text-white">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                <span className="text-xl">✅</span>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold">Create Approval Task</h2>
+                <p className="text-blue-100 text-sm">Set up a workflow approval process</p>
+              </div>
+            </div>
+            <button 
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/20 transition-colors text-white/80 hover:text-white text-xl font-bold"
+              onClick={onClose}
+            >
+              ×
+            </button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="modal-content">
-          <div className="form-grid">
-            <div className="form-group full-width">
-              <label htmlFor="title">Task Name *</label>
+        <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[calc(95vh-120px)]">
+          <div className="p-8 space-y-8">
+            {/* Task Name */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-800">
+                Task Name <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
-                id="title"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 text-gray-900 placeholder-gray-400"
                 placeholder="e.g., Budget Approval Q1 2024"
                 required
                 maxLength={100}
               />
             </div>
 
-            <div className="form-group full-width">
-              <label className="checkbox-label approval-toggle">
-                <input
-                  type="checkbox"
-                  name="isApprovalTask"
-                  checked={formData.isApprovalTask}
-                  onChange={handleChange}
-                  required
-                />
-                <span className="checkmark"></span>
-                <strong>This is an Approval Task</strong>
-                <span className="toggle-help">✓ Enable approval workflow</span>
+            {/* Approval Task Toggle */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6">
+              <label className="flex items-center space-x-4 cursor-pointer group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    name="isApprovalTask"
+                    checked={formData.isApprovalTask}
+                    onChange={handleChange}
+                    required
+                    className="sr-only"
+                  />
+                  <div className={`w-6 h-6 border-2 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                    formData.isApprovalTask 
+                      ? 'bg-green-500 border-green-500 text-white' 
+                      : 'border-gray-300 group-hover:border-green-400'
+                  }`}>
+                    {formData.isApprovalTask && <span className="text-sm font-bold">✓</span>}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="font-semibold text-gray-900 text-lg">This is an Approval Task</div>
+                  <div className="text-green-700 text-sm">Enable approval workflow with designated approvers</div>
+                </div>
               </label>
             </div>
 
             {formData.isApprovalTask && (
-              <>
-                <div className="form-group">
-                  <label htmlFor="approvers">Approvers *</label>
-                  <select
-                    id="approvers"
-                    name="approvers"
-                    multiple
-                    value={formData.approverIds}
-                    onChange={handleApproverChange}
-                    className="multi-select"
-                    required
-                    size="4"
-                  >
-                    {availableApprovers.map(approver => (
-                      <option key={approver.id} value={approver.id}>
-                        {approver.name} ({approver.role})
-                      </option>
-                    ))}
-                  </select>
-                  <small className="form-help">Hold Ctrl/Cmd to select multiple approvers</small>
-                </div>
+              <div className="space-y-8">
+                {/* Approvers & Approval Mode */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-800">
+                      Approvers <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="approvers"
+                      multiple
+                      value={formData.approverIds}
+                      onChange={handleApproverChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200"
+                      required
+                      size="4"
+                    >
+                      {availableApprovers.map(approver => (
+                        <option key={approver.id} value={approver.id} className="py-2">
+                          {approver.name} ({approver.role})
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-gray-500">Hold Ctrl/Cmd to select multiple approvers</p>
+                  </div>
 
-                <div className="form-group">
-                  <label htmlFor="approvalMode">Approval Mode *</label>
-                  <select
-                    id="approvalMode"
-                    name="approvalMode"
-                    value={formData.approvalMode}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="any">Any One</option>
-                    <option value="all">All Must Approve</option>
-                    <option value="sequential">Sequential</option>
-                  </select>
-                  <small className="form-help">
-                    {formData.approvalMode === 'any' && 'Any single approver can approve/reject'}
-                    {formData.approvalMode === 'all' && 'All approvers must approve'}
-                    {formData.approvalMode === 'sequential' && 'Approvers act in order'}
-                  </small>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="dueDate">Due Date *</label>
-                  <input
-                    type="date"
-                    id="dueDate"
-                    name="dueDate"
-                    value={formData.dueDate}
-                    onChange={handleChange}
-                    required
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      name="autoApproveEnabled"
-                      checked={formData.autoApproveEnabled}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-800">
+                      Approval Mode <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="approvalMode"
+                      value={formData.approvalMode}
                       onChange={handleChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200"
+                      required
+                    >
+                      <option value="any">Any One Approver</option>
+                      <option value="all">All Must Approve</option>
+                      <option value="sequential">Sequential Approval</option>
+                    </select>
+                    <p className="text-xs text-gray-500">
+                      {formData.approvalMode === 'any' && 'Any single approver can approve/reject'}
+                      {formData.approvalMode === 'all' && 'All approvers must approve'}
+                      {formData.approvalMode === 'sequential' && 'Approvers act in order'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Due Date & Priority */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-800">
+                      Due Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      name="dueDate"
+                      value={formData.dueDate}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200"
+                      required
+                      min={new Date().toISOString().split('T')[0]}
                     />
-                    <span className="checkmark"></span>
-                    Enable Auto-Approval
-                  </label>
-                  {formData.autoApproveEnabled && (
-                    <div className="auto-approve-config">
-                      <label htmlFor="autoApproveAfter">Auto-Approve After (days):</label>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-sm font-semibold text-gray-800">Priority</label>
+                    <select
+                      name="priority"
+                      value={formData.priority}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200"
+                    >
+                      <option value="low">🟢 Low Priority</option>
+                      <option value="medium">🟡 Medium Priority</option>
+                      <option value="high">🟠 High Priority</option>
+                      <option value="critical">🔴 Critical Priority</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Auto-Approval Settings */}
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+                  <label className="flex items-center space-x-4 cursor-pointer group mb-4">
+                    <div className="relative">
                       <input
-                        type="number"
-                        id="autoApproveAfter"
-                        name="autoApproveAfter"
-                        value={formData.autoApproveAfter}
+                        type="checkbox"
+                        name="autoApproveEnabled"
+                        checked={formData.autoApproveEnabled}
                         onChange={handleChange}
-                        min="1"
-                        max="30"
-                        placeholder="e.g., 3"
+                        className="sr-only"
                       />
-                      <small className="form-help">Auto-approve if no response after due date + X days</small>
+                      <div className={`w-6 h-6 border-2 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                        formData.autoApproveEnabled 
+                          ? 'bg-blue-500 border-blue-500 text-white' 
+                          : 'border-gray-300 group-hover:border-blue-400'
+                      }`}>
+                        {formData.autoApproveEnabled && <span className="text-sm font-bold">✓</span>}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-900">Enable Auto-Approval</div>
+                      <div className="text-blue-700 text-sm">Automatically approve if no response within deadline</div>
+                    </div>
+                  </label>
+                  
+                  {formData.autoApproveEnabled && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Auto-Approve After (days)</label>
+                        <input
+                          type="number"
+                          name="autoApproveAfter"
+                          value={formData.autoApproveAfter}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                          min="1"
+                          max="30"
+                          placeholder="e.g., 3"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Visibility</label>
+                        <select
+                          name="visibility"
+                          value={formData.visibility}
+                          onChange={handleChange}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                        >
+                          <option value="private">🔒 Private</option>
+                          <option value="public">🌐 Public</option>
+                        </select>
+                      </div>
                     </div>
                   )}
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="priority">Priority</label>
-                  <select
-                    id="priority"
-                    name="priority"
-                    value={formData.priority}
+                {/* Description */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-800">Description / Justification</label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
                     onChange={handleChange}
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
-                  </select>
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all duration-200 resize-none"
+                    placeholder="Provide background, criteria, or justification for this approval..."
+                    rows="4"
+                    maxLength={1000}
+                  />
+                  <div className="text-right text-xs text-gray-400">
+                    {formData.description.length}/1000 characters
+                  </div>
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="visibility">Visibility</label>
-                  <select
-                    id="visibility"
-                    name="visibility"
-                    value={formData.visibility}
-                    onChange={handleChange}
+                {/* File Attachments */}
+                <div className="space-y-4">
+                  <label className="block text-sm font-semibold text-gray-800">Attachments</label>
+                  <div 
+                    className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
+                      dragActive 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
+                    }`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
                   >
-                    <option value="private">Private</option>
-                    <option value="public">Public</option>
-                  </select>
+                    <div className="space-y-3">
+                      <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-2xl">📎</span>
+                      </div>
+                      <div>
+                        <p className="text-lg font-medium text-gray-700">
+                          Drag & drop files here or 
+                          <label className="text-blue-600 hover:text-blue-700 cursor-pointer ml-1 underline">
+                            browse
+                            <input
+                              type="file"
+                              multiple
+                              onChange={(e) => handleFileUpload(e.target.files)}
+                              className="sr-only"
+                            />
+                          </label>
+                        </p>
+                        <p className="text-sm text-gray-500">Support for images, documents, and PDFs up to 10MB</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {formData.attachments.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium text-gray-700">Attached Files ({formData.attachments.length})</h4>
+                      <div className="space-y-2">
+                        {formData.attachments.map(attachment => (
+                          <div key={attachment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <span className="text-lg">📄</span>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-900 truncate">{attachment.name}</p>
+                                <p className="text-xs text-gray-500">{(attachment.size / 1024).toFixed(1)} KB</p>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-100 text-gray-400 hover:text-red-600 transition-colors"
+                              onClick={() => removeAttachment(attachment.id)}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </>
+              </div>
             )}
           </div>
 
-          {formData.isApprovalTask && (
-            <>
-              <div className="form-group full-width">
-                <label htmlFor="description">Description / Justification</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="Provide background, criteria, or justification for this approval..."
-                  rows="4"
-                  maxLength={1000}
-                />
-              </div>
-
-              <div className="form-group full-width">
-                <label>Attachments</label>
-                <div 
-                  className={`file-upload-area ${dragActive ? 'drag-active' : ''}`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                >
-                  <div className="upload-content">
-                    <span className="upload-icon">📎</span>
-                    <p>Drag & drop files here or <span className="upload-link">browse</span></p>
-                    <input
-                      type="file"
-                      multiple
-                      onChange={(e) => handleFileUpload(e.target.files)}
-                      className="file-input-hidden"
-                    />
-                  </div>
-                </div>
-
-                {formData.attachments.length > 0 && (
-                  <div className="attachment-list">
-                    {formData.attachments.map(attachment => (
-                      <div key={attachment.id} className="attachment-item">
-                        <span className="attachment-icon">📄</span>
-                        <div className="attachment-info">
-                          <span className="attachment-name">{attachment.name}</span>
-                          <span className="attachment-size">
-                            {(attachment.size / 1024).toFixed(1)} KB
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          className="remove-attachment"
-                          onClick={() => removeAttachment(attachment.id)}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-
-          <div className="modal-actions">
-            <button type="button" className="btn-secondary" onClick={onClose}>
+          {/* Actions */}
+          <div className="px-8 py-6 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row gap-3 sm:justify-end">
+            <button 
+              type="button" 
+              className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 hover:border-gray-400 transition-all duration-200 font-medium"
+              onClick={onClose}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn-primary">
+            <button 
+              type="submit" 
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
               Create Approval Task
             </button>
           </div>
