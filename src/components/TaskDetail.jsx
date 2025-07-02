@@ -2833,6 +2833,7 @@ function SubtaskDetailView({
               rows="4"
             />
           </div>
+          
         </div>
 
         <div className="subtask-meta-info">
