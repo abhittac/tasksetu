@@ -3444,12 +3444,12 @@ function SubtaskDrawer({ parentTask, currentUser, onSubmit, onClose }) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 overlay-animate"
+        className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 z-40 overlay-animate"
         onClick={onClose}
       />
 
       {/* Drawer */}
-      <div className="fixed top-0 right-0 h-full w-1/2 bg-white/95 backdrop-blur-sm shadow-2xl z-50 overflow-y-auto modal-animate-slide-right" style={{boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}
+      <div className="fixed top-0 right-0 h-full w-1/2 bg-white shadow-2xl z-50 overflow-y-auto drawer-animate">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
