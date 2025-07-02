@@ -206,7 +206,7 @@ export default function NotificationCenter() {
 
   if (showSettings) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 modal-animate-fade">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center space-x-3">

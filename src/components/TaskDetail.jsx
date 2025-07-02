@@ -862,7 +862,7 @@ function FormsPanel({ forms, taskId }) {
                   </div>
                 </div>
               </div>
-              
+
               {/* Progress Bar for in-progress forms */}
               {form.status === 'in-progress' && (
                 <div className="mb-4">
@@ -875,7 +875,7 @@ function FormsPanel({ forms, taskId }) {
                   </div>
                 </div>
               )}
-              
+
               {/* Form Actions */}
               <div className="flex gap-2">
                 <button
@@ -900,7 +900,7 @@ function FormsPanel({ forms, taskId }) {
                   <span>🗑️</span>
                 </button>
               </div>
-              
+
               {/* Additional Form Info */}
               <div className="mt-4 pt-4 border-t border-gray-100">
                 <div className="flex items-center justify-between text-xs text-gray-500">
@@ -932,8 +932,8 @@ function FormsPanel({ forms, taskId }) {
 
       {/* Add Form Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm  bg-opacity-50 flex items-center justify-center z-50 p-4 mt-0">
-          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4 mt-0 overlay-animate">
+          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full modal-animate-slide-up">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-gray-900">Add New Form</h3>
@@ -944,7 +944,7 @@ function FormsPanel({ forms, taskId }) {
                   <span className="text-sm">✕</span>
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Form Type</label>
@@ -956,7 +956,7 @@ function FormsPanel({ forms, taskId }) {
                     <option value="assessment">Assessment</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Form Name</label>
                   <input
@@ -965,7 +965,7 @@ function FormsPanel({ forms, taskId }) {
                     placeholder="Enter form name..."
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
                   <textarea
@@ -974,7 +974,7 @@ function FormsPanel({ forms, taskId }) {
                     placeholder="Brief description of the form purpose..."
                   />
                 </div>
-                
+
                 <div className="bg-emerald-50 p-4 rounded-lg">
                   <h4 className="text-sm font-medium text-emerald-800 mb-2">Quick Templates</h4>
                   <div className="grid grid-cols-2 gap-2">
@@ -992,7 +992,7 @@ function FormsPanel({ forms, taskId }) {
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={() => setShowAddModal(false)}
@@ -1337,8 +1337,8 @@ function StatusDropdown({ status, onChange, canEdit, task, currentUser }) {
 
       {/* Enhanced Status Confirmation Modal */}
       {showConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overlay-animate">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full modal-animate-fade">
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
@@ -1887,7 +1887,7 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.8558L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                           />
                         </svg>
                       </button>
@@ -2395,13 +2395,12 @@ function SubtaskSlideUpPanel({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center p-4 overlay-animate"
       style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
     >
       <div className="absolute inset-0" onClick={onClose} />
       <div
-        className="relative bg-white rounded-t-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
-        style={{ animation: "slideUp 0.3s ease-out" }}
+        className="relative bg-white rounded-t-xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden panel-animate"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
@@ -2915,7 +2914,7 @@ function LinkedItemsPanel({ linkedItems }) {
                   </button>
                 </div>
               </div>
-              
+
               {/* Additional info */}
               <div className="text-sm text-gray-500">
                 <div className="flex items-center justify-between">
@@ -2947,8 +2946,8 @@ function LinkedItemsPanel({ linkedItems }) {
 
       {/* Add Link Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm  bg-opacity-50 flex items-center justify-center z-50 mt-0">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 mt-0 overlay-animate">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full modal-animate-slide-up">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Link New Item</h3>
@@ -2959,7 +2958,7 @@ function LinkedItemsPanel({ linkedItems }) {
                   <span className="text-sm">✕</span>
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Item Type</label>
@@ -2970,7 +2969,7 @@ function LinkedItemsPanel({ linkedItems }) {
                     <option value="link">External Link</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Search & Select</label>
                   <input
@@ -2979,7 +2978,7 @@ function LinkedItemsPanel({ linkedItems }) {
                     placeholder="Search for items to link..."
                   />
                 </div>
-                
+
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={() => setShowAddModal(false)}
@@ -3252,8 +3251,8 @@ function SnoozeModal({ task, onSubmit, onClose }) {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
+    <div className="modal-overlay overlay-animate">
+      <div className="modal-container modal-animate-fade">
         <div className="modal-header">
           <h3>Snooze Task: {task?.title}</h3>
           <button className="close-button" onClick={onClose}>
@@ -3445,12 +3444,12 @@ function SubtaskDrawer({ parentTask, currentUser, onSubmit, onClose }) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm  bg-opacity-50 z-40 transition-opacity duration-300"
+        className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 z-40 overlay-animate"
         onClick={onClose}
       />
 
       {/* Drawer */}
-      <div className="fixed top-0 right-0 h-full w-1/2 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out overflow-y-auto">
+      <div className="fixed top-0 right-0 h-full w-1/2 bg-white shadow-2xl z-50 overflow-y-auto drawer-animate">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
