@@ -1,68 +1,68 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 
 export default function NotificationCenter() {
   const [notifications, setNotifications] = useState([
     {
       id: 1,
-      type: 'assignment',
-      title: 'New task assigned',
+      type: "assignment",
+      title: "New task assigned",
       message: 'You have been assigned "Database Migration"',
-      timestamp: '2024-01-22 10:30:00',
+      timestamp: "2024-01-22 10:30:00",
       read: false,
       taskId: 1,
-      priority: 'medium'
+      priority: "medium",
     },
     {
       id: 2,
-      type: 'due_date',
-      title: 'Task due soon',
+      type: "due_date",
+      title: "Task due soon",
       message: 'Task "API Documentation" is due in 3 days',
-      timestamp: '2024-01-22 09:00:00',
+      timestamp: "2024-01-22 09:00:00",
       read: false,
       taskId: 3,
-      priority: 'high'
+      priority: "high",
     },
     {
       id: 3,
-      type: 'mention',
-      title: 'You were mentioned',
-      message: 'John Smith mentioned you in a comment',
-      timestamp: '2024-01-22 11:15:00',
+      type: "mention",
+      title: "You were mentioned",
+      message: "John Smith mentioned you in a comment",
+      timestamp: "2024-01-22 11:15:00",
       read: true,
       taskId: 1,
-      priority: 'medium'
+      priority: "medium",
     },
     {
       id: 4,
-      type: 'status_change',
-      title: 'Task status updated',
+      type: "status_change",
+      title: "Task status updated",
       message: 'Task "Mobile App Redesign" was marked as completed',
-      timestamp: '2024-01-21 16:45:00',
+      timestamp: "2024-01-21 16:45:00",
       read: true,
       taskId: 2,
-      priority: 'low'
+      priority: "low",
     },
     {
       id: 5,
-      type: 'snooze_wakeup',
-      title: 'Snoozed task is back',
+      type: "snooze_wakeup",
+      title: "Snoozed task is back",
       message: 'Task "API Documentation" is no longer snoozed',
-      timestamp: '2024-01-22 09:00:00',
+      timestamp: "2024-01-22 09:00:00",
       read: false,
       taskId: 3,
-      priority: 'medium'
+      priority: "medium",
     },
     {
       id: 6,
-      type: 'overdue',
-      title: 'Task overdue',
+      type: "overdue",
+      title: "Task overdue",
       message: 'Task "Security Audit" is 2 days overdue',
-      timestamp: '2024-01-22 08:00:00',
+      timestamp: "2024-01-22 08:00:00",
       read: false,
       taskId: 4,
-      priority: 'critical'
-    }
-  ])
+      priority: "critical",
+    },
+  ]);
 
   const [settings, setSettings] = useState({
     emailNotifications: true,
@@ -70,11 +70,11 @@ export default function NotificationCenter() {
     dueDateReminders: {
       enabled: true,
       daysBeforeDue: [3, 1],
-      time: '09:00'
+      time: "09:00",
     },
     overdueReminders: {
       enabled: true,
-      frequency: 'daily' // daily, every3days, weekly
+      frequency: "daily", // daily, every3days, weekly
     },
     assignmentNotifications: true,
     mentionNotifications: true,
@@ -82,135 +82,140 @@ export default function NotificationCenter() {
     snoozeWakeupNotifications: true,
     quietHours: {
       enabled: false,
-      start: '22:00',
-      end: '08:00'
+      start: "22:00",
+      end: "08:00",
     },
-    weekendNotifications: false
-  })
+    weekendNotifications: false,
+  });
 
-  const [filter, setFilter] = useState('all')
-  const [showSettings, setShowSettings] = useState(false)
+  const [filter, setFilter] = useState("all");
+  const [showSettings, setShowSettings] = useState(false);
 
-  const unreadCount = notifications.filter(n => !n.read).length
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const filteredNotifications = notifications.filter(notification => {
-    if (filter === 'all') return true
-    if (filter === 'unread') return !notification.read
-    return notification.type === filter
-  })
+  const filteredNotifications = notifications.filter((notification) => {
+    if (filter === "all") return true;
+    if (filter === "unread") return !notification.read;
+    return notification.type === filter;
+  });
 
   const getNotificationIcon = (type) => {
     const icons = {
-      assignment: '👤',
-      due_date: '⏰',
-      overdue: '🚨',
-      mention: '💬',
-      status_change: '✏️',
-      snooze_wakeup: '😴',
-      reminder: '🔔'
-    }
-    return icons[type] || '📝'
-  }
+      assignment: "👤",
+      due_date: "⏰",
+      overdue: "🚨",
+      mention: "💬",
+      status_change: "✏️",
+      snooze_wakeup: "😴",
+      reminder: "🔔",
+    };
+    return icons[type] || "📝";
+  };
 
   const getPriorityColor = (priority) => {
     const colors = {
-      critical: '#ff4444',
-      high: '#ff8800',
-      medium: '#0099ff',
-      low: '#00aa44'
-    }
-    return colors[priority] || '#666'
-  }
+      critical: "#ff4444",
+      high: "#ff8800",
+      medium: "#0099ff",
+      low: "#00aa44",
+    };
+    return colors[priority] || "#666";
+  };
 
   const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp)
-    const now = new Date()
-    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60))
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
 
     if (diffInHours < 1) {
-      const diffInMinutes = Math.floor((now - date) / (1000 * 60))
-      return `${diffInMinutes}m ago`
+      const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+      return `${diffInMinutes}m ago`;
     } else if (diffInHours < 24) {
-      return `${diffInHours}h ago`
+      return `${diffInHours}h ago`;
     } else {
-      const diffInDays = Math.floor(diffInHours / 24)
-      return `${diffInDays}d ago`
+      const diffInDays = Math.floor(diffInHours / 24);
+      return `${diffInDays}d ago`;
     }
-  }
+  };
 
   const markAsRead = (notificationId) => {
-    setNotifications(notifications.map(n => 
-      n.id === notificationId ? { ...n, read: true } : n
-    ))
-  }
+    setNotifications(
+      notifications.map((n) =>
+        n.id === notificationId ? { ...n, read: true } : n,
+      ),
+    );
+  };
 
   const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })))
-  }
+    setNotifications(notifications.map((n) => ({ ...n, read: true })));
+  };
 
   const deleteNotification = (notificationId) => {
-    setNotifications(notifications.filter(n => n.id !== notificationId))
-  }
+    setNotifications(notifications.filter((n) => n.id !== notificationId));
+  };
 
   const handleSettingChange = (path, value) => {
-    const keys = path.split('.')
+    const keys = path.split(".");
     if (keys.length === 1) {
-      setSettings({ ...settings, [keys[0]]: value })
+      setSettings({ ...settings, [keys[0]]: value });
     } else if (keys.length === 2) {
       setSettings({
         ...settings,
         [keys[0]]: {
           ...settings[keys[0]],
-          [keys[1]]: value
-        }
-      })
+          [keys[1]]: value,
+        },
+      });
     }
-  }
+  };
 
   const handleDueDateReminderChange = (days) => {
     const updatedDays = settings.dueDateReminders.daysBeforeDue.includes(days)
-      ? settings.dueDateReminders.daysBeforeDue.filter(d => d !== days)
-      : [...settings.dueDateReminders.daysBeforeDue, days].sort((a, b) => b - a)
+      ? settings.dueDateReminders.daysBeforeDue.filter((d) => d !== days)
+      : [...settings.dueDateReminders.daysBeforeDue, days].sort(
+          (a, b) => b - a,
+        );
 
     setSettings({
       ...settings,
       dueDateReminders: {
         ...settings.dueDateReminders,
-        daysBeforeDue: updatedDays
-      }
-    })
-  }
+        daysBeforeDue: updatedDays,
+      },
+    });
+  };
 
   // Simulate notification generation
   useEffect(() => {
     const interval = setInterval(() => {
       // This would typically come from a backend service
-      if (Math.random() < 0.1) { // 10% chance every 30 seconds
+      if (Math.random() < 0.1) {
+        // 10% chance every 30 seconds
         const newNotification = {
           id: Date.now(),
-          type: 'reminder',
-          title: 'System reminder',
-          message: 'Don\'t forget to check your overdue tasks',
+          type: "reminder",
+          title: "System reminder",
+          message: "Don't forget to check your overdue tasks",
           timestamp: new Date().toISOString(),
           read: false,
           taskId: null,
-          priority: 'low'
-        }
-        setNotifications(prev => [newNotification, ...prev])
+          priority: "low",
+        };
+        setNotifications((prev) => [newNotification, ...prev]);
       }
-    }, 30000)
+    }, 30000);
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => clearInterval(interval);
+  }, []);
 
   if (showSettings) {
     return (
       <NotificationSettings
-          settings={settings}
-          onSettingsChange={setSettings}
-          onBack={() => setShowSettings(false)}
-        />
-    )
+        settings={settings}
+        onSettingsChange={setSettings}
+        onBack={() => setShowSettings(false)}
+      />
+    );
   }
 
   return (
@@ -226,14 +231,11 @@ export default function NotificationCenter() {
         </div>
         <div className="flex items-center space-x-3 mt-4 lg:mt-0">
           {unreadCount > 0 && (
-            <button 
-              className="btn btn-secondary"
-              onClick={markAllAsRead}
-            >
+            <button className="btn btn-secondary" onClick={markAllAsRead}>
               Mark All Read
             </button>
           )}
-          <button 
+          <button
             className="btn btn-secondary"
             onClick={() => setShowSettings(true)}
           >
@@ -245,8 +247,8 @@ export default function NotificationCenter() {
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="mb-6">
-          <select 
-            value={filter} 
+          <select
+            value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="form-select"
           >
@@ -262,39 +264,59 @@ export default function NotificationCenter() {
         </div>
 
         <div className="space-y-3">
-          {filteredNotifications.map(notification => (
-            <div 
-              key={notification.id} 
-              className={`flex items-start space-x-3 p-4 rounded-lg border cursor-pointer transition-all duration-200 ${!notification.read ? 'bg-blue-50 border-blue-200 hover:bg-blue-100' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}`}
+          {filteredNotifications.map((notification) => (
+            <div
+              key={notification.id}
+              className={`flex items-start space-x-3 p-4 rounded-lg border cursor-pointer transition-all duration-200 ${!notification.read ? "bg-blue-50 border-blue-200 hover:bg-blue-100" : "bg-gray-50 border-gray-200 hover:bg-gray-100"}`}
               onClick={() => markAsRead(notification.id)}
             >
               <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center border">
-                <span className="text-sm">{getNotificationIcon(notification.type)}</span>
+                <span className="text-sm">
+                  {getNotificationIcon(notification.type)}
+                </span>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h4 className="text-sm font-medium text-gray-900">{notification.title}</h4>
-                    <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                    <h4 className="text-sm font-medium text-gray-900">
+                      {notification.title}
+                    </h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {notification.message}
+                    </p>
                     <div className="flex items-center space-x-2 mt-2">
-                      <span className="text-xs text-gray-500">{formatTimestamp(notification.timestamp)}</span>
-                      <span 
+                      <span className="text-xs text-gray-500">
+                        {formatTimestamp(notification.timestamp)}
+                      </span>
+                      <span
                         className="text-xs font-medium"
-                        style={{ color: getPriorityColor(notification.priority) }}
+                        style={{
+                          color: getPriorityColor(notification.priority),
+                        }}
                       >
                         {notification.priority}
                       </span>
                     </div>
                   </div>
-                  <button 
+                  <button
                     className="text-gray-400 hover:text-gray-600 ml-4"
                     onClick={(e) => {
-                      e.stopPropagation()
-                      deleteNotification(notification.id)
+                      e.stopPropagation();
+                      deleteNotification(notification.id);
                     }}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -306,74 +328,89 @@ export default function NotificationCenter() {
         {filteredNotifications.length === 0 && (
           <div className="text-center py-12">
             <div className="text-gray-400 text-6xl mb-4">🔔</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No notifications
+            </h3>
             <p className="text-gray-500">
-              {filter === 'unread' 
+              {filter === "unread"
                 ? "All caught up! No unread notifications."
-                : "You're all set! No notifications to show."
-              }
+                : "You're all set! No notifications to show."}
             </p>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
 
 function NotificationSettings({ settings, onSettingsChange, onBack }) {
-  const [activeSection, setActiveSection] = useState('delivery')
+  const [activeSection, setActiveSection] = useState("delivery");
 
   const handleToggle = (setting) => {
     onSettingsChange({
       ...settings,
-      [setting]: !settings[setting]
-    })
-  }
+      [setting]: !settings[setting],
+    });
+  };
 
   const handleReminderDaysChange = (days) => {
     onSettingsChange({
       ...settings,
-      reminderDays: days
-    })
-  }
+      reminderDays: days,
+    });
+  };
 
   const handleTimeChange = (time) => {
     onSettingsChange({
       ...settings,
-      reminderTime: time
-    })
-  }
+      reminderTime: time,
+    });
+  };
 
   const sections = [
-    { id: 'delivery', label: 'Delivery', icon: '📨', count: 2 },
-    { id: 'reminders', label: 'Reminders', icon: '⏰', count: 3 },
-    { id: 'advanced', label: 'Advanced', icon: '⚙️', count: 4 }
-  ]
+    { id: "delivery", label: "Delivery", icon: "📨", count: 2 },
+    { id: "reminders", label: "Reminders", icon: "⏰", count: 3 },
+    { id: "advanced", label: "Advanced", icon: "⚙️", count: 4 },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Enhanced Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button 
+          <div className="flex items-center">
+            <div className="flex items-center w-full justify-between gap-4">
+              <button
                 onClick={onBack}
                 className="flex items-center gap-2 px-4 py-2 bg-white/90 hover:bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 hover:text-gray-900 transition-all duration-300 shadow-sm hover:shadow-md"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
                 </svg>
                 Back to Notifications
               </button>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center  gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
                   <span className="text-2xl">⚙️</span>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Notification Settings</h1>
-                  <p className="text-gray-600">Customize how and when you receive notifications</p>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    Notification Settings
+                  </h1>
+                  <p className="text-gray-600">
+                    Customize how and when you receive notifications
+                  </p>
                 </div>
               </div>
             </div>
@@ -383,11 +420,12 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
 
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-
           {/* Enhanced Sidebar Navigation */}
           <div className="lg:col-span-1">
             <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/50 shadow-xl p-6 sticky top-24">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Settings Categories</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Settings Categories
+              </h3>
               <nav className="space-y-2">
                 {sections.map((section) => (
                   <button
@@ -395,19 +433,21 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                     onClick={() => setActiveSection(section.id)}
                     className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-between group ${
                       activeSection === section.id
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
-                        : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'
+                        ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg"
+                        : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <span className="text-lg">{section.icon}</span>
                       <span>{section.label}</span>
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      activeSection === section.id 
-                        ? 'bg-white/20 text-white' 
-                        : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
-                    }`}>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        activeSection === section.id
+                          ? "bg-white/20 text-white"
+                          : "bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600"
+                      }`}
+                    >
                       {section.count}
                     </span>
                   </button>
@@ -419,17 +459,20 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
           {/* Enhanced Content Area */}
           <div className="lg:col-span-3">
             <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/50 shadow-xl overflow-hidden">
-
               {/* Delivery Preferences */}
-              {activeSection === 'delivery' && (
+              {activeSection === "delivery" && (
                 <div className="p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center">
                       <span className="text-xl">📨</span>
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-gray-900">Delivery Preferences</h2>
-                      <p className="text-gray-600">Choose how you want to receive notifications</p>
+                      <h2 className="text-xl font-bold text-gray-900">
+                        Delivery Preferences
+                      </h2>
+                      <p className="text-gray-600">
+                        Choose how you want to receive notifications
+                      </p>
                     </div>
                   </div>
 
@@ -439,9 +482,13 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <span className="text-lg">📧</span>
-                            <h3 className="text-lg font-semibold text-gray-900">Email notifications</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Email notifications
+                            </h3>
                           </div>
-                          <p className="text-gray-600">Receive notifications via email</p>
+                          <p className="text-gray-600">
+                            Receive notifications via email
+                          </p>
                           <div className="mt-3 text-sm text-gray-500">
                             ✓ Task assignments, updates, and deadlines
                           </div>
@@ -450,7 +497,7 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                           <input
                             type="checkbox"
                             checked={settings.emailNotifications}
-                            onChange={() => handleToggle('emailNotifications')}
+                            onChange={() => handleToggle("emailNotifications")}
                             className="sr-only peer"
                           />
                           <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-indigo-600"></div>
@@ -463,9 +510,13 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <span className="text-lg">🔔</span>
-                            <h3 className="text-lg font-semibold text-gray-900">Push notifications</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Push notifications
+                            </h3>
                           </div>
-                          <p className="text-gray-600">Receive browser push notifications</p>
+                          <p className="text-gray-600">
+                            Receive browser push notifications
+                          </p>
                           <div className="mt-3 text-sm text-gray-500">
                             ✓ Real-time alerts and instant updates
                           </div>
@@ -474,7 +525,7 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                           <input
                             type="checkbox"
                             checked={settings.pushNotifications}
-                            onChange={() => handleToggle('pushNotifications')}
+                            onChange={() => handleToggle("pushNotifications")}
                             className="sr-only peer"
                           />
                           <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-indigo-600"></div>
@@ -486,15 +537,19 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
               )}
 
               {/* Due Date Reminders */}
-              {activeSection === 'reminders' && (
+              {activeSection === "reminders" && (
                 <div className="p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center">
                       <span className="text-xl">⏰</span>
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-gray-900">Due Date Reminders</h2>
-                      <p className="text-gray-600">Get reminded before tasks are due</p>
+                      <h2 className="text-xl font-bold text-gray-900">
+                        Due Date Reminders
+                      </h2>
+                      <p className="text-gray-600">
+                        Get reminded before tasks are due
+                      </p>
                     </div>
                   </div>
 
@@ -504,15 +559,19 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <span className="text-lg">📅</span>
-                            <h3 className="text-lg font-semibold text-gray-900">Enable due date reminders</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Enable due date reminders
+                            </h3>
                           </div>
-                          <p className="text-gray-600">Receive reminders before tasks are due</p>
+                          <p className="text-gray-600">
+                            Receive reminders before tasks are due
+                          </p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
                             checked={settings.dueDateReminders}
-                            onChange={() => handleToggle('dueDateReminders')}
+                            onChange={() => handleToggle("dueDateReminders")}
                             className="sr-only peer"
                           />
                           <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-orange-500 peer-checked:to-red-600"></div>
@@ -528,19 +587,40 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                               {[
-                                { days: 7, label: '7 days before', desc: 'Week ahead' },
-                                { days: 3, label: '3 days before', desc: 'Few days' },
-                                { days: 1, label: '1 day before', desc: 'Last minute' }
+                                {
+                                  days: 7,
+                                  label: "7 days before",
+                                  desc: "Week ahead",
+                                },
+                                {
+                                  days: 3,
+                                  label: "3 days before",
+                                  desc: "Few days",
+                                },
+                                {
+                                  days: 1,
+                                  label: "1 day before",
+                                  desc: "Last minute",
+                                },
                               ].map(({ days, label, desc }) => (
                                 <label key={days} className="relative">
                                   <input
                                     type="checkbox"
-                                    checked={settings.reminderDays.includes(days)}
+                                    checked={settings.reminderDays.includes(
+                                      days,
+                                    )}
                                     onChange={(e) => {
                                       if (e.target.checked) {
-                                        handleReminderDaysChange([...settings.reminderDays, days])
+                                        handleReminderDaysChange([
+                                          ...settings.reminderDays,
+                                          days,
+                                        ]);
                                       } else {
-                                        handleReminderDaysChange(settings.reminderDays.filter(d => d !== days))
+                                        handleReminderDaysChange(
+                                          settings.reminderDays.filter(
+                                            (d) => d !== days,
+                                          ),
+                                        );
                                       }
                                     }}
                                     className="sr-only peer"
@@ -548,13 +628,27 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                                   <div className="bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 peer-checked:border-orange-500 peer-checked:bg-orange-50 hover:border-orange-300">
                                     <div className="flex items-center justify-between">
                                       <div>
-                                        <div className="font-medium text-gray-900">{label}</div>
-                                        <div className="text-sm text-gray-600">{desc}</div>
+                                        <div className="font-medium text-gray-900">
+                                          {label}
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                          {desc}
+                                        </div>
                                       </div>
                                       <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:border-orange-500 peer-checked:bg-orange-500 flex items-center justify-center">
-                                        {settings.reminderDays.includes(days) && (
-                                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        {settings.reminderDays.includes(
+                                          days,
+                                        ) && (
+                                          <svg
+                                            className="w-3 h-3 text-white"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                          >
+                                            <path
+                                              fillRule="evenodd"
+                                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                              clipRule="evenodd"
+                                            />
                                           </svg>
                                         )}
                                       </div>
@@ -574,7 +668,9 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                               <input
                                 type="time"
                                 value={settings.reminderTime}
-                                onChange={(e) => handleTimeChange(e.target.value)}
+                                onChange={(e) =>
+                                  handleTimeChange(e.target.value)
+                                }
                                 className="w-full text-lg font-medium text-gray-900 bg-transparent border-none outline-none"
                               />
                             </div>
@@ -587,15 +683,19 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
               )}
 
               {/* Advanced Settings */}
-              {activeSection === 'advanced' && (
+              {activeSection === "advanced" && (
                 <div className="p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-xl flex items-center justify-center">
                       <span className="text-xl">⚙️</span>
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-gray-900">Advanced Settings</h2>
-                      <p className="text-gray-600">Fine-tune your notification preferences</p>
+                      <h2 className="text-xl font-bold text-gray-900">
+                        Advanced Settings
+                      </h2>
+                      <p className="text-gray-600">
+                        Fine-tune your notification preferences
+                      </p>
                     </div>
                   </div>
 
@@ -605,15 +705,29 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                         <span>🔕</span>
                         Quiet Hours
                       </h3>
-                      <p className="text-gray-600 mb-4">Set times when you don't want to receive notifications</p>
+                      <p className="text-gray-600 mb-4">
+                        Set times when you don't want to receive notifications
+                      </p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Start time</label>
-                          <input type="time" defaultValue="22:00" className="form-input w-full" />
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Start time
+                          </label>
+                          <input
+                            type="time"
+                            defaultValue="22:00"
+                            className="form-input w-full"
+                          />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">End time</label>
-                          <input type="time" defaultValue="08:00" className="form-input w-full" />
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            End time
+                          </label>
+                          <input
+                            type="time"
+                            defaultValue="08:00"
+                            className="form-input w-full"
+                          />
                         </div>
                       </div>
                     </div>
@@ -623,18 +737,38 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                         <span>📊</span>
                         Digest Settings
                       </h3>
-                      <p className="text-gray-600 mb-4">Receive summary notifications instead of individual ones</p>
+                      <p className="text-gray-600 mb-4">
+                        Receive summary notifications instead of individual ones
+                      </p>
                       <div className="space-y-3">
                         <label className="flex items-center gap-3 cursor-pointer">
-                          <input type="radio" name="digest" value="none" defaultChecked className="w-4 h-4 text-green-600" />
-                          <span className="text-gray-700">Send notifications immediately</span>
+                          <input
+                            type="radio"
+                            name="digest"
+                            value="none"
+                            defaultChecked
+                            className="w-4 h-4 text-green-600"
+                          />
+                          <span className="text-gray-700">
+                            Send notifications immediately
+                          </span>
                         </label>
                         <label className="flex items-center gap-3 cursor-pointer">
-                          <input type="radio" name="digest" value="hourly" className="w-4 h-4 text-green-600" />
+                          <input
+                            type="radio"
+                            name="digest"
+                            value="hourly"
+                            className="w-4 h-4 text-green-600"
+                          />
                           <span className="text-gray-700">Hourly digest</span>
                         </label>
                         <label className="flex items-center gap-3 cursor-pointer">
-                          <input type="radio" name="digest" value="daily" className="w-4 h-4 text-green-600" />
+                          <input
+                            type="radio"
+                            name="digest"
+                            value="daily"
+                            className="w-4 h-4 text-green-600"
+                          />
                           <span className="text-gray-700">Daily digest</span>
                         </label>
                       </div>
@@ -645,17 +779,32 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                         <span>🚨</span>
                         Priority Filter
                       </h3>
-                      <p className="text-gray-600 mb-4">Only receive notifications for specific priority levels</p>
+                      <p className="text-gray-600 mb-4">
+                        Only receive notifications for specific priority levels
+                      </p>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {[
-                          { level: 'low', color: 'green', label: 'Low' },
-                          { level: 'medium', color: 'yellow', label: 'Medium' },
-                          { level: 'high', color: 'orange', label: 'High' },
-                          { level: 'critical', color: 'red', label: 'Critical' }
+                          { level: "low", color: "green", label: "Low" },
+                          { level: "medium", color: "yellow", label: "Medium" },
+                          { level: "high", color: "orange", label: "High" },
+                          {
+                            level: "critical",
+                            color: "red",
+                            label: "Critical",
+                          },
                         ].map(({ level, color, label }) => (
-                          <label key={level} className="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" defaultChecked className={`w-4 h-4 text-${color}-600`} />
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium bg-${color}-100 text-${color}-800`}>
+                          <label
+                            key={level}
+                            className="flex items-center gap-2 cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              defaultChecked
+                              className={`w-4 h-4 text-${color}-600`}
+                            />
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-medium bg-${color}-100 text-${color}-800`}
+                            >
                               {label}
                             </span>
                           </label>
@@ -670,5 +819,5 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
