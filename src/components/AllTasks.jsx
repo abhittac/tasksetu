@@ -1002,16 +1002,11 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
       {/* Slide-in Drawer */}
       {showCreateTaskDrawer && (
-        <div className={`task-drawer ${showCreateTaskDrawer ? "open" : ""}`}>
-          <div
-            className="drawer-overlay"
-            onClick={() => setShowCreateTaskDrawer(false)}
-          ></div>
-          <div className="drawer-content">
+        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate">
+          <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreateTaskDrawer(false)}></div>
+          <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 600px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
             <div className="drawer-header">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Create New Task
-              </h2>
+              <h2 className="text-2xl font-bold text-white">Create New Task</h2>
               <button
                 onClick={() => setShowCreateTaskDrawer(false)}
                 className="close-btn"
