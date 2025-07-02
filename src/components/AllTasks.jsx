@@ -979,8 +979,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-700">
+      <div className="flex  items-center justify-between">
+        <div className="text-sm bg-whi text-gray-700">
           Showing <span className="font-medium">1</span> to{" "}
           <span className="font-medium">4</span> of{" "}
           <span className="font-medium">97</span> results

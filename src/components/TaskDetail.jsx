@@ -2450,7 +2450,7 @@ function SubtaskSlideUpPanel({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overlay-animate">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden modal-animate-slide-right" style={{boxShadow: '0 25px 50px rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.2)'}}>
+      <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-4xl max-h-[700px] overflow-hidden modal-animate-slide-right" style={{boxShadow: '0 25px 50px rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.2)'}}>
         
         {/* Enhanced Header */}
         <div className="relative p-6 border-b border-gray-200/50 bg-gradient-to-r from-blue-50 to-indigo-50 overflow-hidden">
