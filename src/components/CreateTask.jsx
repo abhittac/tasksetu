@@ -589,7 +589,7 @@ function MoreOptionsModal({ data, onChange, onClose, onSave }) {
             Save Options
           </button>
         </div>
-      </div>
+      {/* </div> */}
     </>
   )
 }
