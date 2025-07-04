@@ -628,7 +628,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   }
 
   return (
-    <div className="space-y-6 px-4 py-6">
+    <div className="space-y-6 px-4 py-6 h-auto overflow-scroll">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>

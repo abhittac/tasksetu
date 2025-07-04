@@ -44,7 +44,7 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="min-h-full bg-gray-50">
+    <div className="min-h-full overflow-scroll bg-gray-50">
       <div className="page-header">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>

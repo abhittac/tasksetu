@@ -134,7 +134,7 @@ export default function RecurringTaskManager({ onClose }) {
   })
 
   return (
-    <div className="space-y-6 p-5">
+    <div className="space-y-6 p-5 h-auto overflow-scroll">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
@@ -335,7 +335,7 @@ export default function RecurringTaskManager({ onClose }) {
 
       {/* Slide-in Drawer for Creating Recurring Task */}
       {showCreateRecurringDrawer && (
-        <div className="fixed inset-0 z-50 overflow-hidden  overlay-animate">
+        <div className="fixed inset-0 z-50 overflow-hidden  overlay-animate mt-0">
           <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreateRecurringDrawer(false)}></div>
           <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 600px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
             <div className="drawer-header">
@@ -717,7 +717,7 @@ function EditRecurrenceModal({ task, onClose, onSave }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4 overlay-animate">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4 overlay-animate mt-0">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-animate-slide-right">
         {/* Enhanced Header */}
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 rounded-t-2xl">

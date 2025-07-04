@@ -119,7 +119,7 @@ export default function ApprovalManager() {
   }
 
   return (
-    <div className="space-y-6 p-5">
+    <div className="space-y-6 p-5 h-auto overflow-scroll">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Approval Tasks</h1>

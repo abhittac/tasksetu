@@ -36,7 +36,7 @@ export default function TaskAnalytics() {
   ]
 
   return (
-    <div className="analytics-container">
+    <div className="analytics-container h-auto overflow-scroll">
       {/* Header Section */}
       <div className="analytics-header">
         <div className="header-content">

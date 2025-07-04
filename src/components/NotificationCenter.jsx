@@ -219,7 +219,7 @@ export default function NotificationCenter() {
   }
 
   return (
-    <div className="space-y-6 p-5">
+    <div className="space-y-6 p-5 h-auto overflow-scroll">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center space-x-3">
           <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
@@ -353,8 +353,6 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
     });
   };
 
-  
-
   const sections = [
     { id: "delivery", label: "Delivery", icon: "📨", count: 2 },
     { id: "reminders", label: "Reminders", icon: "⏰", count: 3 },
@@ -362,7 +360,7 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-scroll">
       {/* Enhanced Header */}
       <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-4">
@@ -599,24 +597,29 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                                     )}
                                     onChange={(e) => {
                                       if (e.target.checked) {
-                                        const newDays = [...settings.dueDateReminders.daysBeforeDue, days].sort((a, b) => b - a);
+                                        const newDays = [
+                                          ...settings.dueDateReminders
+                                            .daysBeforeDue,
+                                          days,
+                                        ].sort((a, b) => b - a);
                                         onSettingsChange({
                                           ...settings,
                                           dueDateReminders: {
                                             ...settings.dueDateReminders,
-                                            daysBeforeDue: newDays
-                                          }
+                                            daysBeforeDue: newDays,
+                                          },
                                         });
                                       } else {
-                                        const newDays = settings.dueDateReminders.daysBeforeDue.filter(
-                                          (d) => d !== days,
-                                        );
+                                        const newDays =
+                                          settings.dueDateReminders.daysBeforeDue.filter(
+                                            (d) => d !== days,
+                                          );
                                         onSettingsChange({
                                           ...settings,
                                           dueDateReminders: {
                                             ...settings.dueDateReminders,
-                                            daysBeforeDue: newDays
-                                          }
+                                            daysBeforeDue: newDays,
+                                          },
                                         });
                                       }
                                     }}
@@ -670,8 +673,8 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                                     ...settings,
                                     dueDateReminders: {
                                       ...settings.dueDateReminders,
-                                      time: e.target.value
-                                    }
+                                      time: e.target.value,
+                                    },
                                   })
                                 }
                                 className="w-full text-lg font-medium text-gray-900 bg-transparent border-none outline-none"

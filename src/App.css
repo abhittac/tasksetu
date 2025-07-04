@@ -81,6 +81,8 @@
         @apply flex-1 flex flex-col overflow-scroll;
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
+        overflow:hidden
+        
       }
 
       .page-header {
@@ -2138,6 +2140,7 @@
     .header-main-content {
       display: flex;
       align-items: center;
+     
       gap: 1.5rem;
       flex: 1;
     }
