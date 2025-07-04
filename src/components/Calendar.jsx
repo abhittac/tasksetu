@@ -1,11 +1,14 @@
 
 import React, { useState, useEffect } from 'react'
+import CreateTask from './CreateTask'
 
 export default function Calendar({ onClose }) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [viewMode, setViewMode] = useState('month') // month, week, day
   const [recurringTasks, setRecurringTasks] = useState([])
   const [upcomingInstances, setUpcomingInstances] = useState([])
+  const [showCreateTask, setShowCreateTask] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(null)
 
   // Mock recurring tasks data
   useEffect(() => {
@@ -104,6 +107,14 @@ export default function Calendar({ onClose }) {
     const newDate = new Date(currentDate)
     newDate.setMonth(newDate.getMonth() + direction)
     setCurrentDate(newDate)
+  }
+
+  const handleDateClick = (date) => {
+    if (date) {
+      const dateStr = date.toISOString().split('T')[0]
+      setShowCreateTask(true)
+      setSelectedDate(dateStr)
+    }
   }
 
   const monthNames = [
@@ -205,10 +216,12 @@ export default function Calendar({ onClose }) {
                     key={index}
                     className={`
                       min-h-[80px] p-2 border border-gray-100 rounded-lg
-                      ${date ? 'bg-white hover:bg-gray-50' : 'bg-gray-50'}
+                      ${date ? 'bg-white hover:bg-gray-50 cursor-pointer' : 'bg-gray-50'}
                       ${isToday ? 'border-blue-500 bg-blue-50' : ''}
                       transition-colors
                     `}
+                    onClick={() => handleDateClick(date)}
+                    title={date ? `Click to create task for ${date.toDateString()}` : ''}
                   >
                     {date && (
                       <>
@@ -274,6 +287,42 @@ export default function Calendar({ onClose }) {
           </div>
         </div>
       </div>
+
+      {/* Create Task Modal */}
+      {showCreateTask && (
+        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
+          <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreateTask(false)}></div>
+          <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 600px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
+            <div className="drawer-header">
+              <h2 className="text-2xl font-bold text-white">Create Task for {selectedDate}</h2>
+              <button
+                onClick={() => setShowCreateTask(false)}
+                className="close-btn"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="drawer-body">
+              <CreateTask 
+                onClose={() => setShowCreateTask(false)} 
+                preFilledDate={selectedDate}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -18,6 +18,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' });
   const [showStatusConfirmation, setShowStatusConfirmation] = useState(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(null);
+  const [showTaskTypeDropdown, setShowTaskTypeDropdown] = useState(false);
+  const [selectedTaskType, setSelectedTaskType] = useState('regular');
 
   const [tasks, setTasks] = useState([
     {
@@ -627,6 +629,28 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     }
   }
 
+  const handleAddSubtask = (taskId) => {
+    // In a real app, this would open a subtask creation modal
+    const task = tasks.find(t => t.id === taskId)
+    if (task) {
+      console.log(`Adding subtask to "${task.title}"`)
+      // For now, just increment the subtask count
+      setTasks(prevTasks => 
+        prevTasks.map(t => 
+          t.id === taskId 
+            ? { ...t, subtaskCount: t.subtaskCount + 1 }
+            : t
+        )
+      )
+    }
+  }
+
+  const handleToggleSubtasks = (taskId) => {
+    // In a real app, this would expand/collapse subtask rows
+    console.log(`Toggling subtasks for task ${taskId}`)
+    // This would show/hide subtask rows in the table
+  }
+
   return (
     <div className="space-y-6 px-4 py-6 h-auto overflow-scroll">
       {/* Header */}
@@ -657,25 +681,105 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
             </svg>
             {showSnooze ? "Hide" : "Show"} Snoozed Tasks
           </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowCreateTaskDrawer(true)}
-          >
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <div className="relative">
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                setSelectedTaskType('regular')
+                setShowCreateTaskDrawer(true)
+              }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Add Task
-          </button>
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Create Task
+            </button>
+            <button
+              className="btn btn-primary ml-1 px-2"
+              onClick={() => setShowTaskTypeDropdown(!showTaskTypeDropdown)}
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+            
+            {showTaskTypeDropdown && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowTaskTypeDropdown(false)} />
+                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
+                  <div className="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide border-b border-gray-200">
+                    Task Types
+                  </div>
+                  <button
+                    className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
+                    onClick={() => {
+                      setSelectedTaskType('regular')
+                      setShowCreateTaskDrawer(true)
+                      setShowTaskTypeDropdown(false)
+                    }}
+                  >
+                    <span className="text-lg">📋</span>
+                    <div>
+                      <div className="font-medium text-gray-900">Simple Task</div>
+                      <div className="text-sm text-gray-500">Standard one-time task</div>
+                    </div>
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
+                    onClick={() => {
+                      setSelectedTaskType('recurring')
+                      setShowCreateTaskDrawer(true)
+                      setShowTaskTypeDropdown(false)
+                    }}
+                  >
+                    <span className="text-lg">🔄</span>
+                    <div>
+                      <div className="font-medium text-gray-900">Recurring Task</div>
+                      <div className="text-sm text-gray-500">Repeats on schedule</div>
+                    </div>
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
+                    onClick={() => {
+                      setSelectedTaskType('milestone')
+                      setShowCreateTaskDrawer(true)
+                      setShowTaskTypeDropdown(false)
+                    }}
+                  >
+                    <span className="text-lg">🎯</span>
+                    <div>
+                      <div className="font-medium text-gray-900">Milestone</div>
+                      <div className="text-sm text-gray-500">Project checkpoint</div>
+                    </div>
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
+                    onClick={() => {
+                      setSelectedTaskType('approval')
+                      setShowCreateTaskDrawer(true)
+                      setShowTaskTypeDropdown(false)
+                    }}
+                  >
+                    <span className="text-lg">✅</span>
+                    <div>
+                      <div className="font-medium text-gray-900">Approval Task</div>
+                      <div className="text-sm text-gray-500">Requires approval workflow</div>
+                    </div>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -957,6 +1061,26 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 </button>
+                <button
+                  className="text-gray-400 cursor-pointer hover:text-green-600 transition-colors p-1"
+                  onClick={() => handleAddSubtask(task.id)}
+                  title="Add sub-task"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+                {task.subtaskCount > 0 && (
+                  <button
+                    className="text-gray-400 cursor-pointer hover:text-indigo-600 transition-colors p-1"
+                    onClick={() => handleToggleSubtasks(task.id)}
+                    title="Toggle sub-tasks"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                )}
                 {canDeleteTask(task) && (
                   <button
                     className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
@@ -1027,7 +1151,10 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               </button>
             </div>
             <div className="drawer-body">
-              <CreateTask onClose={() => setShowCreateTaskDrawer(false)} />
+              <CreateTask 
+                onClose={() => setShowCreateTaskDrawer(false)} 
+                initialTaskType={selectedTaskType}
+              />
             </div>
           </div>
         </div>
