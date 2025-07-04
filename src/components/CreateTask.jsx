@@ -3,7 +3,7 @@ import { calculateDueDateFromPriority } from './PriorityManager'
 import RecurringTaskManager from './RecurringTaskManager'
 import MilestoneManager from './MilestoneManager'
 
-export default function CreateTask({ onClose }) {
+export default function CreateTask({ onClose, prefilledDate }) {
   const [taskType, setTaskType] = useState('regular')
   const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [formData, setFormData] = useState({
@@ -12,12 +12,12 @@ export default function CreateTask({ onClose }) {
     assignee: '',
     priority: 'medium',
     status: 'todo',
-    dueDate: '',
+    dueDate: prefilledDate || '',
     category: '',
     tags: '',
     attachments: []
   })
-  const [isManualDueDate, setIsManualDueDate] = useState(false)
+  const [isManualDueDate, setIsManualDueDate] = useState(!!prefilledDate)
   const [moreOptionsData, setMoreOptionsData] = useState({
     referenceProcess: '',
     customForm: '',

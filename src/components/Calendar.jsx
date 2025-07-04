@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 
 export default function Calendar({ onClose }) {
@@ -49,7 +48,7 @@ export default function Calendar({ onClose }) {
   const generateUpcomingInstances = (tasks) => {
     const instances = []
     const today = new Date()
-    
+
     tasks.forEach(task => {
       if (task.status === 'active') {
         // Generate only the next upcoming instance for each recurring task
@@ -67,7 +66,7 @@ export default function Calendar({ onClose }) {
         }
       }
     })
-    
+
     setUpcomingInstances(instances)
   }
 
@@ -78,19 +77,19 @@ export default function Calendar({ onClose }) {
     const lastDay = new Date(year, month + 1, 0)
     const daysInMonth = lastDay.getDate()
     const startDayOfWeek = firstDay.getDay()
-    
+
     const days = []
-    
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startDayOfWeek; i++) {
       days.push(null)
     }
-    
+
     // Add all days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(new Date(year, month, day))
     }
-    
+
     return days
   }
 
@@ -146,11 +145,11 @@ export default function Calendar({ onClose }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            
+
             <h3 className="text-lg font-medium text-gray-900">
               {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
             </h3>
-            
+
             <button
               onClick={() => navigateMonth(1)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -199,12 +198,12 @@ export default function Calendar({ onClose }) {
               {getDaysInMonth(currentDate).map((date, index) => {
                 const tasksForDate = getTasksForDate(date)
                 const isToday = date && date.toDateString() === new Date().toDateString()
-                
+
                 return (
                   <div
                     key={index}
                     className={`
-                      min-h-[80px] p-2 border border-gray-100 rounded-lg
+                      min-h-[80px] p-2 border border-gray-100 rounded-lg group
                       ${date ? 'bg-white hover:bg-gray-50' : 'bg-gray-50'}
                       ${isToday ? 'border-blue-500 bg-blue-50' : ''}
                       transition-colors
@@ -212,8 +211,9 @@ export default function Calendar({ onClose }) {
                   >
                     {date && (
                       <>
-                        <div className={`text-sm font-medium mb-1 ${isToday ? 'text-blue-700' : 'text-gray-900'}`}>
-                          {date.getDate()}
+                        <div className={`text-sm font-medium mb-1 flex items-center justify-between ${isToday ? 'text-blue-700' : 'text-gray-900'}`}>
+                          <span>{date.getDate()}</span>
+                          <span className="text-xs text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">+</span>
                         </div>
                         <div className="space-y-1">
                           {tasksForDate.map(task => (
