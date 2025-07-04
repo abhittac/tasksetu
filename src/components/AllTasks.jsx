@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import CreateTask from './CreateTask'
+import ApprovalTaskCreator from './ApprovalTaskCreator'
 
 export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [searchTerm, setSearchTerm] = useState('')
@@ -20,6 +21,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(null);
   const [showTaskTypeDropdown, setShowTaskTypeDropdown] = useState(false);
   const [selectedTaskType, setSelectedTaskType] = useState('regular');
+  const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
 
   const [tasks, setTasks] = useState([
     {
@@ -651,6 +653,34 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     // This would show/hide subtask rows in the table
   }
 
+  const handleCreateApprovalTask = (approvalTaskData) => {
+    // Add the approval task to the tasks list
+    const newTask = {
+      id: Date.now(),
+      title: approvalTaskData.title,
+      assignee: 'Current User',
+      assigneeId: 1,
+      status: 'OPEN',
+      priority: approvalTaskData.priority || 'Medium',
+      dueDate: approvalTaskData.dueDate,
+      category: 'Approval',
+      progress: 0,
+      subtaskCount: 0,
+      collaborators: [],
+      createdBy: 'Current User',
+      creatorId: 1,
+      isApprovalTask: true,
+      approvers: approvalTaskData.approvers || [],
+      approvalMode: approvalTaskData.approvalMode || 'any',
+      description: approvalTaskData.description || '',
+      subtasks: []
+    }
+    
+    setTasks(prevTasks => [...prevTasks, newTask])
+    setShowApprovalTaskModal(false)
+    console.log('Approval task created:', newTask)
+  }
+
   return (
     <div className="space-y-6 px-4 py-6 h-auto overflow-scroll">
       {/* Header */}
@@ -765,8 +795,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                   <button
                     className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
                     onClick={() => {
-                      setSelectedTaskType('approval')
-                      setShowCreateTaskDrawer(true)
+                      setShowApprovalTaskModal(true)
                       setShowTaskTypeDropdown(false)
                     }}
                   >
@@ -1198,6 +1227,19 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
           onCancel={() => setShowDeleteConfirmation(null)}
           currentUser={currentUser}
         />
+      )}
+
+      {/* Approval Task Modal */}
+      {showApprovalTaskModal && (
+        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate">
+          <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowApprovalTaskModal(false)}></div>
+          <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 700px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
+            <ApprovalTaskCreator
+              onClose={() => setShowApprovalTaskModal(false)}
+              onSubmit={handleCreateApprovalTask}
+            />
+          </div>
+        </div>
       )}
     </div>
   )
