@@ -167,10 +167,40 @@ export default function ApprovalManager() {
       </div>
 
       {showCreateModal && (
-        <ApprovalTaskCreator
-          onClose={() => setShowCreateModal(false)}
-          onSubmit={handleCreateApprovalTask}
-        />
+        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
+          <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}></div>
+          <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 600px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
+            <div className="drawer-header">
+              <h2 className="text-2xl font-bold text-white">
+                Create Approval Task
+              </h2>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="close-btn"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="drawer-body">
+              <ApprovalTaskCreator
+                onClose={() => setShowCreateModal(false)}
+                onSubmit={handleCreateApprovalTask}
+              />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
