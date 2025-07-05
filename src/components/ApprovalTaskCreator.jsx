@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react'
 
-export default function ApprovalTaskCreator({ onClose, onSubmit }) {
+export default function ApprovalTaskCreator({ onClose, onSubmit,clas }) {
   const [formData, setFormData] = useState({
     title: '',
     isApprovalTask: true,
@@ -146,7 +146,7 @@ export default function ApprovalTaskCreator({ onClose, onSubmit }) {
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4 overlay-animate">
-      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-animate-slide-right">
+      <div className={`bg-white rounded-xl shadow-xl max-w-2xl w-full  overflow-y-auto modal-animate-slide-right`}>
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-t-xl">
           <div className="flex items-center justify-between">

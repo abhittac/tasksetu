@@ -1231,12 +1231,13 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
       {/* Approval Task Modal */}
       {showApprovalTaskModal && (
-        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate">
+        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate !p-0 mt-0">
           <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowApprovalTaskModal(false)}></div>
-          <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 700px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
+          <div className="absolute right-0 top-0 h-full  bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 700px)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
             <ApprovalTaskCreator
               onClose={() => setShowApprovalTaskModal(false)}
               onSubmit={handleCreateApprovalTask}
+         
             />
           </div>
         </div>
