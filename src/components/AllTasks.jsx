@@ -27,6 +27,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [selectedSubtask, setSelectedSubtask] = useState(null);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [selectedDateForTask, setSelectedDateForTask] = useState(null);
+  const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
+  const [selectedApprovalTask, setSelectedApprovalTask] = useState(null);
 
   const [tasks, setTasks] = useState([
     {
@@ -700,7 +702,16 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   };
 
   const handleViewTask = (taskId) => {
-    // Navigate to task detail page
+    const task = tasks.find(t => t.id === taskId);
+    
+    // If it's an approval task, show the approval modal
+    if (task && task.isApprovalTask) {
+      setSelectedApprovalTask(task);
+      setShowApprovalTaskModal(true);
+      return;
+    }
+    
+    // Navigate to task detail page for regular tasks
     if (onNavigateToTask) {
       onNavigateToTask(taskId)
     }
@@ -1526,6 +1537,61 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
           onUpdate={(updatedSubtask) => handleUpdateSubtask(selectedSubtask.parentTaskId, updatedSubtask)}
           onDelete={() => handleDeleteSubtask(selectedSubtask.parentTaskId, selectedSubtask.id)}
           currentUser={currentUser}
+        />
+      )}
+
+      {/* Approval Task Detail Modal */}
+      {showApprovalTaskModal && selectedApprovalTask && (
+        <ApprovalTaskDetailModal
+          task={selectedApprovalTask}
+          onClose={() => {
+            setShowApprovalTaskModal(false);
+            setSelectedApprovalTask(null);
+          }}
+          currentUser={currentUser}
+          onApproval={(taskId, approverId, action, comment) => {
+            // Handle approval action
+            setTasks(prevTasks => 
+              prevTasks.map(task => {
+                if (task.id !== taskId) return task;
+                
+                const updatedApprovers = task.approvers.map(approver => {
+                  if (approver.id === approverId) {
+                    return {
+                      ...approver,
+                      status: action,
+                      comment: comment || null,
+                      approvedAt: new Date().toISOString()
+                    };
+                  }
+                  return approver;
+                });
+
+                // Determine overall task status based on approval mode
+                let newStatus = task.status;
+                if (action === 'approved') {
+                  if (task.approvalMode === 'any') {
+                    newStatus = 'DONE';
+                  } else if (task.approvalMode === 'all') {
+                    const allApproved = updatedApprovers.every(a => a.status === 'approved');
+                    if (allApproved) newStatus = 'DONE';
+                  }
+                } else if (action === 'rejected') {
+                  newStatus = 'CANCELLED';
+                }
+
+                return {
+                  ...task,
+                  approvers: updatedApprovers,
+                  status: newStatus
+                };
+              })
+            );
+            
+            // Close modal after action
+            setShowApprovalTaskModal(false);
+            setSelectedApprovalTask(null);
+          }}
         />
       )}
     </div>
@@ -2431,6 +2497,360 @@ function CalendarDatePicker({ onClose, onDateSelect, taskType }) {
             </h4>
             
             <button
+
+// Approval Task Detail Modal Component
+function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
+  const [comment, setComment] = useState('');
+  const [showApprovalConfirm, setShowApprovalConfirm] = useState(null);
+
+  const userApprover = task.approvers?.find(a => a.id === currentUser.id);
+  const canUserApprove = userApprover && userApprover.status === 'pending';
+
+  const getApprovalModeDescription = (mode) => {
+    switch (mode) {
+      case 'any': return 'Any single approver can approve/reject';
+      case 'all': return 'All approvers must approve';
+      case 'sequential': return 'Approvers must act in order';
+      default: return '';
+    }
+  };
+
+  const getOverallStatus = () => {
+    if (!task.approvers) return 'pending';
+    
+    const hasRejected = task.approvers.some(a => a.status === 'rejected');
+    if (hasRejected) return 'rejected';
+    
+    const allApproved = task.approvers.every(a => a.status === 'approved');
+    if (allApproved) return 'approved';
+    
+    const hasApproved = task.approvers.some(a => a.status === 'approved');
+    if (hasApproved && task.approvalMode === 'any') return 'approved';
+    
+    return 'pending';
+  };
+
+  const handleApprovalAction = (action) => {
+    if (!comment.trim() && action === 'rejected') {
+      alert('Please provide a comment when rejecting');
+      return;
+    }
+    
+    setShowApprovalConfirm({ action, comment });
+  };
+
+  const confirmApproval = () => {
+    if (showApprovalConfirm) {
+      onApproval(task.id, currentUser.id, showApprovalConfirm.action, showApprovalConfirm.comment);
+      setShowApprovalConfirm(null);
+      setComment('');
+    }
+  };
+
+  const overallStatus = getOverallStatus();
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose}></div>
+      
+      {/* Sliding Panel */}
+      <div className="absolute right-0 top-0 h-full w-full max-w-4xl bg-white shadow-2xl flex flex-col animate-slide-in-right">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-700 text-white p-6 flex-shrink-0">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl">✅</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-2xl font-bold mb-2 break-words">{task.title}</h2>
+                <div className="flex flex-wrap items-center gap-3 text-sm">
+                  <span className={`px-3 py-1 rounded-full font-medium ${
+                    overallStatus === 'approved' ? 'bg-green-500/20 text-green-100' :
+                    overallStatus === 'rejected' ? 'bg-red-500/20 text-red-100' :
+                    'bg-yellow-500/20 text-yellow-100'
+                  }`}>
+                    {overallStatus.charAt(0).toUpperCase() + overallStatus.slice(1)}
+                  </span>
+                  <span className="text-blue-100">Approval Task</span>
+                  <span className="text-blue-200">Due: {task.dueDate}</span>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-white/80 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-8">
+          {/* Task Details Section */}
+          <div className="bg-gray-50 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Task Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Created By</label>
+                <p className="text-gray-900">{task.createdBy || 'Unknown'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Created Date</label>
+                <p className="text-gray-900">{task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'Unknown'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                  task.priority === 'critical' ? 'bg-red-100 text-red-800' :
+                  task.priority === 'high' ? 'bg-orange-100 text-orange-800' :
+                  task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-green-100 text-green-800'
+                }`}>
+                  {task.priority?.charAt(0).toUpperCase() + task.priority?.slice(1) || 'Medium'}
+                </span>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                  task.visibility === 'public' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {task.visibility?.charAt(0).toUpperCase() + task.visibility?.slice(1) || 'Private'}
+                </span>
+              </div>
+            </div>
+            
+            {task.description && (
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <p className="text-gray-900 whitespace-pre-wrap">{task.description}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Approval Workflow Section */}
+          <div className="bg-white border border-gray-200 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Approval Workflow
+            </h3>
+            
+            <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-blue-900">Approval Mode</h4>
+                  <p className="text-sm text-blue-700">{getApprovalModeDescription(task.approvalMode)}</p>
+                </div>
+                <span className="px-3 py-1 bg-blue-200 text-blue-800 rounded-full text-sm font-medium">
+                  {task.approvalMode?.toUpperCase() || 'ANY'}
+                </span>
+              </div>
+            </div>
+
+            {/* Approvers List */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-900">Approvers ({task.approvers?.length || 0})</h4>
+              {task.approvers?.map((approver, index) => (
+                <div key={approver.id} className={`p-4 rounded-lg border-2 transition-all ${
+                  approver.status === 'approved' ? 'border-green-200 bg-green-50' :
+                  approver.status === 'rejected' ? 'border-red-200 bg-red-50' :
+                  approver.status === 'pending' ? 'border-blue-200 bg-blue-50' :
+                  'border-gray-200 bg-gray-50'
+                }`}>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0">
+                        <span className="text-2xl">
+                          {approver.avatar || (approver.status === 'approved' ? '✅' : 
+                           approver.status === 'rejected' ? '❌' : 
+                           approver.status === 'pending' ? '⏳' : '⏸️')}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <h5 className="font-medium text-gray-900">{approver.name}</h5>
+                          <span className="text-sm text-gray-500">({approver.role})</span>
+                          {approver.id === currentUser.id && (
+                            <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">You</span>
+                          )}
+                        </div>
+                        <div className="mt-1">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            approver.status === 'approved' ? 'bg-green-100 text-green-800' :
+                            approver.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                            approver.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {approver.status?.charAt(0).toUpperCase() + approver.status?.slice(1) || 'Waiting'}
+                          </span>
+                          {approver.approvedAt && (
+                            <span className="ml-2 text-xs text-gray-500">
+                              on {new Date(approver.approvedAt).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                        {approver.comment && (
+                          <div className="mt-2 p-2 bg-white rounded border">
+                            <p className="text-sm text-gray-700">"{approver.comment}"</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )) || (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No approvers assigned</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Attachments Section */}
+          {task.attachments && task.attachments.length > 0 && (
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+                Attachments ({task.attachments.length})
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {task.attachments.map((attachment) => (
+                  <div key={attachment.id} className="flex items-center p-3 bg-gray-50 rounded-lg border">
+                    <span className="text-lg mr-3">📄</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{attachment.name}</p>
+                      <p className="text-xs text-gray-500">{(attachment.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action Section */}
+          {canUserApprove && (
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Your Review
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Comment (required for rejection)
+                  </label>
+                  <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    rows="4"
+                    placeholder="Add your comments or feedback..."
+                  />
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={() => handleApprovalAction('approved')}
+                    className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleApprovalAction('rejected')}
+                    className="flex-1 bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Reject
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Confirmation Modal */}
+      {showApprovalConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${
+                  showApprovalConfirm.action === 'approved' ? 'bg-green-100' : 'bg-red-100'
+                }`}>
+                  {showApprovalConfirm.action === 'approved' ? (
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Confirm {showApprovalConfirm.action === 'approved' ? 'Approval' : 'Rejection'}
+                </h3>
+              </div>
+
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to {showApprovalConfirm.action === 'approved' ? 'approve' : 'reject'} this task?
+                {showApprovalConfirm.comment && (
+                  <span className="block mt-2 font-medium">
+                    Comment: "{showApprovalConfirm.comment}"
+                  </span>
+                )}
+              </p>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowApprovalConfirm(null)}
+                  className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmApproval}
+                  className={`flex-1 px-4 py-2 text-white rounded-lg transition-colors ${
+                    showApprovalConfirm.action === 'approved' 
+                      ? 'bg-green-600 hover:bg-green-700' 
+                      : 'bg-red-600 hover:bg-red-700'
+                  }`}
+                >
+                  Confirm {showApprovalConfirm.action === 'approved' ? 'Approval' : 'Rejection'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
               onClick={() => navigateMonth(1)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
