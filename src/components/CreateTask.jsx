@@ -3,7 +3,7 @@ import { calculateDueDateFromPriority } from './PriorityManager'
 import RecurringTaskManager from './RecurringTaskManager'
 import MilestoneManager from './MilestoneManager'
 
-export default function CreateTask({ onClose, initialTaskType = 'regular', preFilledDate = null }) {
+export default function CreateTask({ onClose, initialTaskType = 'regular', preFilledDate = null, showDateInTitle = false }) {
   const [taskType, setTaskType] = useState(initialTaskType)
   const [showMoreOptions, setShowMoreOptions] = useState(false)
   const [formData, setFormData] = useState({
@@ -62,6 +62,20 @@ export default function CreateTask({ onClose, initialTaskType = 'regular', preFi
 
   return (
     <div className="create-task-container">
+      {/* Modal Header with Date */}
+      {showDateInTitle && preFilledDate && (
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Create New Task</h1>
+          <p className="text-lg text-gray-600">
+            for {new Date(preFilledDate).toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </p>
+        </div>
+      )}
 
       {/* Task Type Selector */}
       <div className="card">

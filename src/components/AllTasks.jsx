@@ -27,6 +27,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [selectedSubtask, setSelectedSubtask] = useState(null);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [selectedDateForTask, setSelectedDateForTask] = useState(null);
+  const [showCreateTask, setShowCreateTask] = useState(false);
 
   const [tasks, setTasks] = useState([
     {
@@ -749,7 +750,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     );
 
     setShowSubtaskCreator(null);
-    
+
     // Auto-expand parent task to show new subtask
     setExpandedTasks(prev => new Set([...prev, parentTaskId]));
   };
@@ -823,13 +824,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const handleCalendarDateSelect = (selectedDate) => {
     setSelectedDateForTask(selectedDate);
     setShowCalendarModal(false);
-    
-    // Open appropriate task creation modal based on selected type
-    if (selectedTaskType === 'approval') {
-      setShowApprovalTaskModal(true);
-    } else {
-      setShowCreateTaskDrawer(true);
-    }
+    setShowCreateTask(true);
   };
 
   // Handle task type selection from dropdown
@@ -861,7 +856,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       description: approvalTaskData.description || '',
       subtasks: []
     }
-    
+
     setTasks(prevTasks => [...prevTasks, newTask])
     setShowApprovalTaskModal(false)
     setSelectedDateForTask(null)
@@ -926,7 +921,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
             </button>
-            
+
             {showTaskTypeDropdown && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowTaskTypeDropdown(false)} />
@@ -1156,7 +1151,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                               {expandedTasks.has(task.id) ? '▼' : '▶'}
                             </button>
                           )}
-                          
+
                           {editingTaskId === task.id ? (
                             <input
                               type="text"
@@ -1270,9 +1265,9 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                       </button>
-                     
-                      
-                     
+
+
+
                     </div>
                   </td>
                 </tr>
@@ -1402,11 +1397,23 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
       {/* Slide-in Drawer */}
       {showCreateTaskDrawer && (
-        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
+        
           <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreateTaskDrawer(false)}></div>
           <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 600px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
             <div className="drawer-header">
-              <h2 className="text-2xl font-bold text-white">Create New Task</h2>
+              <h2 className="text-2xl font-bold text-white">
+                Create New Task
+                {selectedDateForTask && (
+                  <span className="block text-lg font-normal opacity-90 mt-1">
+                    for {new Date(selectedDateForTask).toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </span>
+                )}
+              </h2>
               <button
                 onClick={() => setShowCreateTaskDrawer(false)}
                 className="close-btn"
@@ -1434,10 +1441,11 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                 }} 
                 initialTaskType={selectedTaskType}
                 preFilledDate={selectedDateForTask}
+                showDateInTitle={true}
               />
             </div>
           </div>
-        </div>
+        
       )}
 
       {/* Task Edit Modal */}
@@ -1494,7 +1502,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
       {/* Approval Task Modal */}
       {showApprovalTaskModal && (
-        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate !p-0 mt-0">
+        
           <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => {
             setShowApprovalTaskModal(false)
             setSelectedDateForTask(null)
@@ -1509,7 +1517,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               preFilledDate={selectedDateForTask}
             />
           </div>
-        </div>
+        
       )}
 
       {/* Subtask Creator Modal */}
@@ -1584,7 +1592,7 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
         >
           {currentStatusObj?.label || currentStatus}
           <svg className="ml-1 w-3 h-3 opacity-50" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2-2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
           </svg>
         </span>
         {showTooltip && (
@@ -1623,7 +1631,8 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
           <div className="absolute top-full left-0 mt-1 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
             {/* Current Status */}
-            <div className="px-3 py-2 bg-gray-50 border-b border-gray-200">
+            <div className="px-3 py-2 bg-gray-50 border-b border```text
+-gray-200">
               <div className="flex items-center gap-2 text-xs text-gray-600">
                 <span 
                   className="w-3 h-3 rounded-full"
@@ -2342,19 +2351,19 @@ function CalendarDatePicker({ onClose, onDateSelect, taskType }) {
     const lastDay = new Date(year, month + 1, 0)
     const daysInMonth = lastDay.getDate()
     const startDayOfWeek = firstDay.getDay()
-    
+
     const days = []
-    
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startDayOfWeek; i++) {
       days.push(null)
     }
-    
+
     // Add all days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(new Date(year, month, day))
     }
-    
+
     return days
   }
 
@@ -2430,11 +2439,11 @@ function CalendarDatePicker({ onClose, onDateSelect, taskType }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            
+
             <h4 className="text-lg font-semibold text-gray-900">
               {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
             </h4>
-            
+
             <button
               onClick={() => navigateMonth(1)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"

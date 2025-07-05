@@ -156,7 +156,18 @@ export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate }
               </div>
               <div>
                 <h2 className="text-xl font-bold">Create Approval Task</h2>
-                <p className="text-blue-100 text-sm">Set up a task requiring approval workflow</p>
+                {preFilledDate ? (
+                  <p className="text-blue-100 text-sm">
+                    for {new Date(preFilledDate).toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </p>
+                ) : (
+                  <p className="text-blue-100 text-sm">Set up a task requiring approval workflow</p>
+                )}
               </div>
             </div>
             <button
