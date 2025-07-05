@@ -27,9 +27,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [selectedSubtask, setSelectedSubtask] = useState(null);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [selectedDateForTask, setSelectedDateForTask] = useState(null);
-  const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
+  // const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
   const [selectedApprovalTask, setSelectedApprovalTask] = useState(null);
-
   const [tasks, setTasks] = useState([
     {
       id: 1,
