@@ -847,12 +847,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     setSelectedTaskType(taskType);
     setShowTaskTypeDropdown(false);
     
-    if (taskType === 'approval') {
-      // Open approval task modal directly (no calendar for approval tasks)
-      setShowApprovalTaskModal(true);
-    } else {
-      setShowCalendarModal(true);
-    }
+    // Always show calendar first for all task types
+    setShowCalendarModal(true);
   };
 
   const handleCreateApprovalTask = (approvalTaskData) => {
