@@ -1,14 +1,14 @@
 
 import React, { useState } from 'react'
 
-export default function ApprovalTaskCreator({ onClose, onSubmit,clas }) {
+export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate }) {
   const [formData, setFormData] = useState({
     title: '',
     isApprovalTask: true,
     approver: 'Current User',
     approverIds: [],
     approvalMode: 'any',
-    dueDate: '',
+    dueDate: preFilledDate || '',
     autoApproveAfter: '',
     autoApproveEnabled: false,
     description: '',
