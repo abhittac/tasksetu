@@ -22,6 +22,9 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [showTaskTypeDropdown, setShowTaskTypeDropdown] = useState(false);
   const [selectedTaskType, setSelectedTaskType] = useState('regular');
   const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
+  const [expandedTasks, setExpandedTasks] = useState(new Set());
+  const [showSubtaskCreator, setShowSubtaskCreator] = useState(null);
+  const [selectedSubtask, setSelectedSubtask] = useState(null);
 
   const [tasks, setTasks] = useState([
     {
@@ -40,9 +43,45 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       creatorId: 1,
       isRecurring: false,
       subtasks: [
-        { id: 101, status: "completed" },
-        { id: 102, status: "in-progress" },
-        { id: 103, status: "pending" }
+        { 
+          id: 101, 
+          title: "Setup OAuth providers",
+          assignee: "John Doe",
+          assigneeId: 2,
+          status: "DONE", 
+          priority: "High",
+          dueDate: "2024-01-22",
+          progress: 100,
+          parentTaskId: 1,
+          createdBy: "Current User",
+          createdAt: "2024-01-15T09:00:00Z"
+        },
+        { 
+          id: 102, 
+          title: "Implement session management",
+          assignee: "Jane Smith",
+          assigneeId: 3,
+          status: "INPROGRESS", 
+          priority: "High",
+          dueDate: "2024-01-24",
+          progress: 75,
+          parentTaskId: 1,
+          createdBy: "Current User",
+          createdAt: "2024-01-16T10:00:00Z"
+        },
+        { 
+          id: 103, 
+          title: "Add password reset flow",
+          assignee: "Mike Johnson",
+          assigneeId: 4,
+          status: "OPEN", 
+          priority: "Medium",
+          dueDate: "2024-01-26",
+          progress: 0,
+          parentTaskId: 1,
+          createdBy: "Current User",
+          createdAt: "2024-01-17T11:00:00Z"
+        }
       ]
     },
     {
@@ -90,16 +129,50 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       dueDate: "2024-01-28",
       category: "Research",
       progress: 80,
-      subtaskCount: 5,
+      subtaskCount: 3,
       collaborators: [1, 2],
       createdBy: "Current User",
       creatorId: 1,
       subtasks: [
-        { id: 301, status: "completed" },
-        { id: 302, status: "completed" },
-        { id: 303, status: "in-progress" },
-        { id: 304, status: "pending" },
-        { id: 305, status: "pending" }
+        { 
+          id: 301, 
+          title: "Prepare interview questions",
+          assignee: "Sarah Wilson",
+          assigneeId: 5,
+          status: "DONE", 
+          priority: "High",
+          dueDate: "2024-01-25",
+          progress: 100,
+          parentTaskId: 4,
+          createdBy: "Current User",
+          createdAt: "2024-01-20T09:00:00Z"
+        },
+        { 
+          id: 302, 
+          title: "Schedule participant sessions",
+          assignee: "Emily Davis",
+          assigneeId: 6,
+          status: "INPROGRESS", 
+          priority: "Medium",
+          dueDate: "2024-01-27",
+          progress: 60,
+          parentTaskId: 4,
+          createdBy: "Sarah Wilson",
+          createdAt: "2024-01-21T10:00:00Z"
+        },
+        { 
+          id: 303, 
+          title: "Analyze interview data",
+          assignee: "Sarah Wilson",
+          assigneeId: 5,
+          status: "OPEN", 
+          priority: "High",
+          dueDate: "2024-01-30",
+          progress: 0,
+          parentTaskId: 4,
+          createdBy: "Current User",
+          createdAt: "2024-01-22T11:00:00Z"
+        }
       ]
     },
     {
@@ -631,26 +704,117 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     }
   }
 
-  const handleAddSubtask = (taskId) => {
-    // In a real app, this would open a subtask creation modal
-    const task = tasks.find(t => t.id === taskId)
-    if (task) {
-      console.log(`Adding subtask to "${task.title}"`)
-      // For now, just increment the subtask count
-      setTasks(prevTasks => 
-        prevTasks.map(t => 
-          t.id === taskId 
-            ? { ...t, subtaskCount: t.subtaskCount + 1 }
-            : t
-        )
+  // Toggle task expansion
+  const handleToggleTaskExpansion = (taskId) => {
+    setExpandedTasks(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+      } else {
+        newSet.add(taskId);
+      }
+      return newSet;
+    });
+  };
+
+  // Create new subtask
+  const handleCreateSubtask = (parentTaskId, subtaskData) => {
+    const newSubtask = {
+      id: Date.now(),
+      title: subtaskData.title,
+      assignee: subtaskData.assignee || currentUser.name,
+      assigneeId: subtaskData.assigneeId || currentUser.id,
+      status: subtaskData.status || 'OPEN',
+      priority: subtaskData.priority || 'Medium',
+      dueDate: subtaskData.dueDate,
+      progress: 0,
+      parentTaskId: parentTaskId,
+      createdBy: currentUser.name,
+      createdAt: new Date().toISOString(),
+      description: subtaskData.description || ''
+    };
+
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === parentTaskId 
+          ? { 
+              ...task, 
+              subtasks: [...(task.subtasks || []), newSubtask],
+              subtaskCount: (task.subtaskCount || 0) + 1
+            }
+          : task
       )
+    );
+
+    setShowSubtaskCreator(null);
+    
+    // Auto-expand parent task to show new subtask
+    setExpandedTasks(prev => new Set([...prev, parentTaskId]));
+  };
+
+  // Update subtask
+  const handleUpdateSubtask = (parentTaskId, updatedSubtask) => {
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === parentTaskId 
+          ? { 
+              ...task, 
+              subtasks: task.subtasks.map(subtask => 
+                subtask.id === updatedSubtask.id ? updatedSubtask : subtask
+              )
+            }
+          : task
+      )
+    );
+    setSelectedSubtask(null);
+  };
+
+  // Delete subtask
+  const handleDeleteSubtask = (parentTaskId, subtaskId) => {
+    if (window.confirm('Are you sure you want to delete this sub-task?')) {
+      setTasks(prevTasks => 
+        prevTasks.map(task => 
+          task.id === parentTaskId 
+            ? { 
+                ...task, 
+                subtasks: task.subtasks.filter(subtask => subtask.id !== subtaskId),
+                subtaskCount: Math.max(0, (task.subtaskCount || 0) - 1)
+              }
+            : task
+        )
+      );
+      setSelectedSubtask(null);
     }
+  };
+
+  // Handle subtask status change
+  const handleSubtaskStatusChange = (parentTaskId, subtaskId, newStatus) => {
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === parentTaskId 
+          ? { 
+              ...task, 
+              subtasks: task.subtasks.map(subtask => 
+                subtask.id === subtaskId 
+                  ? { 
+                      ...subtask, 
+                      status: newStatus,
+                      progress: newStatus === 'DONE' ? 100 : subtask.progress
+                    }
+                  : subtask
+              )
+            }
+          : task
+      )
+    );
+  };
+
+  const handleAddSubtask = (taskId) => {
+    setShowSubtaskCreator(taskId);
   }
 
   const handleToggleSubtasks = (taskId) => {
-    // In a real app, this would expand/collapse subtask rows
-    console.log(`Toggling subtasks for task ${taskId}`)
-    // This would show/hide subtask rows in the table
+    handleToggleTaskExpansion(taskId);
   }
 
   const handleCreateApprovalTask = (approvalTaskData) => {
@@ -959,12 +1123,12 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {tasks.map((task) => (
-                <tr
-                  key={task.id}
-                  className={`hover:bg-gray-50 transition-colors ${
-                    selectedTasks.includes(task.id) ? 'bg-blue-50' : ''
-                  }`}
-                >
+                <React.Fragment key={task.id}>
+                  <tr
+                    className={`hover:bg-gray-50 transition-colors ${
+                      selectedTasks.includes(task.id) ? 'bg-blue-50' : ''
+                    }`}
+                  >
                   <td className="px-6 py-4 text-nowrap">
                     <input
                       type="checkbox"
@@ -977,6 +1141,17 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                     <div>
                       <div className="font-medium text-gray-900">
                         <div className="flex items-center gap-2">
+                          {/* Expansion control for tasks with subtasks */}
+                          {task.subtasks && task.subtasks.length > 0 && (
+                            <button
+                              onClick={() => handleToggleTaskExpansion(task.id)}
+                              className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                              title={expandedTasks.has(task.id) ? 'Collapse subtasks' : 'Expand subtasks'}
+                            >
+                              {expandedTasks.has(task.id) ? '▼' : '▶'}
+                            </button>
+                          )}
+                          
                           {editingTaskId === task.id ? (
                             <input
                               type="text"
@@ -1005,13 +1180,13 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                               >
                                 {task.title}
                               </span>
-                              {task.subtaskCount > 0 && (
+                              {task.subtasks && task.subtasks.length > 0 && (
                                 <span 
                                   className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200 transition-colors"
-                                  title={`${task.subtaskCount} sub-tasks`}
-                                  onClick={() => console.log(`View sub-tasks for task ${task.id}`)}
+                                  title={`${task.subtasks.length} sub-tasks - Click to ${expandedTasks.has(task.id) ? 'collapse' : 'expand'}`}
+                                  onClick={() => handleToggleTaskExpansion(task.id)}
                                 >
-                                  ⋗ {task.subtaskCount}
+                                  🗂️ {task.subtasks.length}
                                 </span>
                               )}
                               {task.recurringFromTaskId && (
@@ -1080,51 +1255,146 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                   </td>
                   <td className="px-6 py-4 text-nowrap">
                     <div className="flex items-center space-x-3">
-                <button
-                  className="text-gray-400 cursor-pointer hover:text-blue-600 transition-colors p-1"
-                  onClick={() => handleViewTask(task.id)}
-                  title="View task details"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                </button>
-                <button
-                  className="text-gray-400 cursor-pointer hover:text-green-600 transition-colors p-1"
-                  onClick={() => handleAddSubtask(task.id)}
-                  title="Add sub-task"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                </button>
-                {task.subtaskCount > 0 && (
-                  <button
-                    className="text-gray-400 cursor-pointer hover:text-indigo-600 transition-colors p-1"
-                    onClick={() => handleToggleSubtasks(task.id)}
-                    title="Toggle sub-tasks"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                )}
-                {canDeleteTask(task) && (
-                  <button
-                    className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
-                    onClick={() => handleDeleteTask(task.id)}
-                    title="Delete task"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                )}
-             
-              </div>
+                      <button
+                        className="text-gray-400 cursor-pointer hover:text-blue-600 transition-colors p-1"
+                        onClick={() => handleViewTask(task.id)}
+                        title="View task details"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </button>
+                      <button
+                        className="text-gray-400 cursor-pointer hover:text-green-600 transition-colors p-1"
+                        onClick={() => handleAddSubtask(task.id)}
+                        title="Add sub-task"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </button>
+                      {task.subtasks && task.subtasks.length > 0 && (
+                        <button
+                          className="text-gray-400 cursor-pointer hover:text-indigo-600 transition-colors p-1"
+                          onClick={() => handleToggleSubtasks(task.id)}
+                          title="Toggle sub-tasks"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
+                      )}
+                      {canDeleteTask(task) && (
+                        <button
+                          className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
+                          onClick={() => handleDeleteTask(task.id)}
+                          title="Delete task"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
+
+                {/* Subtask Rows */}
+                {expandedTasks.has(task.id) && task.subtasks && task.subtasks.map((subtask) => (
+                  <tr
+                    key={`subtask-${subtask.id}`}
+                    className="bg-gray-50 hover:bg-gray-100 transition-colors border-l-4 border-l-blue-300"
+                  >
+                    <td className="px-6 py-3"></td>
+                    <td className="px-6 py-3">
+                      <div className="pl-8">
+                        <div className="flex items-center gap-2">
+                          <span className="text-blue-500">↳</span>
+                          <span 
+                            className="font-medium text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
+                            onClick={() => setSelectedSubtask({ ...subtask, parentTaskId: task.id })}
+                            title="Click to view/edit subtask"
+                          >
+                            {subtask.title}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-500 pl-7">
+                          Sub-task of "{task.title}"
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex items-center">
+                        <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center mr-2">
+                          <span className="text-xs font-medium text-gray-600">
+                            {subtask.assignee
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </span>
+                        </div>
+                        <span className="text-sm text-gray-700">
+                          {subtask.assignee}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <TaskStatusDropdown
+                        task={subtask}
+                        currentStatus={subtask.status}
+                        statuses={companyStatuses}
+                        onStatusChange={(newStatus) => handleSubtaskStatusChange(task.id, subtask.id, newStatus)}
+                        canEdit={canEditTaskStatus(subtask)}
+                        canMarkCompleted={true}
+                      />
+                    </td>
+                    <td className="px-6 py-3">
+                      <span className={getPriorityBadge(subtask.priority)}>
+                        {subtask.priority}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3 text-sm text-gray-700">
+                      {subtask.dueDate}
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex items-center">
+                        <div className="w-full bg-gray-200 rounded-full h-1.5 mr-2">
+                          <div
+                            className="bg-primary-600 h-1.5 rounded-full"
+                            style={{ width: `${subtask.progress}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-xs text-gray-600 min-w-[3rem]">
+                          {subtask.progress}%
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          className="text-gray-400 cursor-pointer hover:text-blue-600 transition-colors p-1"
+                          onClick={() => setSelectedSubtask({ ...subtask, parentTaskId: task.id })}
+                          title="View/Edit subtask"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button
+                          className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
+                          onClick={() => handleDeleteSubtask(task.id, subtask.id)}
+                          title="Delete subtask"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </React.Fragment>
               ))}
             </tbody>
           </table>
@@ -1241,6 +1511,28 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
             />
           </div>
         </div>
+      )}
+
+      {/* Subtask Creator Modal */}
+      {showSubtaskCreator && (
+        <SubtaskCreator
+          parentTask={tasks.find(t => t.id === showSubtaskCreator)}
+          onClose={() => setShowSubtaskCreator(null)}
+          onSubmit={(subtaskData) => handleCreateSubtask(showSubtaskCreator, subtaskData)}
+          currentUser={currentUser}
+        />
+      )}
+
+      {/* Subtask Detail Panel */}
+      {selectedSubtask && (
+        <SubtaskDetailPanel
+          subtask={selectedSubtask}
+          parentTask={tasks.find(t => t.id === selectedSubtask.parentTaskId)}
+          onClose={() => setSelectedSubtask(null)}
+          onUpdate={(updatedSubtask) => handleUpdateSubtask(selectedSubtask.parentTaskId, updatedSubtask)}
+          onDelete={() => handleDeleteSubtask(selectedSubtask.parentTaskId, selectedSubtask.id)}
+          currentUser={currentUser}
+        />
       )}
     </div>
   )
@@ -1883,6 +2175,438 @@ function TaskEditModal({ task, onSave, onClose }) {
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+// Subtask Creator Component
+function SubtaskCreator({ parentTask, onClose, onSubmit, currentUser }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    assignee: currentUser.name,
+    assigneeId: currentUser.id,
+    priority: 'Medium',
+    dueDate: parentTask.dueDate,
+    description: ''
+  });
+
+  const teamMembers = [
+    { id: 1, name: 'Current User' },
+    { id: 2, name: 'John Doe' },
+    { id: 3, name: 'Jane Smith' },
+    { id: 4, name: 'Mike Johnson' },
+    { id: 5, name: 'Sarah Wilson' }
+  ];
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (formData.title.trim()) {
+      onSubmit(formData);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 overlay-animate">
+      <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full modal-animate-slide-up">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Create Sub-task</h3>
+              <p className="text-sm text-gray-600">Parent: {parentTask.title}</p>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Sub-task Title *
+            </label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              className="form-input w-full"
+              placeholder="Enter sub-task title..."
+              required
+              autoFocus
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Assignee
+              </label>
+              <select
+                value={formData.assigneeId}
+                onChange={(e) => {
+                  const member = teamMembers.find(m => m.id === parseInt(e.target.value));
+                  setFormData(prev => ({ 
+                    ...prev, 
+                    assigneeId: member.id,
+                    assignee: member.name
+                  }));
+                }}
+                className="form-select w-full"
+              >
+                {teamMembers.map(member => (
+                  <option key={member.id} value={member.id}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Priority
+              </label>
+              <select
+                value={formData.priority}
+                onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
+                className="form-select w-full"
+              >
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Urgent">Urgent</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Due Date
+            </label>
+            <input
+              type="date"
+              value={formData.dueDate}
+              onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+              className="form-input w-full"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Description
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              className="form-textarea w-full"
+              rows="3"
+              placeholder="Add sub-task description..."
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn btn-secondary flex-1"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary flex-1"
+              disabled={!formData.title.trim()}
+            >
+              Create Sub-task
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// Subtask Detail Panel Component
+function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, currentUser }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    title: subtask.title,
+    assignee: subtask.assignee,
+    assigneeId: subtask.assigneeId,
+    status: subtask.status,
+    priority: subtask.priority,
+    dueDate: subtask.dueDate,
+    description: subtask.description || ''
+  });
+
+  const teamMembers = [
+    { id: 1, name: 'Current User' },
+    { id: 2, name: 'John Doe' },
+    { id: 3, name: 'Jane Smith' },
+    { id: 4, name: 'Mike Johnson' },
+    { id: 5, name: 'Sarah Wilson' }
+  ];
+
+  const handleSave = () => {
+    const updatedSubtask = {
+      ...subtask,
+      ...formData
+    };
+    onUpdate(updatedSubtask);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setFormData({
+      title: subtask.title,
+      assignee: subtask.assignee,
+      assigneeId: subtask.assigneeId,
+      status: subtask.status,
+      priority: subtask.priority,
+      dueDate: subtask.dueDate,
+      description: subtask.description || ''
+    });
+    setIsEditing(false);
+  };
+
+  const getStatusColor = (status) => {
+    const colors = {
+      'OPEN': 'bg-gray-100 text-gray-800',
+      'INPROGRESS': 'bg-blue-100 text-blue-800',
+      'DONE': 'bg-green-100 text-green-800',
+      'ONHOLD': 'bg-yellow-100 text-yellow-800',
+      'CANCELLED': 'bg-red-100 text-red-800'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getPriorityColor = (priority) => {
+    const colors = {
+      'Low': 'bg-green-100 text-green-800',
+      'Medium': 'bg-yellow-100 text-yellow-800',
+      'High': 'bg-orange-100 text-orange-800',
+      'Urgent': 'bg-red-100 text-red-800'
+    };
+    return colors[priority] || 'bg-gray-100 text-gray-800';
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 overlay-animate">
+      <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-animate-slide-right">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Sub-task Details</h3>
+              <p className="text-sm text-gray-600">Parent: {parentTask.title}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                className="btn btn-secondary btn-sm"
+              >
+                {isEditing ? 'Cancel' : 'Edit'}
+              </button>
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 space-y-6">
+          {/* Title */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Title
+            </label>
+            {isEditing ? (
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                className="form-input w-full"
+              />
+            ) : (
+              <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{subtask.title}</p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-6">
+            {/* Assignee */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Assignee
+              </label>
+              {isEditing ? (
+                <select
+                  value={formData.assigneeId}
+                  onChange={(e) => {
+                    const member = teamMembers.find(m => m.id === parseInt(e.target.value));
+                    setFormData(prev => ({ 
+                      ...prev, 
+                      assigneeId: member.id,
+                      assignee: member.name
+                    }));
+                  }}
+                  className="form-select w-full"
+                >
+                  {teamMembers.map(member => (
+                    <option key={member.id} value={member.id}>
+                      {member.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{subtask.assignee}</p>
+              )}
+            </div>
+
+            {/* Status */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status
+              </label>
+              {isEditing ? (
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
+                  className="form-select w-full"
+                >
+                  <option value="OPEN">Open</option>
+                  <option value="INPROGRESS">In Progress</option>
+                  <option value="DONE">Done</option>
+                  <option value="ONHOLD">On Hold</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
+              ) : (
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(subtask.status)}`}>
+                  {subtask.status}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-6">
+            {/* Priority */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Priority
+              </label>
+              {isEditing ? (
+                <select
+                  value={formData.priority}
+                  onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
+                  className="form-select w-full"
+                >
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                  <option value="Urgent">Urgent</option>
+                </select>
+              ) : (
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(subtask.priority)}`}>
+                  {subtask.priority}
+                </span>
+              )}
+            </div>
+
+            {/* Due Date */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Due Date
+              </label>
+              {isEditing ? (
+                <input
+                  type="date"
+                  value={formData.dueDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                  className="form-input w-full"
+                />
+              ) : (
+                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{subtask.dueDate}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Description
+            </label>
+            {isEditing ? (
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                className="form-textarea w-full"
+                rows="4"
+              />
+            ) : (
+              <p className="text-gray-900 bg-gray-50 p-3 rounded-lg min-h-[100px]">
+                {subtask.description || 'No description provided'}
+              </p>
+            )}
+          </div>
+
+          {/* Metadata */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Metadata</h4>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-500">Created by:</span>
+                <p className="text-gray-900">{subtask.createdBy}</p>
+              </div>
+              <div>
+                <span className="text-gray-500">Created at:</span>
+                <p className="text-gray-900">{new Date(subtask.createdAt).toLocaleDateString()}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-4 border-t border-gray-200">
+            {isEditing ? (
+              <>
+                <button
+                  onClick={handleCancel}
+                  className="btn btn-secondary flex-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="btn btn-primary flex-1"
+                >
+                  Save Changes
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={onDelete}
+                  className="btn btn-danger"
+                >
+                  Delete Sub-task
+                </button>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="btn btn-primary flex-1"
+                >
+                  Edit Sub-task
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
