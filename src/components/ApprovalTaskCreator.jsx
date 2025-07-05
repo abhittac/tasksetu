@@ -145,34 +145,8 @@ export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate, 
   }
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4 overlay-animate">
-      <div className={`bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-animate-slide-right`}>
-        {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-t-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                <span className="text-xl">✅</span>
-              </div>
-              <div>
-                <h2 className="text-xl font-bold">
-                  Create Approval Task{selectedDate && ` for ${new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
-                </h2>
-                <p className="text-blue-100 text-sm">Set up a task requiring approval workflow</p>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-white/80 hover:text-white hover:bg-white/10 rounded-lg p-2 transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+    <div className="create-task-container">
+      <form onSubmit={handleSubmit} className="space-y-6">
           {/* Task Name */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">
@@ -462,20 +436,19 @@ export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate, 
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="btn btn-secondary"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-lg"
+              className="btn btn-primary"
               disabled={formData.approverIds.length === 0 || !formData.title.trim() || !formData.dueDate}
             >
               Create Approval Task
             </button>
           </div>
         </form>
-      </div>
     </div>
   )
 }
