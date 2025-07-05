@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react'
 
-export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate }) {
+export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate, selectedDate }) {
   const [formData, setFormData] = useState({
     title: '',
     isApprovalTask: true,
@@ -155,7 +155,9 @@ export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate }
                 <span className="text-xl">✅</span>
               </div>
               <div>
-                <h2 className="text-xl font-bold">Create Approval Task</h2>
+                <h2 className="text-xl font-bold">
+                  Create Approval Task{selectedDate && ` for ${new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
+                </h2>
                 <p className="text-blue-100 text-sm">Set up a task requiring approval workflow</p>
               </div>
             </div>

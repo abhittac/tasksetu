@@ -1406,7 +1406,9 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
           <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreateTaskDrawer(false)}></div>
           <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 600px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
             <div className="drawer-header">
-              <h2 className="text-2xl font-bold text-white">Create New Task</h2>
+              <h2 className="text-2xl font-bold text-white">
+                Create New Task{selectedDateForTask && ` for ${new Date(selectedDateForTask).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
+              </h2>
               <button
                 onClick={() => setShowCreateTaskDrawer(false)}
                 className="close-btn"
@@ -1499,7 +1501,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
             setShowApprovalTaskModal(false)
             setSelectedDateForTask(null)
           }}></div>
-          <div className="absolute right-0 top-0 h-full  bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 700px)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
+          <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 700px)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
             <ApprovalTaskCreator
               onClose={() => {
                 setShowApprovalTaskModal(false)
@@ -1507,6 +1509,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               }}
               onSubmit={handleCreateApprovalTask}
               preFilledDate={selectedDateForTask}
+              selectedDate={selectedDateForTask}
             />
           </div>
         </div>
