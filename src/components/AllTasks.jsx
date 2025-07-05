@@ -880,13 +880,6 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     console.log('Approval task created:', newTask)
   }
 
-  // Direct function to open approval task modal (can be called from other components)
-  const openApprovalTaskModal = (preFilledDate = null) => {
-    setSelectedDateForTask(preFilledDate)
-    setSelectedApprovalTask(null)
-    setShowApprovalTaskModal(true)
-  }
-
   return (
     <div className="space-y-6 px-4 py-6 h-auto overflow-scroll">
       {/* Header */}
@@ -1516,20 +1509,14 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       {/* Approval Task Creator Modal */}
       {showApprovalTaskModal && !selectedApprovalTask && (
         <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
-          <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => {
-            setShowApprovalTaskModal(false)
-            setSelectedDateForTask(null)
-          }}></div>
+          <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowApprovalTaskModal(false)}></div>
           <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 600px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
             <div className="drawer-header">
               <h2 className="text-2xl font-bold text-white">
                 Create Approval Task{selectedDateForTask && ` for ${new Date(selectedDateForTask).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
               </h2>
               <button
-                onClick={() => {
-                  setShowApprovalTaskModal(false)
-                  setSelectedDateForTask(null)
-                }}
+                onClick={() => setShowApprovalTaskModal(false)}
                 className="close-btn"
               >
                 <svg
