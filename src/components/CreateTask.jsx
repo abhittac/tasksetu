@@ -17,6 +17,17 @@ export default function CreateTask({ onClose, initialTaskType = 'regular', preFi
     tags: '',
     attachments: []
   })
+
+  const formatSelectedDate = (dateStr) => {
+    if (!dateStr) return ''
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short', 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric'
+    })
+  }
   const [isManualDueDate, setIsManualDueDate] = useState(false)
   const [moreOptionsData, setMoreOptionsData] = useState({
     referenceProcess: '',
@@ -66,8 +77,17 @@ export default function CreateTask({ onClose, initialTaskType = 'regular', preFi
       {/* Task Type Selector */}
       <div className="card">
         <div className="card-header">
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Task Type</h3>
-          <p className="text-gray-600">Choose the type of task you want to create</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
+            Task Type {preFilledDate && `- ${formatSelectedDate(preFilledDate)}`}
+          </h3>
+          <p className="text-gray-600">
+            Choose the type of task you want to create
+            {preFilledDate && (
+              <span className="block text-sm text-blue-600 mt-1">
+                📅 Creating task for {formatSelectedDate(preFilledDate)}
+              </span>
+            )}
+          </p>
         </div>
         <div className="grid grid-cols-3 md:grid-cols-3 gap-3">
           <button
@@ -146,8 +166,17 @@ export default function CreateTask({ onClose, initialTaskType = 'regular', preFi
         <form onSubmit={handleSubmit} className="space-y-6">
         <div className="card">
           <div className="card-header">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Task Details</h3>
-            <p className="text-gray-600">Fill in the basic information for your task</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              Task Details {preFilledDate && `- ${formatSelectedDate(preFilledDate)}`}
+            </h3>
+            <p className="text-gray-600">
+              Fill in the basic information for your task
+              {preFilledDate && (
+                <span className="block text-sm text-blue-600 mt-1">
+                  📅 Due date pre-filled with selected date: {formatSelectedDate(preFilledDate)}
+                </span>
+              )}
+            </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
