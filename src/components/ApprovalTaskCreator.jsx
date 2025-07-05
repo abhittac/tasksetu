@@ -146,7 +146,7 @@ export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate, 
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4 overlay-animate">
-      <div className={`bg-white rounded-xl shadow-xl max-w-2xl w-full  overflow-y-auto modal-animate-slide-right`}>
+      <div className={`bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto modal-animate-slide-right`}>
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-t-xl">
           <div className="flex items-center justify-between">
@@ -156,7 +156,7 @@ export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate, 
               </div>
               <div>
                 <h2 className="text-xl font-bold">
-                  Create Approval Task{selectedDate && ` for ${new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
+                  Create Approval Task{selectedDate && ` for ${new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
                 </h2>
                 <p className="text-blue-100 text-sm">Set up a task requiring approval workflow</p>
               </div>
@@ -338,7 +338,7 @@ export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate, 
               </div>
 
               {/* Auto-Approval */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <input
                     type="checkbox"
@@ -462,13 +462,13 @@ export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate, 
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-lg"
               disabled={formData.approverIds.length === 0 || !formData.title.trim() || !formData.dueDate}
             >
               Create Approval Task

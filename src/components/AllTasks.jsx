@@ -1496,23 +1496,15 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
       {/* Approval Task Modal */}
       {showApprovalTaskModal && (
-        <div className="fixed inset-0 z-50  overlay-animate !p-0 mt-0">
-          <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => {
+        <ApprovalTaskCreator
+          onClose={() => {
             setShowApprovalTaskModal(false)
             setSelectedDateForTask(null)
-          }}></div>
-          <div className="absolute right-0 top-0 bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 700px)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
-            <ApprovalTaskCreator
-              onClose={() => {
-                setShowApprovalTaskModal(false)
-                setSelectedDateForTask(null)
-              }}
-              onSubmit={handleCreateApprovalTask}
-              preFilledDate={selectedDateForTask}
-              selectedDate={selectedDateForTask}
-            />
-          </div>
-        </div>
+          }}
+          onSubmit={handleCreateApprovalTask}
+          preFilledDate={selectedDateForTask}
+          selectedDate={selectedDateForTask}
+        />
       )}
 
       {/* Subtask Creator Modal */}
