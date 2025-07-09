@@ -484,6 +484,15 @@ export default function TaskComments({ taskId }) {
               <button type="button" onClick={() => handleFormatting('bullet')} title="Bullet Point">
                 •
               </button>
+              <div className="toolbar-separator"></div>
+              <button 
+                type="button" 
+                onClick={() => fileInputRef.current?.click()}
+                title="Add attachment"
+                className="attachment-btn"
+              >
+                📎
+              </button>
             </div>
 
             <div 
@@ -511,20 +520,48 @@ export default function TaskComments({ taskId }) {
 
             {selectedFiles.length > 0 && (
               <div className="selected-files">
-                {selectedFiles.map(file => (
-                  <div key={file.id} className="selected-file">
-                    <span className="file-info">
-                      📎 {file.name} ({file.size})
-                    </span>
-                    <button
-                      type="button"
-                      className="remove-file"
-                      onClick={() => removeFile(file.id)}
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+                <div className="files-header">
+                  <span className="files-count">{selectedFiles.length} file{selectedFiles.length > 1 ? 's' : ''} attached</span>
+                </div>
+                <div className="files-grid">
+                  {selectedFiles.map(file => (
+                    <div key={file.id} className="selected-file-card">
+                      <div className="file-preview">
+                        {file.type.startsWith('image/') ? (
+                          <div className="image-preview">
+                            <img 
+                              src={URL.createObjectURL(file.file)} 
+                              alt={file.name}
+                              className="preview-image"
+                            />
+                          </div>
+                        ) : (
+                          <div className="file-icon">
+                            {file.type.includes('pdf') ? '📄' : 
+                             file.type.includes('word') ? '📝' : 
+                             file.type.includes('excel') ? '📊' : 
+                             file.type.includes('powerpoint') ? '📽️' : 
+                             '📎'}
+                          </div>
+                        )}
+                      </div>
+                      <div className="file-info">
+                        <span className="file-name" title={file.name}>
+                          {file.name.length > 20 ? `${file.name.substring(0, 20)}...` : file.name}
+                        </span>
+                        <span className="file-size">({file.size})</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="remove-file-btn"
+                        onClick={() => removeFile(file.id)}
+                        title="Remove file"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -556,15 +593,8 @@ export default function TaskComments({ taskId }) {
               multiple
               style={{ display: 'none' }}
               onChange={(e) => handleFileUpload(e.target.files)}
+              accept="image/*,.pdf,.doc,.docx,.txt,.xlsx,.ppt,.pptx"
             />
-            <button 
-              type="button" 
-              className="tool-button" 
-              onClick={() => fileInputRef.current?.click()}
-              title="Add attachment"
-            >
-              📎
-            </button>
             <div className="emoji-picker-container" ref={emojiPickerRef}>
               <button 
                 type="button" 
