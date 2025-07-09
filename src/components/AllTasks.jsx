@@ -1828,172 +1828,42 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
   );
 }
 
-// Task Delete Confirmation Modal Component
+// Simple Task Delete Confirmation Modal Component
 function TaskDeleteConfirmationModal({ task, options, onConfirm, onCancel, currentUser }) {
-  const [deleteOptions, setDeleteOptions] = useState({
-    deleteSubtasks: false,
-    deleteAttachments: false,
-    deleteLinkedItems: false,
-    confirmed: false,
-    ...options
-  });
+  const [deleteSubtasks, setDeleteSubtasks] = useState(false);
 
   const hasSubtasks = task?.subtasks && task.subtasks.length > 0;
-  const hasAttachments = task?.attachments && task.attachments.length > 0;
-  const hasLinkedItems = task?.linkedItems && task.linkedItems.length > 0;
 
-  const handleSubmit = () => {
-    if (!deleteOptions.confirmed) {
-      alert('Please confirm you understand this action is irreversible');
-      return;
-    }
-    onConfirm(deleteOptions);
+  const handleConfirm = () => {
+    onConfirm({ deleteSubtasks, deleteAttachments: deleteSubtasks });
   };
-
-  const getWarningMessages = () => {
-    const warnings = [];
-
-    if (hasSubtasks) {
-      warnings.push(`This task has ${task.subtasks.length} subtask(s). ${deleteOptions.deleteSubtasks ? 'They will be deleted.' : 'They will be orphaned.'}`);
-    }
-
-    if (hasLinkedItems || hasAttachments) {
-      warnings.push(`This task has linked items/attachments. ${deleteOptions.deleteAttachments ? 'They will be deleted.' : 'Links will be preserved.'}`);
-    }
-
-    if (task.createdBy !== currentUser.name && task.assigneeId !== currentUser.id) {
-      warnings.push('This task was created by another user.');
-    }
-
-    return warnings;
-  };
-
-  const warnings = getWarningMessages();
-  const isCreator = task.creatorId === currentUser.id;
-  const isAssignee = task.assigneeId === currentUser.id;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
         <div className="p-6">
-          {/* Header */}
-          <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900">Delete Task</h3>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Are you sure you want to delete this task?
+          </h3>
 
-          {/* Task Info */}
-          <div className="mb-6">
-            <p className="text-gray-600 mb-3">
-              Are you sure you want to delete this task?
-            </p>
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <div className="font-medium text-gray-900 mb-1">"{task.title}"</div>
-              <div className="text-sm text-gray-600">
-                <div>Created by: {task.createdBy}</div>
-                <div>Assigned to: {task.assignee}</div>
-                <div>Status: {getStatusLabel(task.status)}</div>
-                <div>Priority: {task.priority}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Permission Info */}
-          <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-            <div className="text-sm text-blue-800">
-              <div className="font-medium mb-1">Your permissions:</div>
-              <div className="flex flex-wrap gap-2">
-                {isCreator && <span className="bg-blue-200 px-2 py-1 rounded text-xs">Creator</span>}
-                {isAssignee && <span className="bg-green-200 px-2 py-1 rounded text-xs">Assignee</span>}
-                {currentUser.role === 'admin' && <span className="bg-purple-200 px-2 py-1 rounded text-xs">Admin</span>}
-              </div>
-            </div>
-          </div>
-
-          {/* Warnings */}
-          {warnings.length > 0 && (
-            <div className="mb-6 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-              <h4 className="text-orange-800 font-medium mb-2">⚠️ Important:</h4>
-              <ul className="text-sm text-orange-700 space-y-1">
-                {warnings.map((warning, index) => (
-                  <li key={index}>• {warning}</li>
-                ))}
-              </ul>
+          {hasSubtasks && (
+            <div className="mb-6">
+              <label className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  checked={deleteSubtasks}
+                  onChange={(e) => setDeleteSubtasks(e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-gray-700">Also delete all subtasks and attached forms</span>
+              </label>
             </div>
           )}
 
-          {/* Deletion Options */}
-          <div className="mb-6 space-y-3">
-            <h4 className="font-medium text-gray-900">Deletion Options:</h4>
+          <p className="text-gray-600 mb-6">
+            This action is irreversible.
+          </p>
 
-            {hasSubtasks && (
-              <label className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={deleteOptions.deleteSubtasks}
-                  onChange={(e) => setDeleteOptions({
-                    ...deleteOptions,
-                    deleteSubtasks: e.target.checked
-                  })}
-                  className="mt-1 rounded border-gray-300 text-red-600 focus:ring-red-500"
-                />
-                <div>
-                  <div className="font-medium text-gray-900">Delete all subtasks</div>
-                  <div className="text-sm text-gray-600">
-                    This will permanently delete {task.subtasks.length} subtask(s). 
-                    If unchecked, subtasks will become orphaned.
-                  </div>
-                </div>
-              </label>
-            )}
-
-            {(hasAttachments || hasLinkedItems) && (
-              <label className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={deleteOptions.deleteAttachments}
-                  onChange={(e) => setDeleteOptions({
-                    ...deleteOptions,
-                    deleteAttachments: e.target.checked
-                  })}
-                  className="mt-1 rounded border-gray-300 text-red-600 focus:ring-red-500"
-                />
-                <div>
-                  <div className="font-medium text-gray-900">Delete attachments & linked items</div>
-                  <div className="text-sm text-gray-600">
-                    This will delete all files, forms, and linked items.
-                    If unchecked, they will remain accessible from other locations.
-                  </div>
-                </div>
-              </label>
-            )}
-
-            {/* Confirmation Checkbox */}
-            <label className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg cursor-pointer">
-              <input
-                type="checkbox"
-                checked={deleteOptions.confirmed}
-                onChange={(e) => setDeleteOptions({
-                  ...deleteOptions,
-                  confirmed: e.target.checked
-                })}
-                className="mt-1 rounded border-red-300 text-red-600 focus:ring-red-500"
-                required
-              />
-              <div>
-                <div className="font-medium text-red-900">I understand this action is irreversible</div>
-                <div className="text-sm text-red-700">
-                  This task will be permanently deleted and cannot be recovered.
-                </div>
-              </div>
-            </label>
-          </div>
-
-          {/* Actions */}
           <div className="flex gap-3 justify-end">
             <button
               className="btn btn-secondary"
@@ -2003,10 +1873,9 @@ function TaskDeleteConfirmationModal({ task, options, onConfirm, onCancel, curre
             </button>
             <button
               className="btn btn-danger"
-              onClick={handleSubmit}
-              disabled={!deleteOptions.confirmed}
+              onClick={handleConfirm}
             >
-              Delete Task
+              Delete
             </button>
           </div>
         </div>
