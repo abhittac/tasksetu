@@ -310,14 +310,38 @@ export default function MilestoneManager() {
                       </svg>
                       Link to Tasks
                     </label>
-                    <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-4">
-                      <select multiple id="linkedTasks" className="w-full bg-white border border-gray-200 rounded-lg p-3 h-32 text-sm">
-                        <option value="1">✅ UI Design Complete</option>
-                        <option value="2">⚙️ Backend API Development</option>
-                        <option value="3">🧪 Testing Phase</option>
-                        <option value="4">🚀 Deployment</option>
-                      </select>
-                      <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-4">
+                      <div className="space-y-3">
+                        <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-200 cursor-pointer group">
+                          <input type="checkbox" className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
+                          <div className="flex items-center gap-2 flex-1">
+                            <span className="text-green-500">✅</span>
+                            <span className="text-sm font-medium text-gray-900 group-hover:text-indigo-700">UI Design Complete</span>
+                          </div>
+                        </label>
+                        <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-200 cursor-pointer group">
+                          <input type="checkbox" className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
+                          <div className="flex items-center gap-2 flex-1">
+                            <span className="text-blue-500">⚙️</span>
+                            <span className="text-sm font-medium text-gray-900 group-hover:text-indigo-700">Backend API Development</span>
+                          </div>
+                        </label>
+                        <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-200 cursor-pointer group">
+                          <input type="checkbox" className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
+                          <div className="flex items-center gap-2 flex-1">
+                            <span className="text-purple-500">🧪</span>
+                            <span className="text-sm font-medium text-gray-900 group-hover:text-indigo-700">Testing Phase</span>
+                          </div>
+                        </label>
+                        <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-200 cursor-pointer group">
+                          <input type="checkbox" className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" />
+                          <div className="flex items-center gap-2 flex-1">
+                            <span className="text-orange-500">🚀</span>
+                            <span className="text-sm font-medium text-gray-900 group-hover:text-indigo-700">Deployment</span>
+                          </div>
+                        </label>
+                      </div>
+                      <p className="text-xs text-indigo-600 mt-3 flex items-center gap-1 bg-white/50 p-2 rounded-lg">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -379,15 +403,60 @@ export default function MilestoneManager() {
                       </svg>
                       Collaborators
                     </label>
-                    <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-4">
-                      <select multiple id="collaborators" className="w-full bg-white border border-gray-200 rounded-lg p-3 h-24 text-sm">
-                        <option value="Current User">👤 Current User</option>
-                        <option value="John Smith">👨‍💼 John Smith</option>
-                        <option value="Sarah Wilson">👩‍💼 Sarah Wilson</option>
-                        <option value="Mike Johnson">👨‍💻 Mike Johnson</option>
-                        <option value="Emily Davis">👩‍💻 Emily Davis</option>
-                      </select>
-                      <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-xl p-4">
+                      <div className="space-y-3">
+                        <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50 transition-all duration-200 cursor-pointer group">
+                          <input type="checkbox" className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500" />
+                          <div className="flex items-center gap-2 flex-1">
+                            <div className="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center text-white text-xs font-bold">CU</div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-900 group-hover:text-teal-700">Current User</span>
+                              <p className="text-xs text-gray-500">current@company.com</p>
+                            </div>
+                          </div>
+                        </label>
+                        <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50 transition-all duration-200 cursor-pointer group">
+                          <input type="checkbox" className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500" />
+                          <div className="flex items-center gap-2 flex-1">
+                            <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-bold">JS</div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-900 group-hover:text-teal-700">John Smith</span>
+                              <p className="text-xs text-gray-500">john@company.com</p>
+                            </div>
+                          </div>
+                        </label>
+                        <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50 transition-all duration-200 cursor-pointer group">
+                          <input type="checkbox" className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500" />
+                          <div className="flex items-center gap-2 flex-1">
+                            <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs font-bold">SW</div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-900 group-hover:text-teal-700">Sarah Wilson</span>
+                              <p className="text-xs text-gray-500">sarah@company.com</p>
+                            </div>
+                          </div>
+                        </label>
+                        <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50 transition-all duration-200 cursor-pointer group">
+                          <input type="checkbox" className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500" />
+                          <div className="flex items-center gap-2 flex-1">
+                            <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold">MJ</div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-900 group-hover:text-teal-700">Mike Johnson</span>
+                              <p className="text-xs text-gray-500">mike@company.com</p>
+                            </div>
+                          </div>
+                        </label>
+                        <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50 transition-all duration-200 cursor-pointer group">
+                          <input type="checkbox" className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500" />
+                          <div className="flex items-center gap-2 flex-1">
+                            <div className="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center text-white text-xs font-bold">ED</div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-900 group-hover:text-teal-700">Emily Davis</span>
+                              <p className="text-xs text-gray-500">emily@company.com</p>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                      <p className="text-xs text-teal-600 mt-3 flex items-center gap-1 bg-white/50 p-2 rounded-lg">
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
