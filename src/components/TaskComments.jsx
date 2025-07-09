@@ -484,15 +484,6 @@ export default function TaskComments({ taskId }) {
               <button type="button" onClick={() => handleFormatting('bullet')} title="Bullet Point">
                 •
               </button>
-              <div className="toolbar-separator"></div>
-              <button 
-                type="button" 
-                onClick={() => fileInputRef.current?.click()}
-                title="Add attachment"
-                className="attachment-btn"
-              >
-                📎
-              </button>
             </div>
 
             <div 
@@ -511,6 +502,14 @@ export default function TaskComments({ taskId }) {
                 rows="3"
                 disabled={isSubmitting}
               />
+              <button 
+                type="button" 
+                onClick={() => fileInputRef.current?.click()}
+                title="Add attachment"
+                className="textarea-attachment-btn"
+              >
+                📎
+              </button>
               {dragActive && (
                 <div className="drag-overlay">
                   Drop files here to attach
