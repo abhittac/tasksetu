@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react'
 import ApprovalTaskCreator from './ApprovalTaskCreator'
 
@@ -62,7 +61,7 @@ export default function ApprovalManager() {
     const pending = approvers.filter(a => a.status === 'pending')
 
     if (rejected.length > 0 && mode !== 'any') return 'rejected'
-    
+
     switch (mode) {
       case 'any':
         return approved.length > 0 ? 'approved' : pending.length > 0 ? 'pending' : 'waiting'
@@ -92,7 +91,7 @@ export default function ApprovalManager() {
   const handleApproval = (taskId, approverId, action, comment) => {
     setApprovalTasks(tasks => tasks.map(task => {
       if (task.id !== taskId) return task
-      
+
       const updatedApprovers = task.approvers.map(approver => {
         if (approver.id === approverId) {
           return {
@@ -120,11 +119,48 @@ export default function ApprovalManager() {
 
   return (
     <div className="space-y-6 p-5 h-auto overflow-scroll">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Approval Tasks</h1>
-          <p className="mt-2 text-lg text-gray-600">Manage approval workflows and tasks</p>
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Approval Tasks</h1>
+            <p className="mt-2 text-lg text-gray-600">
+              Manage approval workflows and tasks
+            </p>
+          </div>
+
+          {/* Task Type Dropdown */}
+          <div className="flex items-center gap-3 mt-2 lg:mt-0">
+            <select className="px-3 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium border-0 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="normal">Normal</option>
+              <option value="milestone">Milestone</option>
+              <option value="approval" selected>Approval</option>
+            </select>
+
+            <select className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+
+            <select className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="all">All Modes</option>
+              <option value="any">Any One</option>
+              <option value="all">All Must Approve</option>
+              <option value="sequential">Sequential</option>
+            </select>
+          </div>
         </div>
+
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="btn btn-primary mt-4 lg:mt-0"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Create Approval Task
+        </button>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -231,7 +267,7 @@ function ApprovalTaskCard({ task, currentUser, onApproval }) {
 
         <div className="space-y-4">
           <p className="text-gray-600 text-sm">{task.description}</p>
-          
+
           <div className="grid grid-cols-1 gap-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-500">Mode:</span>
@@ -263,7 +299,7 @@ function ApprovalTaskCard({ task, currentUser, onApproval }) {
                       <span className="text-xs text-gray-500 ml-1">({approver.role})</span>
                     </div>
                   </div>
-                  
+
                   {approver.status === 'pending' && canUserApprove(task, approver) && approver.id === currentUser.id && (
                     <button 
                       className="btn btn-sm btn-primary"
@@ -303,7 +339,7 @@ function ApprovalModal({ task, approver, onApproval, onClose }) {
       alert('Please provide a comment for rejection')
       return
     }
-    
+
     onApproval(task.id, approver.id, selectedAction, comment)
     onClose()
   }
@@ -315,7 +351,7 @@ function ApprovalModal({ task, approver, onApproval, onClose }) {
           <h3>Review: {task.title}</h3>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
-        
+
         <div className="modal-content">
           <div className="approval-details">
             <p><strong>Description:</strong> {task.description}</p>
@@ -333,7 +369,7 @@ function ApprovalModal({ task, approver, onApproval, onClose }) {
               rows="4"
             />
           </div>
-          
+
           <div className="modal-actions">
             <button 
               className="btn-secondary" 
@@ -367,7 +403,7 @@ function getApprovalStatus(task) {
   const pending = approvers.filter(a => a.status === 'pending')
 
   if (rejected.length > 0 && mode !== 'any') return 'rejected'
-  
+
   switch (mode) {
     case 'any':
       return approved.length > 0 ? 'approved' : pending.length > 0 ? 'pending' : 'waiting'
