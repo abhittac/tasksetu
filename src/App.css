@@ -1063,7 +1063,16 @@
         font-size: 0.75rem;
         color: #6c757d;
       }
-
+.task-type-options{
+  position:absolute;
+  width:150px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  background-color:white;
+}
+        
       .status-type {
         padding: 0.25rem 0.5rem;
         border-radius: 4px;
@@ -2181,7 +2190,7 @@
     .task-type-label {
       font-size: 0.75rem;
       font-weight: 600;
-      color: white;
+      color: black;
       letter-spacing: 0.025em;
     }
 
