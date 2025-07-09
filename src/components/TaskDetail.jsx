@@ -336,6 +336,7 @@ export default function TaskDetail({ taskId, onClose }) {
               }
               canEdit={permissions.canEdit}
             />
+           
           </div>
 
           <div className="header-badges">
@@ -773,43 +774,43 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
 
 function FormsPanel({ forms, taskId }) {
   const [showAddModal, setShowAddModal] = useState(false);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState("all");
 
-  const filteredForms = forms.filter(form => {
-    if (filter === 'all') return true;
+  const filteredForms = forms.filter((form) => {
+    if (filter === "all") return true;
     return form.status === filter;
   });
 
   const getFormIcon = (type) => {
     const icons = {
-      checklist: '✅',
-      survey: '📊',
-      approval: '👍',
-      feedback: '💬',
-      assessment: '📝'
+      checklist: "✅",
+      survey: "📊",
+      approval: "👍",
+      feedback: "💬",
+      assessment: "📝",
     };
-    return icons[type] || '📄';
+    return icons[type] || "📄";
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      'not-started': 'bg-gray-100 text-gray-800',
-      'in-progress': 'bg-blue-100 text-blue-800',
-      'completed': 'bg-green-100 text-green-800',
-      'overdue': 'bg-red-100 text-red-800'
+      "not-started": "bg-gray-100 text-gray-800",
+      "in-progress": "bg-blue-100 text-blue-800",
+      completed: "bg-green-100 text-green-800",
+      overdue: "bg-red-100 text-red-800",
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || "bg-gray-100 text-gray-800";
   };
 
   const getFormTypeColor = (type) => {
     const colors = {
-      checklist: 'bg-green-100 text-green-800',
-      survey: 'bg-blue-100 text-blue-800',
-      approval: 'bg-purple-100 text-purple-800',
-      feedback: 'bg-orange-100 text-orange-800',
-      assessment: 'bg-indigo-100 text-indigo-800'
+      checklist: "bg-green-100 text-green-800",
+      survey: "bg-blue-100 text-blue-800",
+      approval: "bg-purple-100 text-purple-800",
+      feedback: "bg-orange-100 text-orange-800",
+      assessment: "bg-indigo-100 text-indigo-800",
     };
-    return colors[type] || 'bg-gray-100 text-gray-800';
+    return colors[type] || "bg-gray-100 text-gray-800";
   };
 
   return (
@@ -821,12 +822,16 @@ function FormsPanel({ forms, taskId }) {
             <span className="text-white text-lg">📋</span>
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Attached Forms ({filteredForms.length})</h2>
-            <p className="text-sm text-gray-600">Forms, checklists, and interactive documents</p>
+            <h2 className="text-xl font-bold text-gray-900">
+              Attached Forms ({filteredForms.length})
+            </h2>
+            <p className="text-sm text-gray-600">
+              Forms, checklists, and interactive documents
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <select 
+          <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="form-select text-sm"
@@ -851,8 +856,8 @@ function FormsPanel({ forms, taskId }) {
       {filteredForms.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredForms.map((form) => (
-            <div 
-              key={form.id} 
+            <div
+              key={form.id}
               className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 group"
             >
               <div className="flex items-start justify-between mb-4">
@@ -865,11 +870,15 @@ function FormsPanel({ forms, taskId }) {
                       {form.title}
                     </h4>
                     <div className="flex flex-col gap-1">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-fit ${getFormTypeColor(form.type)}`}>
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-fit ${getFormTypeColor(form.type)}`}
+                      >
                         {form.type}
                       </span>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-fit ${getStatusColor(form.status)}`}>
-                        {form.status.replace('-', ' ')}
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-fit ${getStatusColor(form.status)}`}
+                      >
+                        {form.status.replace("-", " ")}
                       </span>
                     </div>
                   </div>
@@ -877,14 +886,17 @@ function FormsPanel({ forms, taskId }) {
               </div>
 
               {/* Progress Bar for in-progress forms */}
-              {form.status === 'in-progress' && (
+              {form.status === "in-progress" && (
                 <div className="mb-4">
                   <div className="flex justify-between text-xs text-gray-600 mb-1">
                     <span>Progress</span>
                     <span>65%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-emerald-500 h-2 rounded-full" style={{ width: '65%' }}></div>
+                    <div
+                      className="bg-emerald-500 h-2 rounded-full"
+                      style={{ width: "65%" }}
+                    ></div>
                   </div>
                 </div>
               )}
@@ -892,21 +904,21 @@ function FormsPanel({ forms, taskId }) {
               {/* Form Actions */}
               <div className="flex gap-2">
                 <button
-                  onClick={() => console.log('View form:', form.id)}
+                  onClick={() => console.log("View form:", form.id)}
                   className="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
                 >
                   <span>👁️</span>
                   <span>View</span>
                 </button>
                 <button
-                  onClick={() => console.log('Edit form:', form.id)}
+                  onClick={() => console.log("Edit form:", form.id)}
                   className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1"
                 >
                   <span>✏️</span>
                   <span>Edit</span>
                 </button>
                 <button
-                  onClick={() => console.log('Remove form:', form.id)}
+                  onClick={() => console.log("Remove form:", form.id)}
                   className="w-10 h-10 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm transition-colors flex items-center justify-center"
                   title="Remove Form"
                 >
@@ -932,8 +944,12 @@ function FormsPanel({ forms, taskId }) {
           <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">📋</span>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No forms attached</h3>
-          <p className="text-gray-600 mb-4">Add forms, checklists, or surveys to collect structured data</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            No forms attached
+          </h3>
+          <p className="text-gray-600 mb-4">
+            Add forms, checklists, or surveys to collect structured data
+          </p>
           <button
             onClick={() => setShowAddModal(true)}
             className="btn btn-secondary"
@@ -949,7 +965,9 @@ function FormsPanel({ forms, taskId }) {
           <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full modal-animate-slide-up">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Add New Form</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Add New Form
+                </h3>
                 <button
                   onClick={() => setShowAddModal(false)}
                   className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center text-gray-600 transition-colors"
@@ -960,7 +978,9 @@ function FormsPanel({ forms, taskId }) {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Form Type</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Form Type
+                  </label>
                   <select className="form-select w-full">
                     <option value="checklist">Checklist</option>
                     <option value="survey">Survey</option>
@@ -971,7 +991,9 @@ function FormsPanel({ forms, taskId }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Form Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Form Name
+                  </label>
                   <input
                     type="text"
                     className="form-input w-full"
@@ -980,7 +1002,9 @@ function FormsPanel({ forms, taskId }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Description
+                  </label>
                   <textarea
                     className="form-textarea w-full"
                     rows="3"
@@ -989,7 +1013,9 @@ function FormsPanel({ forms, taskId }) {
                 </div>
 
                 <div className="bg-emerald-50 p-4 rounded-lg">
-                  <h4 className="text-sm font-medium text-emerald-800 mb-2">Quick Templates</h4>
+                  <h4 className="text-sm font-medium text-emerald-800 mb-2">
+                    Quick Templates
+                  </h4>
                   <div className="grid grid-cols-2 gap-2">
                     <button className="bg-white border border-emerald-200 text-emerald-700 px-3 py-2 rounded-lg text-sm hover:bg-emerald-50 transition-colors">
                       Project Checklist
@@ -1015,7 +1041,7 @@ function FormsPanel({ forms, taskId }) {
                   </button>
                   <button
                     onClick={() => {
-                      console.log('Create form');
+                      console.log("Create form");
                       setShowAddModal(false);
                     }}
                     className="btn btn-primary flex-1"
@@ -2449,16 +2475,26 @@ function SubtaskSlideUpPanel({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overlay-animate">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-4xl max-h-[700px] overflow-hidden modal-animate-slide-right" style={{boxShadow: '0 25px 50px rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.2)'}}>
-        
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div
+        className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-4xl max-h-[700px] overflow-hidden modal-animate-slide-right"
+        style={{
+          boxShadow: "0 25px 50px rgba(0,0,0,0.25)",
+          border: "1px solid rgba(255,255,255,0.2)",
+        }}
+      >
         {/* Enhanced Header */}
         <div className="relative p-6 border-b border-gray-200/50 bg-gradient-to-r from-blue-50 to-indigo-50 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-600/10"></div>
           <div className="relative flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">{getStatusIcon(subtask.status)}</span>
+                <span className="text-2xl">
+                  {getStatusIcon(subtask.status)}
+                </span>
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-1">
@@ -2493,8 +2529,18 @@ function SubtaskSlideUpPanel({
                 className="w-10 h-10 bg-white/80 backdrop-blur-sm text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-300 flex items-center justify-center shadow-sm"
                 onClick={onClose}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -2502,16 +2548,20 @@ function SubtaskSlideUpPanel({
         </div>
 
         {/* Enhanced Content */}
-        <div className="p-6 overflow-y-auto" style={{ maxHeight: "calc(90vh - 200px)" }}>
+        <div
+          className="p-6 overflow-y-auto"
+          style={{ maxHeight: "calc(90vh - 200px)" }}
+        >
           <div className="space-y-8">
-            
             {/* Title Section */}
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                   <span className="text-blue-600 text-sm font-bold">T</span>
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900">Task Title</h4>
+                <h4 className="text-lg font-semibold text-gray-900">
+                  Task Title
+                </h4>
               </div>
               {isEditing ? (
                 <input
@@ -2525,21 +2575,24 @@ function SubtaskSlideUpPanel({
                 />
               ) : (
                 <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-xl border border-gray-200">
-                  <p className="text-gray-900 font-semibold text-lg">{subtask.title}</p>
+                  <p className="text-gray-900 font-semibold text-lg">
+                    {subtask.title}
+                  </p>
                 </div>
               )}
             </div>
 
             {/* Status & Priority Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
               {/* Status Card */}
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
                     <span className="text-emerald-600 text-sm">🎯</span>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900">Status</h4>
+                  <h4 className="text-lg font-semibold text-gray-900">
+                    Status
+                  </h4>
                 </div>
                 {isEditing ? (
                   <select
@@ -2553,9 +2606,15 @@ function SubtaskSlideUpPanel({
                     <option value="completed">Completed</option>
                   </select>
                 ) : (
-                  <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-semibold ${getStatusColor(subtask.status)}`}>
-                    <span className="text-lg">{getStatusIcon(subtask.status)}</span>
-                    <span className="capitalize">{subtask.status.replace("-", " ")}</span>
+                  <div
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-semibold ${getStatusColor(subtask.status)}`}
+                  >
+                    <span className="text-lg">
+                      {getStatusIcon(subtask.status)}
+                    </span>
+                    <span className="capitalize">
+                      {subtask.status.replace("-", " ")}
+                    </span>
                   </div>
                 )}
               </div>
@@ -2566,7 +2625,9 @@ function SubtaskSlideUpPanel({
                   <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
                     <span className="text-orange-600 text-sm">⚡</span>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900">Priority</h4>
+                  <h4 className="text-lg font-semibold text-gray-900">
+                    Priority
+                  </h4>
                 </div>
                 {isEditing ? (
                   <select
@@ -2581,7 +2642,9 @@ function SubtaskSlideUpPanel({
                     <option value="critical">Critical</option>
                   </select>
                 ) : (
-                  <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-semibold ${getPriorityColor(subtask.priority)}`}>
+                  <div
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-semibold ${getPriorityColor(subtask.priority)}`}
+                  >
                     <span className="capitalize">{subtask.priority}</span>
                   </div>
                 )}
@@ -2590,14 +2653,15 @@ function SubtaskSlideUpPanel({
 
             {/* Assignee & Due Date Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
               {/* Assignee Card */}
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                     <span className="text-purple-600 text-sm">👤</span>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900">Assignee</h4>
+                  <h4 className="text-lg font-semibold text-gray-900">
+                    Assignee
+                  </h4>
                 </div>
                 {isEditing ? (
                   <select
@@ -2619,8 +2683,10 @@ function SubtaskSlideUpPanel({
                       </span>
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">{subtask.assignee}</p>
-                      <p className="text-sm text-gray-500">Task Assignee</p>
+                      <p className="font-semibold text-gray-900">
+                        {subtask.assignee}
+                      </p>
+                      <p className="text-sm text-gray-500">Task     Assignee</p>
                     </div>
                   </div>
                 )}
@@ -2632,7 +2698,9 @@ function SubtaskSlideUpPanel({
                   <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
                     <span className="text-red-600 text-sm">📅</span>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900">Due Date</h4>
+                  <h4 className="text-lg font-semibold text-gray-900">
+                    Due Date
+                  </h4>
                 </div>
                 {isEditing ? (
                   <input
@@ -2644,8 +2712,10 @@ function SubtaskSlideUpPanel({
                   />
                 ) : (
                   <div className="p-3 bg-gradient-to-r from-gray-50 to-red-50 rounded-xl border border-gray-200">
-                    <p className="font-semibold text-gray-900">{subtask.dueDate}</p>
-                    <p className="text-sm text-gray-500">Target completion</p>
+                    <p className="font-semibold text-gray-900">
+                      {subtask.dueDate}
+                    </p>
+                    <p className="text-sm text-gray-500">Target     completion</p>
                   </div>
                 )}
               </div>
@@ -2657,7 +2727,9 @@ function SubtaskSlideUpPanel({
                 <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
                   <span className="text-indigo-600 text-sm">📝</span>
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900">Description</h4>
+                <h4 className="text-lg font-semibold text-gray-900">
+                  Description
+                </h4>
               </div>
               {isEditing ? (
                 <textarea
@@ -2671,9 +2743,13 @@ function SubtaskSlideUpPanel({
               ) : (
                 <div className="bg-gradient-to-br from-gray-50 to-indigo-50 p-4 rounded-xl border border-gray-200 min-h-[120px]">
                   {subtask.description ? (
-                    <p className="text-gray-900 leading-relaxed">{subtask.description}</p>
+                    <p className="text-gray-900 leading-relaxed">
+                      {subtask.description}
+                    </p>
                   ) : (
-                    <p className="text-gray-500 italic">No description provided for this sub-task.</p>
+                    <p className="text-gray-500 italic">
+                      No description provided for this sub-task.
+                    </p>
                   )}
                 </div>
               )}
@@ -2685,30 +2761,46 @@ function SubtaskSlideUpPanel({
                 <div className="w-8 h-8 bg-slate-200 rounded-lg flex items-center justify-center">
                   <span className="text-slate-600 text-sm">ℹ️</span>
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900">Task Information</h4>
+                <h4 className="text-lg font-semibold text-gray-900">
+                  Task Information
+                </h4>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-white/50">
-                  <span className="text-gray-500 text-sm font-medium">Created by:</span>
-                  <p className="text-gray-900 font-semibold">{subtask.createdBy}</p>
+                  <span className="text-gray-500 text-sm font-medium">
+                    Created by:
+                  </span>
+                  <p className="text-gray-900 font-semibold">
+                    {subtask.createdBy}
+                  </p>
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-white/50">
-                  <span className="text-gray-500 text-sm font-medium">Created on:</span>
+                  <span className="text-gray-500 text-sm font-medium">
+                    Created on:
+                  </span>
                   <p className="text-gray-900 font-semibold">
-                    {new Date(subtask.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
+                    {new Date(subtask.createdAt).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
                     })}
                   </p>
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-white/50">
-                  <span className="text-gray-500 text-sm font-medium">Visibility:</span>
-                  <p className="text-gray-900 font-semibold">{subtask.visibility || "Private"}</p>
+                  <span className="text-gray-500 text-sm font-medium">
+                    Visibility:
+                  </span>
+                  <p className="text-gray-900 font-semibold">
+                    {subtask.visibility || "Private"}
+                  </p>
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-white/50">
-                  <span className="text-gray-500 text-sm font-medium">Parent Task ID:</span>
-                  <p className="text-gray-900 font-semibold">#{subtask.parentTaskId}</p>
+                  <span className="text-gray-500 text-sm font-medium">
+                    Parent Task ID:
+                  </span>
+                  <p className="text-gray-900 font-semibold">
+                    #{subtask.parentTaskId}
+                  </p>
                 </div>
               </div>
             </div>
@@ -2719,14 +2811,14 @@ function SubtaskSlideUpPanel({
         {isEditing && (
           <div className="p-6 border-t border-gray-200/50 bg-gradient-to-r from-gray-50 to-blue-50">
             <div className="flex justify-end gap-4">
-              <button 
+              <button
                 className="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 shadow-sm"
                 onClick={handleCancel}
               >
                 <span className="mr-2">↩️</span>
                 Cancel Changes
               </button>
-              <button 
+              <button
                 className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-lg"
                 onClick={handleSave}
               >
@@ -2833,7 +2925,6 @@ function SubtaskDetailView({
               rows="4"
             />
           </div>
-          
         </div>
 
         <div className="subtask-meta-info">
@@ -2866,41 +2957,41 @@ function SubtaskDetailView({
 
 function LinkedItemsPanel({ linkedItems }) {
   const [showAddModal, setShowAddModal] = useState(false);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState("all");
 
-  const filteredItems = linkedItems.filter(item => {
-    if (filter === 'all') return true;
+  const filteredItems = linkedItems.filter((item) => {
+    if (filter === "all") return true;
     return item.type === filter;
   });
 
   const getItemIcon = (type) => {
     const icons = {
-      task: '📋',
-      document: '📄',
-      form: '📝',
-      link: '🔗'
+      task: "📋",
+      document: "📄",
+      form: "📝",
+      link: "🔗",
     };
-    return icons[type] || '🔗';
+    return icons[type] || "🔗";
   };
 
   const getItemTypeColor = (type) => {
     const colors = {
-      task: 'bg-blue-100 text-blue-800',
-      document: 'bg-green-100 text-green-800',
-      form: 'bg-purple-100 text-purple-800',
-      link: 'bg-gray-100 text-gray-800'
+      task: "bg-blue-100 text-blue-800",
+      document: "bg-green-100 text-green-800",
+      form: "bg-purple-100 text-purple-800",
+      link: "bg-gray-100 text-gray-800",
     };
-    return colors[type] || 'bg-gray-100 text-gray-800';
+    return colors[type] || "bg-gray-100 text-gray-800";
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      'in-progress': 'bg-blue-100 text-blue-800',
-      completed: 'bg-green-100 text-green-800',
-      cancelled: 'bg-red-100 text-red-800'
+      pending: "bg-yellow-100 text-yellow-800",
+      "in-progress": "bg-blue-100 text-blue-800",
+      completed: "bg-green-100 text-green-800",
+      cancelled: "bg-red-100 text-red-800",
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || "bg-gray-100 text-gray-800";
   };
 
   return (
@@ -2912,12 +3003,16 @@ function LinkedItemsPanel({ linkedItems }) {
             <span className="text-white text-lg">🔗</span>
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Linked Items ({filteredItems.length})</h2>
-            <p className="text-sm text-gray-600">Connected tasks, documents, and resources</p>
+            <h2 className="text-xl font-bold text-gray-900">
+              Linked Items ({filteredItems.length})
+            </h2>
+            <p className="text-sm text-gray-600">
+              Connected tasks, documents, and resources
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <select 
+          <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="form-select text-sm"
@@ -2942,8 +3037,8 @@ function LinkedItemsPanel({ linkedItems }) {
       {filteredItems.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredItems.map((item) => (
-            <div 
-              key={item.id} 
+            <div
+              key={item.id}
               className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 group cursor-pointer"
               onClick={() => console.log(`Open ${item.type}:`, item.id)}
             >
@@ -2957,10 +3052,14 @@ function LinkedItemsPanel({ linkedItems }) {
                       {item.title}
                     </h4>
                     <div className="flex items-center gap-2">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getItemTypeColor(item.type)}`}>
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getItemTypeColor(item.type)}`}
+                      >
                         {item.type}
                       </span>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}
+                      >
                         {item.status}
                       </span>
                     </div>
@@ -2970,7 +3069,7 @@ function LinkedItemsPanel({ linkedItems }) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log('View item:', item.id);
+                      console.log("View item:", item.id);
                     }}
                     className="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-lg flex items-center justify-center text-blue-600 transition-colors"
                     title="View"
@@ -2980,7 +3079,7 @@ function LinkedItemsPanel({ linkedItems }) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log('Unlink item:', item.id);
+                      console.log("Unlink item:", item.id);
                     }}
                     className="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-lg flex items-center justify-center text-red-600 transition-colors"
                     title="Unlink"
@@ -3008,8 +3107,12 @@ function LinkedItemsPanel({ linkedItems }) {
           <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">🔗</span>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No linked items</h3>
-          <p className="text-gray-600 mb-4">Connect related tasks, documents, or resources</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            No linked items
+          </h3>
+          <p className="text-gray-600 mb-4">
+            Connect related tasks, documents, or resources
+          </p>
           <button
             onClick={() => setShowAddModal(true)}
             className="btn btn-secondary"
@@ -3025,7 +3128,9 @@ function LinkedItemsPanel({ linkedItems }) {
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full modal-animate-slide-up">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Link New Item</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Link New Item
+                </h3>
                 <button
                   onClick={() => setShowAddModal(false)}
                   className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center text-gray-600 transition-colors"
@@ -3036,7 +3141,9 @@ function LinkedItemsPanel({ linkedItems }) {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Item Type</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Item Type
+                  </label>
                   <select className="form-select w-full">
                     <option value="task">Task</option>
                     <option value="document">Document</option>
@@ -3046,7 +3153,9 @@ function LinkedItemsPanel({ linkedItems }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Search & Select</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Search & Select
+                  </label>
                   <input
                     type="text"
                     className="form-input w-full"
@@ -3063,7 +3172,7 @@ function LinkedItemsPanel({ linkedItems }) {
                   </button>
                   <button
                     onClick={() => {
-                      console.log('Link item');
+                      console.log("Link item");
                       setShowAddModal(false);
                     }}
                     className="btn btn-primary flex-1"
@@ -3771,16 +3880,28 @@ function SubtaskDrawer({ parentTask, currentUser, onSubmit, onClose }) {
                   Attachments (optional)
                 </label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-                  <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                  <svg
+                    className="mx-auto h-12 w-12 text-gray-400 mb-4"
+                    stroke="currentColor"
+                    fill="none"
+                    viewBox="0 0 48 48"
+                  >
+                    <path
+                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                   <div className="mt-4">
                     <label className="cursor-pointer">
-                      <span className="text-blue-600 hover:text-blue-500 font-medium">Upload files</span>
-                      <input 
-                        type="file" 
-                        className="sr-only" 
-                        multiple 
+                      <span className="text-blue-600 hover:text-blue-500 font-medium">
+                        Upload files
+                      </span>
+                      <input
+                        type="file"
+                        className="sr-only"
+                        multiple
                         onChange={(e) => {
                           const files = Array.from(e.target.files);
                           setFormData((prev) => ({
@@ -3792,19 +3913,30 @@ function SubtaskDrawer({ parentTask, currentUser, onSubmit, onClose }) {
                     </label>
                     <p className="text-gray-500"> or drag and drop</p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">PNG, JPG, PDF up to 10MB</p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    PNG, JPG, PDF up to 10MB
+                  </p>
                 </div>
                 {formData.attachments && formData.attachments.length > 0 && (
                   <div className="mt-3">
-                    <p className="text-sm text-gray-600 mb-2">Selected files:</p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Selected files:
+                    </p>
                     <div className="space-y-1">
                       {Array.from(formData.attachments).map((file, index) => (
-                        <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
-                          <span className="text-sm text-gray-700 truncate">{file.name}</span>
+                        <div
+                          key={index}
+                          className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded"
+                        >
+                          <span className="text-sm text-gray-700 truncate">
+                            {file.name}
+                          </span>
                           <button
                             type="button"
                             onClick={() => {
-                              const newFiles = Array.from(formData.attachments).filter((_, i) => i !== index);
+                              const newFiles = Array.from(
+                                formData.attachments,
+                              ).filter((_, i) => i !== index);
                               setFormData((prev) => ({
                                 ...prev,
                                 attachments: newFiles,
@@ -3933,13 +4065,13 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
     dueDate: task.dueDate,
     startDate: task.startDate,
     timeEstimate: task.timeEstimate,
-    tags: task.tags.join(', '),
+    tags: task.tags.join(", "),
     taskType: task.taskType,
     isRisky: task.isRisky,
-    riskNote: task.riskNote || '',
+    riskNote: task.riskNote || "",
   });
 
-  const [tagInput, setTagInput] = useState(task.tags.join(', '));
+  const [tagInput, setTagInput] = useState(task.tags.join(", "));
 
   const teamMembers = [
     { id: 1, name: "John Smith" },
@@ -3949,20 +4081,20 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
   ];
 
   const handleChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Process tags
     const tagsArray = tagInput
-      .split(',')
-      .map(tag => tag.trim())
-      .filter(tag => tag.length > 0);
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
 
     const updatedTask = {
       ...task,
@@ -3975,16 +4107,24 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
   };
 
   const handleAssigneeChange = (assigneeId) => {
-    const assignee = teamMembers.find(member => member.id === parseInt(assigneeId));
+    const assignee = teamMembers.find(
+      (member) => member.id === parseInt(assigneeId),
+    );
     if (assignee) {
-      handleChange('assignee', assignee.name);
-      handleChange('assigneeId', assignee.id);
+      handleChange("assignee", assignee.name);
+      handleChange("assigneeId", assignee.id);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 overlay-animate">
-      <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto modal-animate-slide-right" style={{boxShadow: '0 25px 50px rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.2)'}}>
+      <div
+        className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto modal-animate-slide-right"
+        style={{
+          boxShadow: "0 25px 50px rgba(0,0,0,0.25)",
+          border: "1px solid rgba(255,255,255,0.2)",
+        }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div className="flex items-center gap-3">
@@ -3993,15 +4133,27 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">Edit Task</h2>
-              <p className="text-sm text-gray-600">Modify task details and properties</p>
+              <p className="text-sm text-gray-600">
+                Modify task details and properties
+              </p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -4011,8 +4163,10 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
           <div className="space-y-6">
             {/* Basic Information */}
             <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
-              
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Basic Information
+              </h3>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Title */}
                 <div className="lg:col-span-2">
@@ -4022,7 +4176,7 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                   <input
                     type="text"
                     value={formData.title}
-                    onChange={(e) => handleChange('title', e.target.value)}
+                    onChange={(e) => handleChange("title", e.target.value)}
                     className="form-input w-full"
                     placeholder="Enter task title..."
                     required
@@ -4037,7 +4191,9 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                   </label>
                   <textarea
                     value={formData.description}
-                    onChange={(e) => handleChange('description', e.target.value)}
+                    onChange={(e) =>
+                      handleChange("description", e.target.value)
+                    }
                     className="form-textarea w-full"
                     placeholder="Describe the task..."
                     rows={4}
@@ -4051,7 +4207,7 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                   </label>
                   <select
                     value={formData.taskType}
-                    onChange={(e) => handleChange('taskType', e.target.value)}
+                    onChange={(e) => handleChange("taskType", e.target.value)}
                     className="form-select w-full"
                     disabled={!permissions.canEdit}
                   >
@@ -4068,7 +4224,7 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                   </label>
                   <select
                     value={formData.category}
-                    onChange={(e) => handleChange('category', e.target.value)}
+                    onChange={(e) => handleChange("category", e.target.value)}
                     className="form-select w-full"
                   >
                     <option value="">Select category...</option>
@@ -4085,8 +4241,10 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
 
             {/* Assignment & Priority */}
             <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Assignment & Priority</h3>
-              
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Assignment & Priority
+              </h3>
+
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Assignee */}
                 <div>
@@ -4114,7 +4272,7 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                   </label>
                   <select
                     value={formData.status}
-                    onChange={(e) => handleChange('status', e.target.value)}
+                    onChange={(e) => handleChange("status", e.target.value)}
                     className="form-select w-full"
                     disabled={!permissions.canChangeStatus}
                   >
@@ -4133,7 +4291,7 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                   </label>
                   <select
                     value={formData.priority}
-                    onChange={(e) => handleChange('priority', e.target.value)}
+                    onChange={(e) => handleChange("priority", e.target.value)}
                     className="form-select w-full"
                   >
                     <option value="low">Low</option>
@@ -4147,8 +4305,10 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
 
             {/* Timeline */}
             <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Timeline</h3>
-              
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Timeline
+              </h3>
+
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Start Date */}
                 <div>
@@ -4158,7 +4318,7 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                   <input
                     type="date"
                     value={formData.startDate}
-                    onChange={(e) => handleChange('startDate', e.target.value)}
+                    onChange={(e) => handleChange("startDate", e.target.value)}
                     className="form-input w-full"
                   />
                 </div>
@@ -4171,7 +4331,7 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                   <input
                     type="date"
                     value={formData.dueDate}
-                    onChange={(e) => handleChange('dueDate', e.target.value)}
+                    onChange={(e) => handleChange("dueDate", e.target.value)}
                     className="form-input w-full"
                   />
                 </div>
@@ -4184,7 +4344,9 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                   <input
                     type="text"
                     value={formData.timeEstimate}
-                    onChange={(e) => handleChange('timeEstimate', e.target.value)}
+                    onChange={(e) =>
+                      handleChange("timeEstimate", e.target.value)
+                    }
                     className="form-input w-full"
                     placeholder="e.g., 40 hours, 3 days"
                   />
@@ -4194,8 +4356,10 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
 
             {/* Tags & Risk */}
             <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Tags & Risk Management</h3>
-              
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Tags & Risk Management
+              </h3>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Tags */}
                 <div>
@@ -4209,7 +4373,9 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                     className="form-input w-full"
                     placeholder="Enter tags separated by commas..."
                   />
-                  <p className="mt-1 text-xs text-gray-500">Separate multiple tags with commas</p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Separate multiple tags with commas
+                  </p>
                 </div>
 
                 {/* Risk Status */}
@@ -4222,13 +4388,17 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                       <input
                         type="checkbox"
                         checked={formData.isRisky}
-                        onChange={(e) => handleChange('isRisky', e.target.checked)}
+                        onChange={(e) =>
+                          handleChange("isRisky", e.target.checked)
+                        }
                         className="rounded border-gray-300 text-red-600 focus:ring-red-500"
                       />
-                      <span className="ml-2 text-sm text-gray-700">Mark as at risk</span>
+                      <span className="ml-2 text-sm text-gray-700">
+                        Mark as at risk
+                      </span>
                     </label>
                   </div>
-                  
+
                   {formData.isRisky && (
                     <div className="mt-3">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -4236,7 +4406,9 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                       </label>
                       <textarea
                         value={formData.riskNote}
-                        onChange={(e) => handleChange('riskNote', e.target.value)}
+                        onChange={(e) =>
+                          handleChange("riskNote", e.target.value)
+                        }
                         className="form-textarea w-full"
                         placeholder="Describe the risk..."
                         rows={2}
