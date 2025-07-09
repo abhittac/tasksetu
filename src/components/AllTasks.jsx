@@ -19,6 +19,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' });
   const [showStatusConfirmation, setShowStatusConfirmation] = useState(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(null);
+  const [showDeleteSubtaskConfirmation, setShowDeleteSubtaskConfirmation] = useState(null);
   const [showTaskTypeDropdown, setShowTaskTypeDropdown] = useState(false);
   const [selectedTaskType, setSelectedTaskType] = useState('regular');
   const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
@@ -783,20 +784,19 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
   // Delete subtask
   const handleDeleteSubtask = (parentTaskId, subtaskId) => {
-    if (window.confirm('Are you sure you want to delete this sub-task?')) {
-      setTasks(prevTasks => 
-        prevTasks.map(task => 
-          task.id === parentTaskId 
-            ? { 
-                ...task, 
-                subtasks: task.subtasks.filter(subtask => subtask.id !== subtaskId),
-                subtaskCount: Math.max(0, (task.subtaskCount || 0) - 1)
-              }
-            : task
-        )
-      );
-      setSelectedSubtask(null);
-    }
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.id === parentTaskId 
+          ? { 
+              ...task, 
+              subtasks: task.subtasks.filter(subtask => subtask.id !== subtaskId),
+              subtaskCount: Math.max(0, (task.subtaskCount || 0) - 1)
+            }
+          : task
+      )
+    );
+    setSelectedSubtask(null);
+    setShowDeleteSubtaskConfirmation(null);
   };
 
   // Handle subtask status change
@@ -1282,9 +1282,16 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                       </button>
-                     
                       
-                     
+                      <button
+                        className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
+                        onClick={() => handleDeleteTask(task.id)}
+                        title="Delete Task"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -1372,8 +1379,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                         </button>
                         <button
                           className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
-                          onClick={() => handleDeleteSubtask(task.id, subtask.id)}
-                          title="Delete subtask"
+                          onClick={() => setShowDeleteSubtaskConfirmation({ taskId: task.id, subtaskId: subtask.id, subtaskTitle: subtask.title })}
+                          title="Delete Sub-task"
                         >
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -1623,6 +1630,15 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
             setShowApprovalTaskModal(false);
             setSelectedApprovalTask(null);
           }}
+        />
+      )}
+
+      {/* Sub-task Delete Confirmation Modal */}
+      {showDeleteSubtaskConfirmation && (
+        <SubtaskDeleteConfirmationModal
+          subtaskTitle={showDeleteSubtaskConfirmation.subtaskTitle}
+          onConfirm={() => handleDeleteSubtask(showDeleteSubtaskConfirmation.taskId, showDeleteSubtaskConfirmation.subtaskId)}
+          onCancel={() => setShowDeleteSubtaskConfirmation(null)}
         />
       )}
     </div>
@@ -2895,6 +2911,45 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
 }
 
 
+
+// Subtask Delete Confirmation Modal Component
+function SubtaskDeleteConfirmationModal({ subtaskTitle, onConfirm, onCancel }) {
+  return (
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4 mt-0">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+        <div className="p-6">
+          <div className="flex items-center mb-4">
+            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900">Delete Sub-task</h3>
+          </div>
+
+          <p className="text-gray-600 mb-6">
+            Are you sure you want to delete this sub-task: "<strong>{subtaskTitle}</strong>"?
+          </p>
+
+          <div className="flex gap-3 justify-end">
+            <button
+              className="btn btn-secondary"
+              onClick={onCancel}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn btn-danger"
+              onClick={onConfirm}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // Approval Task Detail Modal Component
 function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
