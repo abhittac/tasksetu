@@ -352,24 +352,12 @@ export default function TaskComments({ taskId }) {
       comments.map((comment) => {
         if (comment.id === commentId) {
           const reactions = { ...comment.reactions };
-          const currentUserKey = `${emoji}_users`;
-          const userList = comment[currentUserKey] || [];
-          const hasReacted = userList.includes(currentUser.id);
-          
-          if (hasReacted) {
-            // Remove reaction
-            reactions[emoji] = Math.max(0, (reactions[emoji] || 1) - 1);
-            if (reactions[emoji] === 0) {
-              delete reactions[emoji];
-            }
-            comment[currentUserKey] = userList.filter(id => id !== currentUser.id);
+          if (reactions[emoji]) {
+            reactions[emoji] += 1;
           } else {
-            // Add reaction
-            reactions[emoji] = (reactions[emoji] || 0) + 1;
-            comment[currentUserKey] = [...userList, currentUser.id];
+            reactions[emoji] = 1;
           }
-          
-          return { ...comment, reactions, [currentUserKey]: comment[currentUserKey] };
+          return { ...comment, reactions };
         }
         return comment;
       }),
@@ -519,56 +507,30 @@ export default function TaskComments({ taskId }) {
 
               {Object.keys(comment.reactions).length > 0 && (
                 <div className="comment-reactions">
-                  {Object.entries(comment.reactions).map(([emoji, count]) => {
-                    const userKey = `${emoji}_users`;
-                    const userList = comment[userKey] || [];
-                    const hasReacted = userList.includes(currentUser.id);
-                    
-                    return (
-                      <button
-                        key={emoji}
-                        className={`reaction-btn ${hasReacted ? 'user-reacted' : ''}`}
-                        onClick={() => handleReaction(comment.id, emoji)}
-                        title={hasReacted ? `You reacted with ${emoji}` : `React with ${emoji}`}
-                      >
-                        {emoji} <span className="reaction-count">{count}</span>
-                      </button>
-                    );
-                  })}
+                  {Object.entries(comment.reactions).map(([emoji, count]) => (
+                    <button
+                      key={emoji}
+                      className="reaction-btn"
+                      onClick={() => handleReaction(comment.id, emoji)}
+                    >
+                      {emoji} {count}
+                    </button>
+                  ))}
                 </div>
               )}
 
               {!comment.isDeleted && (
                 <div className="reaction-picker">
-                  <span className="picker-label">React:</span>
-                  {emojis.slice(0, 6).map((emoji) => {
-                    const userKey = `${emoji}_users`;
-                    const userList = comment[userKey] || [];
-                    const hasReacted = userList.includes(currentUser.id);
-                    
-                    return (
-                      <button
-                        key={emoji}
-                        className={`emoji-btn quick-reaction ${hasReacted ? 'already-reacted' : ''}`}
-                        onClick={() => handleReaction(comment.id, emoji)}
-                        title={hasReacted ? `Remove ${emoji} reaction` : `React with ${emoji}`}
-                      >
-                        {emoji}
-                      </button>
-                    );
-                  })}
-                  <button
-                    className="emoji-btn more-reactions"
-                    onClick={() => {
-                      // Add a more comprehensive emoji picker for reactions
-                      const moreEmojis = ["🎉", "🔥", "💪", "👏", "🙌", "✨", "💯", "🚀"];
-                      const randomEmoji = moreEmojis[Math.floor(Math.random() * moreEmojis.length)];
-                      handleReaction(comment.id, randomEmoji);
-                    }}
-                    title="More reactions"
-                  >
-                    ➕
-                  </button>
+                  {emojis.slice(0, 6).map((emoji) => (
+                    <button
+                      key={emoji}
+                      className="emoji-btn"
+                      onClick={() => handleReaction(comment.id, emoji)}
+                      title={`React with ${emoji}`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
@@ -737,40 +699,27 @@ export default function TaskComments({ taskId }) {
             <div className="emoji-picker-container" ref={emojiPickerRef}>
               <button
                 type="button"
-                className="tool-button emoji-trigger"
+                className="tool-button"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                 title="Add emoji"
               >
                 😀
               </button>
               {showEmojiPicker && (
-                <div className="emoji-picker enhanced-picker">
-                  <div className="emoji-picker-header">
-                    <span>Choose an emoji</span>
+                <div className="emoji-picker">
+                  {emojis.map((emoji) => (
                     <button
+                      key={emoji}
                       type="button"
-                      className="picker-close"
-                      onClick={() => setShowEmojiPicker(false)}
+                      className="emoji-option"
+                      onClick={() => {
+                        setNewComment(newComment + emoji);
+                        setShowEmojiPicker(false);
+                      }}
                     >
-                      ×
+                      {emoji}
                     </button>
-                  </div>
-                  <div className="emoji-grid">
-                    {emojis.map((emoji) => (
-                      <button
-                        key={emoji}
-                        type="button"
-                        className="emoji-option enhanced-option"
-                        onClick={() => {
-                          setNewComment(newComment + emoji);
-                          setShowEmojiPicker(false);
-                        }}
-                        title={`Insert ${emoji}`}
-                      >
-                        {emoji}
-                      </button>
-                    ))}
-                  </div>
+                  ))}
                 </div>
               )}
             </div>
