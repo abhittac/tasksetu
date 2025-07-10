@@ -13,6 +13,7 @@ export default function TaskComments({ taskId }) {
       mentions: [],
       attachments: [],
       reactions: { "👍": 2, "🚀": 1 },
+      userReactions: { "sarah_wilson": ["👍"], "mike_johnson": ["👍", "🚀"] },
       isEdited: false,
     },
     {
@@ -26,6 +27,7 @@ export default function TaskComments({ taskId }) {
       mentions: ["John Smith"],
       attachments: [],
       reactions: {},
+      userReactions: {},
       isEdited: false,
     },
     {
@@ -39,6 +41,7 @@ export default function TaskComments({ taskId }) {
       mentions: [],
       attachments: [{ name: "test-plan.pdf", size: "245KB", type: "pdf" }],
       reactions: { "💯": 1 },
+      userReactions: { "john_smith": ["💯"] },
       isEdited: false,
     },
   ]);
@@ -111,6 +114,59 @@ export default function TaskComments({ taskId }) {
     "🎉",
     "🔥",
     "✅",
+  ];
+
+  const allEmojis = [
+    // Smileys & Emotion
+    "😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂", "🙂", "🙃",
+    "😉", "😊", "😇", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙",
+    "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤫", "🤔",
+    "🤐", "🤨", "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "🤥",
+    "😔", "😪", "🤤", "😴", "😷", "🤒", "🤕", "🤢", "🤮", "🤧",
+    "🥵", "🥶", "🥴", "😵", "🤯", "🤠", "🥳", "😎", "🤓", "🧐",
+    "😕", "😟", "🙁", "☹️", "😮", "😯", "😲", "😳", "🥺", "😦",
+    "😧", "😨", "😰", "😥", "😢", "😭", "😱", "😖", "😣", "😞",
+    "😓", "😩", "😫", "🥱", "😤", "😡", "😠", "🤬", "😈", "👿",
+    
+    // People & Body
+    "👋", "🤚", "🖐️", "✋", "🖖", "👌", "🤏", "✌️", "🤞", "🤟",
+    "🤘", "🤙", "👈", "👉", "👆", "🖕", "👇", "☝️", "👍", "👎",
+    "👊", "✊", "🤛", "🤜", "👏", "🙌", "👐", "🤲", "🤝", "🙏",
+    
+    // Animals & Nature
+    "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯",
+    "🦁", "🐮", "🐷", "🐸", "🐵", "🙈", "🙉", "🙊", "🐒", "🐔",
+    "🐧", "🐦", "🐤", "🐣", "🐥", "🦆", "🦅", "🦉", "🦇", "🐺",
+    
+    // Food & Drink
+    "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🍈", "🍒",
+    "🍑", "🥭", "🍍", "🥥", "🥝", "🍅", "🍆", "🥑", "🥦", "🥒",
+    "🌶️", "🌽", "🥕", "🥔", "🍠", "🥐", "🍞", "🥖", "🥨", "🧀",
+    
+    // Activities
+    "⚽", "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉", "🥏", "🎱",
+    "🏓", "🏸", "🏒", "🏑", "🥍", "🏏", "⛳", "🏹", "🎣", "🥊",
+    "🥋", "🎽", "⛸️", "🥌", "🛷", "🎿", "⛷️", "🏂", "🏋️", "🤼",
+    
+    // Objects
+    "⌚", "📱", "📲", "💻", "⌨️", "🖥️", "🖨️", "🖱️", "🖲️", "🕹️",
+    "🗜️", "💽", "💾", "💿", "📀", "📼", "📷", "📸", "📹", "🎥",
+    "📽️", "🎞️", "📞", "☎️", "📟", "📠", "📺", "📻", "🎙️", "🎚️",
+    
+    // Symbols
+    "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔",
+    "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟", "☮️",
+    "✝️", "☪️", "🕉️", "☸️", "✡️", "🔯", "🕎", "☯️", "☦️", "🛐",
+    "⭐", "🌟", "💫", "✨", "⚡", "☄️", "💥", "🔥", "🌪️", "🌈",
+    "☀️", "🌤️", "⛅", "🌦️", "🌧️", "⛈️", "🌩️", "🌨️", "❄️", "☃️",
+    "⛄", "🌬️", "💨", "🌊", "💧", "💦", "☔", "🌙", "🌛", "🌜",
+    "🌚", "🌕", "🌖", "🌗", "🌘", "🌑", "🌒", "🌓", "🌔", "🌎",
+    "🌍", "🌏", "💫", "⭐", "🌟", "✨", "🎊", "🎉", "🎈", "🎁",
+    "🏆", "🥇", "🥈", "🥉", "🏅", "🎖️", "🏵️", "🎗️", "🎫", "🎟️",
+    
+    // Additional useful emojis
+    "🚀", "💯", "🔥", "✅", "❌", "⚠️", "📌", "📍", "🎯", "💡",
+    "🔔", "🔕", "📢", "📣", "💬", "💭", "🗯️", "♠️", "♥️", "♦️", "♣️"
   ];
 
   useEffect(() => {
@@ -280,6 +336,7 @@ export default function TaskComments({ taskId }) {
         type: f.type,
       })),
       reactions: {},
+      userReactions: {},
       isEdited: false,
     };
 
@@ -352,12 +409,30 @@ export default function TaskComments({ taskId }) {
       comments.map((comment) => {
         if (comment.id === commentId) {
           const reactions = { ...comment.reactions };
-          if (reactions[emoji]) {
-            reactions[emoji] += 1;
+          const userReactions = comment.userReactions || {};
+          const currentUserId = currentUser.id;
+          
+          // Check if current user already reacted with this emoji
+          if (userReactions[currentUserId] && userReactions[currentUserId].includes(emoji)) {
+            // Remove reaction
+            reactions[emoji] = Math.max(0, (reactions[emoji] || 1) - 1);
+            if (reactions[emoji] === 0) {
+              delete reactions[emoji];
+            }
+            userReactions[currentUserId] = userReactions[currentUserId].filter(e => e !== emoji);
+            if (userReactions[currentUserId].length === 0) {
+              delete userReactions[currentUserId];
+            }
           } else {
-            reactions[emoji] = 1;
+            // Add reaction
+            reactions[emoji] = (reactions[emoji] || 0) + 1;
+            if (!userReactions[currentUserId]) {
+              userReactions[currentUserId] = [];
+            }
+            userReactions[currentUserId].push(emoji);
           }
-          return { ...comment, reactions };
+          
+          return { ...comment, reactions, userReactions };
         }
         return comment;
       }),
@@ -507,15 +582,19 @@ export default function TaskComments({ taskId }) {
 
               {Object.keys(comment.reactions).length > 0 && (
                 <div className="comment-reactions">
-                  {Object.entries(comment.reactions).map(([emoji, count]) => (
-                    <button
-                      key={emoji}
-                      className="reaction-btn"
-                      onClick={() => handleReaction(comment.id, emoji)}
-                    >
-                      {emoji} {count}
-                    </button>
-                  ))}
+                  {Object.entries(comment.reactions).map(([emoji, count]) => {
+                    const userReacted = comment.userReactions?.[currentUser.id]?.includes(emoji);
+                    return (
+                      <button
+                        key={emoji}
+                        className={`reaction-btn ${userReacted ? 'user-reacted' : ''}`}
+                        onClick={() => handleReaction(comment.id, emoji)}
+                        title={userReacted ? 'Remove reaction' : 'Add reaction'}
+                      >
+                        {emoji} {count}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
 
@@ -699,27 +778,53 @@ export default function TaskComments({ taskId }) {
             <div className="emoji-picker-container" ref={emojiPickerRef}>
               <button
                 type="button"
-                className="tool-button"
+                className="tool-button emoji-picker-btn"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                 title="Add emoji"
               >
                 😀
               </button>
               {showEmojiPicker && (
-                <div className="emoji-picker">
-                  {emojis.map((emoji) => (
+                <div className="emoji-picker large-emoji-picker">
+                  <div className="emoji-picker-header">
+                    <span>Pick an emoji</span>
                     <button
-                      key={emoji}
                       type="button"
-                      className="emoji-option"
-                      onClick={() => {
-                        setNewComment(newComment + emoji);
-                        setShowEmojiPicker(false);
-                      }}
+                      className="close-emoji-picker"
+                      onClick={() => setShowEmojiPicker(false)}
                     >
-                      {emoji}
+                      ×
                     </button>
-                  ))}
+                  </div>
+                  <div className="emoji-grid">
+                    {allEmojis.map((emoji) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        className="emoji-option"
+                        onClick={() => {
+                          const cursorPosition = textareaRef.current.selectionStart;
+                          const newValue = 
+                            newComment.slice(0, cursorPosition) + 
+                            emoji + 
+                            newComment.slice(cursorPosition);
+                          setNewComment(newValue);
+                          
+                          // Reset cursor position after emoji insertion
+                          setTimeout(() => {
+                            textareaRef.current.focus();
+                            textareaRef.current.setSelectionRange(
+                              cursorPosition + emoji.length, 
+                              cursorPosition + emoji.length
+                            );
+                          }, 0);
+                        }}
+                        title={emoji}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
