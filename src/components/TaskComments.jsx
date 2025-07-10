@@ -49,14 +49,17 @@ export default function TaskComments({ taskId }) {
   const [mentionQuery, setMentionQuery] = useState("");
   const [mentionPosition, setMentionPosition] = useState({ start: 0, end: 0 });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showEmojiModal, setShowEmojiModal] = useState(false);
   const [editingComment, setEditingComment] = useState(null);
   const [editContent, setEditContent] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(0);
 
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
   const emojiPickerRef = useRef(null);
+  const emojiModalRef = useRef(null);
 
   const currentUser = {
     id: "current_user",
@@ -113,6 +116,46 @@ export default function TaskComments({ taskId }) {
     "✅",
   ];
 
+  const modalEmojis = [
+    "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇",
+    "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚",
+    "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩",
+    "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "☹️", "😣",
+    "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬",
+    "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗",
+    "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯",
+    "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐",
+    "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈",
+    "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾",
+    "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿",
+    "😾", "👋", "🤚", "🖐️", "✋", "🖖", "👌", "🤏", "✌️", "🤞",
+    "🤟", "🤘", "🤙", "👈", "👉", "👆", "🖕", "👇", "☝️", "👍",
+    "👎", "👊", "✊", "🤛", "🤜", "👏", "🙌", "👐", "🤲", "🤝",
+    "🙏", "✍️", "💅", "🤳", "💪", "🦾", "🦿", "🦵", "🦶", "👂",
+    "🦻", "👃", "🧠", "🦷", "🦴", "👀", "👁️", "👅", "👄", "💋",
+    "🩸", "❤️", "🧡", "💛", "💚", "💙", "💜", "🤎", "🖤", "🤍",
+    "💔", "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟",
+    "☮️", "✝️", "☪️", "🕉️", "☸️", "✡️", "🔯", "🕎", "☯️", "☦️",
+    "🛐", "⛎", "♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏",
+    "♐", "♑", "♒", "♓", "🆔", "⚛️", "🉑", "☢️", "☣️", "📴",
+    "📳", "🈶", "🈚", "🈸", "🈺", "🈷️", "✴️", "🆚", "💮", "🉐",
+    "㊙️", "㊗️", "🈴", "🈵", "🈹", "🈲", "🅰️", "🅱️", "🆎", "🆑",
+    "🅾️", "🆘", "❌", "⭕", "🛑", "⛔", "📛", "🚫", "💯", "💢",
+    "♨️", "🚷", "🚯", "🚳", "🚱", "🔞", "📵", "🚭", "❗", "❕",
+    "❓", "❔", "‼️", "⁉️", "🔅", "🔆", "〽️", "⚠️", "🚸", "🔱",
+    "⚜️", "🔰", "♻️", "✅", "🈯", "💹", "❇️", "✳️", "❎", "🌐",
+    "💠", "Ⓜ️", "🌀", "💤", "🏧", "🚾", "♿", "🅿️", "🈳", "🈂️",
+    "🛂", "🛃", "🛄", "🛅", "🚹", "🚺", "🚼", "🚻", "🚮", "🎦",
+    "📶", "🈁", "🔣", "ℹ️", "🔤", "🔡", "🔠", "🆖", "🆗", "🆙",
+    "🆒", "🆕", "🆓", "0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣",
+    "7️⃣", "8️⃣", "9️⃣", "🔟", "#️⃣", "*️⃣", "⏏️", "▶️", "⏸️", "⏯️",
+    "⏹️", "⏺️", "⏭️", "⏮️", "⏩", "⏪", "⏫", "⏬", "◀️", "🔼",
+    "🔽", "➡️", "⬅️", "⬆️", "⬇️", "↗️", "↘️", "↙️", "↖️", "↕️",
+    "↔️", "↪️", "↩️", "⤴️", "⤵️", "🔀", "🔁", "🔂", "🔄", "🔃",
+    "🎵", "🎶", "➕", "➖", "➗", "✖️", "🟰", "♾️", "💲", "💱",
+    "™️", "©️", "®️", "👑", "🎩", "🎓", "📿", "💄", "💍", "💎"
+  ];
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -121,6 +164,12 @@ export default function TaskComments({ taskId }) {
       ) {
         setShowEmojiPicker(false);
       }
+      if (
+        emojiModalRef.current &&
+        !emojiModalRef.current.contains(event.target)
+      ) {
+        setShowEmojiModal(false);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -128,17 +177,18 @@ export default function TaskComments({ taskId }) {
 
   const handleCommentChange = (e) => {
     const value = e.target.value;
-    const cursorPosition = e.target.selectionStart;
+    const cursorPos = e.target.selectionStart;
 
     setNewComment(value);
+    setCursorPosition(cursorPos);
 
     // Handle @ mentions
-    const atIndex = value.lastIndexOf("@", cursorPosition - 1);
+    const atIndex = value.lastIndexOf("@", cursorPos - 1);
     if (atIndex !== -1) {
-      const afterAt = value.substring(atIndex + 1, cursorPosition);
+      const afterAt = value.substring(atIndex + 1, cursorPos);
       if (!afterAt.includes(" ") && afterAt.length >= 0) {
         setMentionQuery(afterAt);
-        setMentionPosition({ start: atIndex, end: cursorPosition });
+        setMentionPosition({ start: atIndex, end: cursorPos });
         setShowMentionSuggestions(true);
       } else {
         setShowMentionSuggestions(false);
@@ -146,6 +196,34 @@ export default function TaskComments({ taskId }) {
     } else {
       setShowMentionSuggestions(false);
     }
+  };
+
+  const handleTextareaClick = (e) => {
+    setCursorPosition(e.target.selectionStart);
+  };
+
+  const handleTextareaKeyUp = (e) => {
+    setCursorPosition(e.target.selectionStart);
+  };
+
+  const insertEmojiAtCursor = (emoji) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const before = newComment.substring(0, cursorPosition);
+    const after = newComment.substring(cursorPosition);
+    const newValue = before + emoji + after;
+    
+    setNewComment(newValue);
+    setShowEmojiModal(false);
+    
+    // Set cursor position after emoji
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = cursorPosition + emoji.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+      setCursorPosition(newCursorPos);
+    }, 0);
   };
 
   const handleMentionSelect = (member) => {
@@ -581,6 +659,17 @@ export default function TaskComments({ taskId }) {
               <div className="toolbar-separator"></div>
             </div>
 
+            <div className="flex items-center gap-2 mb-2">
+              <button
+                type="button"
+                onClick={() => setShowEmojiModal(true)}
+                title="Add emoji"
+                className="emoji-trigger-btn flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer text-lg"
+              >
+                😀
+              </button>
+            </div>
+
             <div
               className={`textarea-container flex items-center gap-1 justify-between w-full ${dragActive ? "drag-active" : ""}`}
               onDragEnter={handleDrag}
@@ -592,6 +681,8 @@ export default function TaskComments({ taskId }) {
                 ref={textareaRef}
                 value={newComment}
                 onChange={handleCommentChange}
+                onClick={handleTextareaClick}
+                onKeyUp={handleTextareaKeyUp}
                 placeholder="Leave a comment... Use @ to mention team members"
                 className="comment-input w-full indent-4 pt-4 !border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows="3"
@@ -737,6 +828,44 @@ export default function TaskComments({ taskId }) {
       {comments.length === 0 && (
         <div className="empty-comments">
           <p>No comments yet. Be the first to comment!</p>
+        </div>
+      )}
+
+      {/* Emoji Modal */}
+      {showEmojiModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div
+            ref={emojiModalRef}
+            className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[70vh] overflow-y-auto"
+          >
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900">Choose an Emoji</h3>
+                <button
+                  onClick={() => setShowEmojiModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="p-4">
+              <div className="grid grid-cols-8 gap-2">
+                {modalEmojis.map((emoji, index) => (
+                  <button
+                    key={index}
+                    onClick={() => insertEmojiAtCursor(emoji)}
+                    className="w-10 h-10 flex items-center justify-center text-xl hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                    title={emoji}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

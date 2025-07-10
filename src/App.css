@@ -1798,6 +1798,14 @@
 .comment-input{
   border:rgb(59 130 246);
 }
+
+.emoji-trigger-btn {
+  transition: all 0.2s ease;
+}
+
+.emoji-trigger-btn:hover {
+  transform: scale(1.1);
+}
       .status-form-modal .grid-cols-8 button {
         width: 2.5rem;
         height: 2.5rem;
