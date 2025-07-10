@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import CreateTask from './CreateTask'
 import ApprovalTaskCreator from './ApprovalTaskCreator'
+import Toast from './Toast'
 
 export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [searchTerm, setSearchTerm] = useState('')
@@ -30,6 +31,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [selectedDateForTask, setSelectedDateForTask] = useState(null);
   // const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
   const [selectedApprovalTask, setSelectedApprovalTask] = useState(null);
+  const [toast, setToast] = useState({ message: '', type: 'success', isVisible: false });
   const [tasks, setTasks] = useState([
     {
       id: 1,
@@ -547,8 +549,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       options: options
     });
 
-    // Show success notification
-    console.log(`✅ Task "${task.title}" deleted successfully by ${currentUser.name}`);
+    // Show success toast notification
+    showToast(`Task "${task.title}" deleted successfully`, 'success');
 
     // Close confirmation modal
     setShowDeleteConfirmation(null);
@@ -574,13 +576,17 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       setTasks(prevTasks => prevTasks.filter(task => !selectedTasks.includes(task.id)));
       setSelectedTasks([]);
       setShowBulkActions(false);
-      console.log(`Bulk deleted ${selectedTaskObjects.length} tasks by ${currentUser.name}`);
+      showToast(`${selectedTaskObjects.length} tasks deleted successfully`, 'success');
     }
   };
 
   const logActivity = (type, details) => {
     console.log(`🔄 Activity Log:`, details);
     // In real app, this would be sent to backend for permanent audit trail
+  };
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type, isVisible: true });
   };
 
   // Handle bulk status update
@@ -784,6 +790,9 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
   // Delete subtask
   const handleDeleteSubtask = (parentTaskId, subtaskId) => {
+    const parentTask = tasks.find(t => t.id === parentTaskId);
+    const subtask = parentTask?.subtasks.find(s => s.id === subtaskId);
+    
     setTasks(prevTasks => 
       prevTasks.map(task => 
         task.id === parentTaskId 
@@ -795,6 +804,12 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
           : task
       )
     );
+    
+    // Show success toast notification
+    if (subtask) {
+      showToast(`Sub-task "${subtask.title}" deleted successfully`, 'success');
+    }
+    
     setSelectedSubtask(null);
     setShowDeleteSubtaskConfirmation(null);
   };
@@ -1641,6 +1656,14 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
           onCancel={() => setShowDeleteSubtaskConfirmation(null)}
         />
       )}
+
+      {/* Toast Notification */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={() => setToast(prev => ({ ...prev, isVisible: false }))}
+      />
     </div>
   )
 }
