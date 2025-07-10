@@ -226,12 +226,71 @@ export default function StatusManager() {
     })))
   }
 
+  const [draggedItem, setDraggedItem] = useState(null)
+  const [dragOverItem, setDragOverItem] = useState(null)
+
   const handleReorderStatuses = (reorderedStatuses) => {
     const updatedStatuses = reorderedStatuses.map((status, index) => ({
       ...status,
       order: index + 1
     }))
     setCompanyStatuses(updatedStatuses)
+  }
+
+  const handleDragStart = (e, status) => {
+    setDraggedItem(status)
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/html', e.target.outerHTML)
+    e.target.style.opacity = '0.5'
+  }
+
+  const handleDragEnd = (e) => {
+    e.target.style.opacity = '1'
+    setDraggedItem(null)
+    setDragOverItem(null)
+  }
+
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleDragEnter = (e, status) => {
+    e.preventDefault()
+    setDragOverItem(status)
+  }
+
+  const handleDrop = (e, targetStatus) => {
+    e.preventDefault()
+    
+    if (!draggedItem || draggedItem.id === targetStatus.id) {
+      return
+    }
+
+    const currentStatuses = [...activeCompanyStatuses].sort((a, b) => a.order - b.order)
+    const draggedIndex = currentStatuses.findIndex(s => s.id === draggedItem.id)
+    const targetIndex = currentStatuses.findIndex(s => s.id === targetStatus.id)
+
+    // Remove dragged item from its current position
+    currentStatuses.splice(draggedIndex, 1)
+    // Insert at new position
+    currentStatuses.splice(targetIndex, 0, draggedItem)
+
+    // Update order numbers
+    const reorderedStatuses = currentStatuses.map((status, index) => ({
+      ...status,
+      order: index + 1
+    }))
+
+    // Update the full statuses array maintaining inactive items
+    const updatedAllStatuses = companyStatuses.map(status => {
+      const reordered = reorderedStatuses.find(r => r.id === status.id)
+      return reordered || status
+    })
+
+    setCompanyStatuses(updatedAllStatuses)
+    setDraggedItem(null)
+    setDragOverItem(null)
   }
 
   const getValidTransitions = (currentStatusCode, taskData = null) => {
@@ -400,6 +459,12 @@ export default function StatusManager() {
                   onDelete={() => setDeleteModal(status)}
                   onSetDefault={() => handleSetDefault(status.id)}
                   canEdit={currentUser.role === 'admin'}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={handleDragOver}
+                  onDragEnter={handleDragEnter}
+                  onDrop={handleDrop}
+                  isDraggedOver={dragOverItem && dragOverItem.id === status.id}
                 />
               ))}
             </div>
@@ -478,13 +543,21 @@ export default function StatusManager() {
   )
 }
 
-function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefault, canEdit }) {
+function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefault, canEdit, onDragStart, onDragEnd, onDragOver, onDragEnter, onDrop, isDraggedOver }) {
   const taskCount = getTaskCount(status.code)
 
   return (
-    <div className="table-row">
+    <div 
+      className={`table-row ${isDraggedOver ? 'drag-over' : ''}`}
+      draggable={canEdit}
+      onDragStart={(e) => onDragStart(e, status)}
+      onDragEnd={onDragEnd}
+      onDragOver={onDragOver}
+      onDragEnter={(e) => onDragEnter(e, status)}
+      onDrop={(e) => onDrop(e, status)}
+    >
       <div className="td">
-        <div className="drag-handle">⋮⋮</div>
+        <div className={`drag-handle ${canEdit ? 'draggable' : ''}`}>⋮⋮</div>
         <span className="order-number">{status.order}</span>
       </div>
       <div className="td">

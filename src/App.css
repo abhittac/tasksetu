@@ -1014,6 +1014,31 @@
         color: #6c757d;
         font-size: 1.2rem;
         margin-right: 0.5rem;
+        transition: color 0.2s ease;
+      }
+
+      .drag-handle.draggable:hover {
+        color: #495057;
+      }
+
+      .drag-handle:not(.draggable) {
+        cursor: not-allowed;
+        color: #adb5bd;
+      }
+
+      .table-row.drag-over {
+        background: #e3f2fd;
+        border: 2px dashed #2196f3;
+        border-radius: 4px;
+      }
+
+      .table-row[draggable="true"]:hover {
+        background: #f8f9fa;
+        cursor: move;
+      }
+
+      .table-row[draggable="true"]:active {
+        opacity: 0.8;
       }
 
       .order-number {
