@@ -193,15 +193,15 @@ export default function Dashboard() {
 
             {/* Notification Dropdown */}
             {showNotifications && (
-              <div className="fixed right-4 top-16 w-full max-w-sm sm:max-w-md lg:max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-200 z-[9999] max-h-[80vh] overflow-hidden backdrop-blur-sm">
+              <div className="absolute right-0 top-12 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
                 {/* Header */}
-                <div className="p-4 sm:p-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
+                <div className="p-4 border-b border-gray-200 bg-gray-50">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
                     {unreadCount > 0 && (
                       <button
                         onClick={markAllAsRead}
-                        className="text-sm text-blue-600 hover:text-blue-800 font-medium px-3 py-1 rounded-full hover:bg-blue-100 transition-colors"
+                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                       >
                         Mark all as read
                       </button>
@@ -210,47 +210,47 @@ export default function Dashboard() {
                 </div>
 
                 {/* Notifications List */}
-                <div className="max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                <div className="max-h-80 overflow-y-auto">
                   {notifications.length > 0 ? (
                     notifications.slice(0, 10).map((notification) => (
                       <div
                         key={notification.id}
-                        className={`p-4 sm:p-5 border-b border-gray-100 cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                        className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${
                           !notification.read 
-                            ? "bg-blue-50 hover:bg-blue-100 border-l-4 border-l-blue-500" 
+                            ? "bg-blue-50 hover:bg-blue-100" 
                             : "hover:bg-gray-50"
                         }`}
                         onClick={() => markAsRead(notification.id)}
                       >
                         <div className="flex items-start space-x-3">
-                          <div className="flex-shrink-0 w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-gray-200 shadow-sm">
-                            <span className="text-base">
+                          <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center border">
+                            <span className="text-sm">
                               {getNotificationIcon(notification.type)}
                             </span>
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
-                                <h4 className="text-sm font-semibold text-gray-900 mb-1 leading-tight">
+                                <h4 className="text-sm font-medium text-gray-900 mb-1">
                                   {notification.title}
                                 </h4>
-                                <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+                                <p className="text-sm text-gray-600 mb-2">
                                   {notification.message}
                                 </p>
-                                <div className="flex items-center space-x-3">
-                                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-xs text-gray-500">
                                     {formatTimestamp(notification.timestamp)}
                                   </span>
                                   <span
-                                    className="text-xs font-medium px-2 py-1 rounded-full text-white"
+                                    className="text-xs font-medium"
                                     style={{
-                                      backgroundColor: getPriorityColor(notification.priority),
+                                      color: getPriorityColor(notification.priority),
                                     }}
                                   >
                                     {notification.priority}
                                   </span>
                                   {!notification.read && (
-                                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                                    <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                                   )}
                                 </div>
                               </div>
@@ -260,23 +260,22 @@ export default function Dashboard() {
                       </div>
                     ))
                   ) : (
-                    <div className="p-8 sm:p-12 text-center">
-                      <div className="text-gray-400 text-5xl mb-4">🔔</div>
-                      <h4 className="text-lg font-medium text-gray-700 mb-2">No notifications</h4>
-                      <p className="text-sm text-gray-500">You're all caught up!</p>
+                    <div className="p-8 text-center">
+                      <div className="text-gray-400 text-4xl mb-2">🔔</div>
+                      <p className="text-gray-500">No notifications</p>
                     </div>
                   )}
                 </div>
 
                 {/* Footer */}
                 {notifications.length > 0 && (
-                  <div className="p-4 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-blue-50">
+                  <div className="p-3 border-t border-gray-200 bg-gray-50">
                     <button
                       onClick={() => {
                         setShowNotifications(false);
                         // You can add navigation to full notifications page here
                       }}
-                      className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium py-2 px-4 rounded-xl hover:bg-blue-100 transition-colors"
+                      className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium"
                     >
                       View All Notifications
                     </button>
