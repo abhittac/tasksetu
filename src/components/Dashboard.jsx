@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import StatsCard from "./StatsCard";
 import RecentActivity from "./RecentActivity";
 import CreateTask from "./CreateTask";
@@ -6,6 +6,57 @@ import CreateTask from "./CreateTask";
 export default function Dashboard() {
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [selectedTaskType, setSelectedTaskType] = useState("regular");
+  const [showNotifications, setShowNotifications] = React.useState(false)
+  const [notifications, setNotifications] = React.useState([
+    {
+      id: 1,
+      type: "assignment",
+      title: "New task assigned",
+      message: 'You have been assigned "Database Migration"',
+      timestamp: "2024-01-22 10:30:00",
+      read: false,
+      priority: "medium",
+    },
+    {
+      id: 2,
+      type: "due_date",
+      title: "Task due soon",
+      message: 'Task "API Documentation" is due in 3 days',
+      timestamp: "2024-01-22 09:00:00",
+      read: false,
+      priority: "high",
+    },
+    {
+      id: 3,
+      type: "mention",
+      title: "You were mentioned",
+      message: "John Smith mentioned you in a comment",
+      timestamp: "2024-01-22 11:15:00",
+      read: true,
+      priority: "medium",
+    },
+    {
+      id: 4,
+      type: "status_change",
+      title: "Task status updated",
+      message: 'Task "Mobile App Redesign" was marked as completed',
+      timestamp: "2024-01-21 16:45:00",
+      read: true,
+      priority: "low",
+    },
+    {
+      id: 5,
+      type: "overdue",
+      title: "Task overdue",
+      message: 'Task "Security Audit" is 2 days overdue',
+      timestamp: "2024-01-22 08:00:00",
+      read: false,
+      priority: "critical",
+    },
+  ])
+
+  const unreadCount = notifications.filter(n => !n.read).length
+
 
   const handleCreateTask = (taskType) => {
     setSelectedTaskType(taskType);
@@ -50,6 +101,68 @@ export default function Dashboard() {
     },
   ];
 
+  const getNotificationIcon = (type) => {
+    const icons = {
+      assignment: "👤",
+      due_date: "⏰",
+      overdue: "🚨",
+      mention: "💬",
+      status_change: "✏️",
+      snooze_wakeup: "😴",
+      reminder: "🔔",
+    };
+    return icons[type] || "📝";
+  };
+
+  const getPriorityColor = (priority) => {
+    const colors = {
+      critical: "#ff4444",
+      high: "#ff8800",
+      medium: "#0099ff",
+      low: "#00aa44",
+    };
+    return colors[priority] || "#666";
+  };
+
+  const formatTimestamp = (timestamp) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+
+    if (diffInHours < 1) {
+      const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+      return `${diffInMinutes}m ago`;
+    } else if (diffInHours < 24) {
+      return `${diffInHours}h ago`;
+    } else {
+      const diffInDays = Math.floor(diffInHours / 24);
+      return `${diffInDays}d ago`;
+    }
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })));
+  };
+
+  const markAsRead = (notificationId) => {
+    setNotifications(notifications.map(n => 
+      n.id === notificationId ? { ...n, read: true } : n
+    ));
+  };
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showNotifications && !event.target.closest('.notification-dropdown')) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotifications]);
+
+
   return (
     <div className="min-h-full overflow-scroll bg-gray-50">
       <div className="page-header">
@@ -60,19 +173,116 @@ export default function Dashboard() {
               Welcome back! Here's what's happening with your tasks.
             </p>
           </div>
-          <div className="relative">
-            <button className="p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors relative">
-              
+          <div className="relative notification-dropdown">
+            <button
+              className="p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors relative"
+              onClick={() => setShowNotifications(!showNotifications)}
+            >
 
               {/* Proper bell icon */}
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
               </svg>
-              {/* Notification badge */}
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                4
-              </span>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
             </button>
+
+
+            {/* Notification Dropdown */}
+            {showNotifications && (
+              <div className="absolute right-0 top-12 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
+                {/* Header */}
+                <div className="p-4 border-b border-gray-200 bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={markAllAsRead}
+                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Notifications List */}
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.length > 0 ? (
+                    notifications.slice(0, 10).map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${
+                          !notification.read 
+                            ? "bg-blue-50 hover:bg-blue-100" 
+                            : "hover:bg-gray-50"
+                        }`}
+                        onClick={() => markAsRead(notification.id)}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center border">
+                            <span className="text-sm">
+                              {getNotificationIcon(notification.type)}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h4 className="text-sm font-medium text-gray-900 mb-1">
+                                  {notification.title}
+                                </h4>
+                                <p className="text-sm text-gray-600 mb-2">
+                                  {notification.message}
+                                </p>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-xs text-gray-500">
+                                    {formatTimestamp(notification.timestamp)}
+                                  </span>
+                                  <span
+                                    className="text-xs font-medium"
+                                    style={{
+                                      color: getPriorityColor(notification.priority),
+                                    }}
+                                  >
+                                    {notification.priority}
+                                  </span>
+                                  {!notification.read && (
+                                    <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-8 text-center">
+                      <div className="text-gray-400 text-4xl mb-2">🔔</div>
+                      <p className="text-gray-500">No notifications</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                {notifications.length > 0 && (
+                  <div className="p-3 border-t border-gray-200 bg-gray-50">
+                    <button
+                      onClick={() => {
+                        setShowNotifications(false);
+                        // You can add navigation to full notifications page here
+                      }}
+                      className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      View All Notifications
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
