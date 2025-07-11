@@ -193,7 +193,7 @@ export default function Dashboard() {
 
             {/* Notification Dropdown */}
             {showNotifications && (
-              <div className="absolute right-0 top-12 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
+              <div className="fixed right-4 top-16 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-[9999] max-h-[80vh] overflow-hidden">
                 {/* Header */}
                 <div className="p-4 border-b border-gray-200 bg-gray-50">
                   <div className="flex items-center justify-between">
@@ -210,7 +210,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Notifications List */}
-                <div className="max-h-80 overflow-y-auto">
+                <div className="max-h-96 overflow-y-auto">
                   {notifications.length > 0 ? (
                     notifications.slice(0, 10).map((notification) => (
                       <div
