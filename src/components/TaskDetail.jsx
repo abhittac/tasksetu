@@ -1955,15 +1955,22 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                        <span className="text-xs font-medium text-gray-600">
-                          {subtask.assignee?.charAt(0) || "U"}
+                    <div className="flex items-center gap-3">
+                      <SubtaskStatusDropdown
+                        subtask={subtask}
+                        onUpdate={handleUpdateSubtask}
+                        canEdit={canEditSubtask(subtask)}
+                      />
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                          <span className="text-xs font-medium text-gray-600">
+                            {subtask.assignee?.charAt(0) || "U"}
+                          </span>
+                        </div>
+                        <span className="text-sm text-gray-600 hidden sm:inline">
+                          {subtask.assignee}
                         </span>
                       </div>
-                      <span className="text-sm text-gray-600 hidden sm:inline">
-                        {subtask.assignee}
-                      </span>
                     </div>
                   </div>
 
@@ -2461,6 +2468,82 @@ function SubtaskSummary({
           </button>
         )}
       </div>
+    </div>
+  );
+}
+
+// Subtask Status Dropdown Component
+function SubtaskStatusDropdown({ subtask, onUpdate, canEdit }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const statuses = [
+    { value: "to-do", label: "To Do", color: "#6b7280" },
+    { value: "in-progress", label: "In Progress", color: "#3b82f6" },
+    { value: "completed", label: "Completed", color: "#10b981" },
+    { value: "blocked", label: "Blocked", color: "#ef4444" },
+  ];
+
+  const currentStatus = statuses.find(s => s.value === subtask.status) || statuses[0];
+
+  const handleStatusChange = (newStatus) => {
+    const updatedSubtask = { ...subtask, status: newStatus.value };
+    onUpdate(updatedSubtask);
+    setIsOpen(false);
+  };
+
+  if (!canEdit) {
+    return (
+      <div className="subtask-status-display readonly">
+        <span 
+          className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white"
+          style={{ backgroundColor: currentStatus.color }}
+        >
+          {currentStatus.label}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="subtask-status-dropdown">
+      <button
+        className="subtask-status-button inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white transition-all duration-200"
+        style={{ backgroundColor: currentStatus.color }}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {currentStatus.label}
+        <svg className="ml-1 w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+          <path
+            fillRule="evenodd"
+            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="subtask-status-menu absolute top-full left-0 mt-1 min-w-[8rem] bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+            {statuses.map((status) => (
+              <button
+                key={status.value}
+                className="subtask-status-option w-full text-left px-3 py-2 text-xs hover:bg-gray-50 transition-colors flex items-center gap-2"
+                onClick={() => handleStatusChange(status)}
+              >
+                <span
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: status.color }}
+                />
+                {status.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
