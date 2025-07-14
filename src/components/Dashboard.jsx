@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import StatsCard from "./StatsCard";
 import RecentActivity from "./RecentActivity";
 import CreateTask from "./CreateTask";
+import AnnualSelfAppraisal from './AnnualSelfAppraisal';
 
 export default function Dashboard() {
   const [showCreateTask, setShowCreateTask] = useState(false);
@@ -56,6 +57,7 @@ export default function Dashboard() {
   ])
 
   const unreadCount = notifications.filter(n => !n.read).length
+  const [showSelfAppraisal, setShowSelfAppraisal] = useState(false);
 
 
   const handleCreateTask = (taskType) => {
@@ -161,6 +163,17 @@ export default function Dashboard() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showNotifications]);
+
+    // Sample employee data for demo
+    const sampleEmployeeData = {
+      employeeId: 'EMP001',
+      fullName: 'John Smith',
+      position: 'Senior Developer',
+      department: 'Engineering',
+      manager: 'Sarah Wilson',
+      reviewPeriod: '2024',
+      hireDate: '2022-01-15'
+    };
 
 
   return (
@@ -387,6 +400,10 @@ export default function Dashboard() {
                 <span className="mr-2">👥</span>
                 Team Tasks
               </button>
+              <button className="btn btn-secondary"  onClick={() => setShowSelfAppraisal(true)}>
+                <span className="mr-2">📝</span>
+                Self-Appraisal
+              </button>
               <button className="btn btn-secondary">
                 <span className="mr-2">⚙️</span>
                 Settings
@@ -441,6 +458,30 @@ export default function Dashboard() {
                 onClose={() => setShowCreateTask(false)}
                 initialTaskType={selectedTaskType}
               />
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Annual Self-Appraisal Form */}
+      {showSelfAppraisal && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={() => setShowSelfAppraisal(false)}></div>
+          <div className="flex items-center justify-center min-h-screen px-4 py-8">
+            <div className="relative bg-white rounded shadow-lg max-w-3xl mx-auto">
+              <div className="flex justify-between items-center bg-gray-100 p-4 border-b">
+                <h2 className="text-lg font-semibold">Annual Self-Appraisal Form</h2>
+                <button onClick={() => setShowSelfAppraisal(false)} className="text-gray-500 hover:text-gray-700">
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="p-4">
+                <AnnualSelfAppraisal
+                  onClose={() => setShowSelfAppraisal(false)}
+                  employeeData={sampleEmployeeData}
+                />
+              </div>
             </div>
           </div>
         </div>
