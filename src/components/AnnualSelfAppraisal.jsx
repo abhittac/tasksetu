@@ -1,50 +1,49 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
   const [formData, setFormData] = useState({
     // Personal Info (Read-only)
-    employeeId: employeeData?.employeeId || 'EMP001',
-    fullName: employeeData?.fullName || 'John Smith',
-    position: employeeData?.position || 'Senior Developer',
-    department: employeeData?.department || 'Engineering',
-    manager: employeeData?.manager || 'Sarah Wilson',
-    reviewPeriod: employeeData?.reviewPeriod || '2024',
-    hireDate: employeeData?.hireDate || '2022-01-15',
-    
+    employeeId: employeeData?.employeeId || "EMP001",
+    fullName: employeeData?.fullName || "John Smith",
+    position: employeeData?.position || "Senior Developer",
+    department: employeeData?.department || "Engineering",
+    manager: employeeData?.manager || "Sarah Wilson",
+    reviewPeriod: employeeData?.reviewPeriod || "2024",
+    hireDate: employeeData?.hireDate || "2022-01-15",
+
     // Achievements Section
-    keyAccomplishments: '',
-    projectsCompleted: '',
-    skillsDeveloped: '',
-    recognitionReceived: '',
-    quantifiableResults: '',
-    
+    keyAccomplishments: "",
+    projectsCompleted: "",
+    skillsDeveloped: "",
+    recognitionReceived: "",
+    quantifiableResults: "",
+
     // Challenges Section
-    challengesFaced: '',
-    lessonsLearned: '',
-    areasForImprovement: '',
-    supportNeeded: '',
-    
+    challengesFaced: "",
+    lessonsLearned: "",
+    areasForImprovement: "",
+    supportNeeded: "",
+
     // Goals Section
-    shortTermGoals: '',
-    longTermGoals: '',
-    careerAspirations: '',
-    learningObjectives: '',
-    
+    shortTermGoals: "",
+    longTermGoals: "",
+    careerAspirations: "",
+    learningObjectives: "",
+
     // Self-Rating (1-5 scale)
-    performanceRating: '',
-    communicationRating: '',
-    teamworkRating: '',
-    innovationRating: '',
-    reliabilityRating: '',
-    
+    performanceRating: "",
+    communicationRating: "",
+    teamworkRating: "",
+    innovationRating: "",
+    reliabilityRating: "",
+
     // Optional Manager Feedback
-    managerComments: '',
-    managerRecommendations: '',
-    developmentPlan: ''
+    managerComments: "",
+    managerRecommendations: "",
+    developmentPlan: "",
   });
 
-  const [formStatus, setFormStatus] = useState('draft'); // draft, saved, submitted
+  const [formStatus, setFormStatus] = useState("draft"); // draft, saved, submitted
   const [validationErrors, setValidationErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastSaved, setLastSaved] = useState(null);
@@ -53,7 +52,7 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
   // Auto-save functionality
   useEffect(() => {
     const autoSaveTimer = setTimeout(() => {
-      if (formStatus === 'draft') {
+      if (formStatus === "draft") {
         handleAutoSave();
       }
     }, 30000); // Auto-save every 30 seconds
@@ -64,8 +63,8 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
   // Calculate word counts for text areas
   useEffect(() => {
     const newWordCounts = {};
-    Object.keys(formData).forEach(key => {
-      if (typeof formData[key] === 'string' && formData[key].length > 0) {
+    Object.keys(formData).forEach((key) => {
+      if (typeof formData[key] === "string" && formData[key].length > 0) {
         newWordCounts[key] = formData[key].trim().split(/\s+/).length;
       }
     });
@@ -73,16 +72,16 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
   }, [formData]);
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
-    
+
     // Clear validation error when user starts typing
     if (validationErrors[field]) {
-      setValidationErrors(prev => ({
+      setValidationErrors((prev) => ({
         ...prev,
-        [field]: ''
+        [field]: "",
       }));
     }
   };
@@ -90,17 +89,17 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
   const validateForm = () => {
     const errors = {};
     const requiredFields = [
-      'keyAccomplishments',
-      'challengesFaced',
-      'shortTermGoals',
-      'performanceRating',
-      'communicationRating',
-      'teamworkRating'
+      "keyAccomplishments",
+      "challengesFaced",
+      "shortTermGoals",
+      "performanceRating",
+      "communicationRating",
+      "teamworkRating",
     ];
 
-    requiredFields.forEach(field => {
+    requiredFields.forEach((field) => {
       if (!formData[field] || formData[field].trim().length === 0) {
-        errors[field] = 'This field is required';
+        errors[field] = "This field is required";
       }
     });
 
@@ -108,7 +107,7 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
     const minWordCounts = {
       keyAccomplishments: 50,
       challengesFaced: 30,
-      shortTermGoals: 30
+      shortTermGoals: 30,
     };
 
     Object.entries(minWordCounts).forEach(([field, minWords]) => {
@@ -119,10 +118,19 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
     });
 
     // Validate ratings are within range
-    const ratingFields = ['performanceRating', 'communicationRating', 'teamworkRating', 'innovationRating', 'reliabilityRating'];
-    ratingFields.forEach(field => {
-      if (formData[field] && (parseInt(formData[field]) < 1 || parseInt(formData[field]) > 5)) {
-        errors[field] = 'Rating must be between 1 and 5';
+    const ratingFields = [
+      "performanceRating",
+      "communicationRating",
+      "teamworkRating",
+      "innovationRating",
+      "reliabilityRating",
+    ];
+    ratingFields.forEach((field) => {
+      if (
+        formData[field] &&
+        (parseInt(formData[field]) < 1 || parseInt(formData[field]) > 5)
+      ) {
+        errors[field] = "Rating must be between 1 and 5";
       }
     });
 
@@ -133,11 +141,11 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
   const handleAutoSave = async () => {
     try {
       // Simulate auto-save API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setLastSaved(new Date());
-      console.log('Form auto-saved');
+      console.log("Form auto-saved");
     } catch (error) {
-      console.error('Auto-save failed:', error);
+      console.error("Auto-save failed:", error);
     }
   };
 
@@ -145,12 +153,12 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
     try {
       setIsSubmitting(true);
       // Simulate save API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setFormStatus('saved');
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setFormStatus("saved");
       setLastSaved(new Date());
-      console.log('Form saved successfully');
+      console.log("Form saved successfully");
     } catch (error) {
-      console.error('Save failed:', error);
+      console.error("Save failed:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -164,59 +172,69 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
     try {
       setIsSubmitting(true);
       // Simulate submit API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setFormStatus('submitted');
-      console.log('Form submitted successfully');
-      alert('Your self-appraisal has been submitted successfully!');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setFormStatus("submitted");
+      console.log("Form submitted successfully");
+      alert("Your self-appraisal has been submitted successfully!");
     } catch (error) {
-      console.error('Submit failed:', error);
-      alert('Submission failed. Please try again.');
+      console.error("Submit failed:", error);
+      alert("Submission failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleReset = () => {
-    if (window.confirm('Are you sure you want to reset the form? All unsaved changes will be lost.')) {
-      setFormData(prev => ({
+    if (
+      window.confirm(
+        "Are you sure you want to reset the form? All unsaved changes will be lost.",
+      )
+    ) {
+      setFormData((prev) => ({
         ...prev,
-        keyAccomplishments: '',
-        projectsCompleted: '',
-        skillsDeveloped: '',
-        recognitionReceived: '',
-        quantifiableResults: '',
-        challengesFaced: '',
-        lessonsLearned: '',
-        areasForImprovement: '',
-        supportNeeded: '',
-        shortTermGoals: '',
-        longTermGoals: '',
-        careerAspirations: '',
-        learningObjectives: '',
-        performanceRating: '',
-        communicationRating: '',
-        teamworkRating: '',
-        innovationRating: '',
-        reliabilityRating: '',
-        managerComments: '',
-        managerRecommendations: '',
-        developmentPlan: ''
+        keyAccomplishments: "",
+        projectsCompleted: "",
+        skillsDeveloped: "",
+        recognitionReceived: "",
+        quantifiableResults: "",
+        challengesFaced: "",
+        lessonsLearned: "",
+        areasForImprovement: "",
+        supportNeeded: "",
+        shortTermGoals: "",
+        longTermGoals: "",
+        careerAspirations: "",
+        learningObjectives: "",
+        performanceRating: "",
+        communicationRating: "",
+        teamworkRating: "",
+        innovationRating: "",
+        reliabilityRating: "",
+        managerComments: "",
+        managerRecommendations: "",
+        developmentPlan: "",
       }));
       setValidationErrors({});
-      setFormStatus('draft');
+      setFormStatus("draft");
     }
   };
 
   const getStatusBadge = () => {
     const statusConfig = {
-      draft: { color: 'bg-gray-100 text-gray-800', icon: '📝', label: 'Draft' },
-      saved: { color: 'bg-blue-100 text-blue-800', icon: '💾', label: 'Saved' },
-      submitted: { color: 'bg-green-100 text-green-800', icon: '✅', label: 'Submitted' }
+      draft: { color: "bg-gray-100 text-gray-800", icon: "📝", label: "Draft" },
+      saved: { color: "bg-blue-100 text-blue-800", icon: "💾", label: "Saved" },
+      submitted: {
+        color: "bg-green-100 text-green-800",
+        icon: "✅",
+        label: "Submitted",
+      },
     };
-    
+
     const config = statusConfig[formStatus];
     return (
-      <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${config.color}`}>
+      <span
+        className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${config.color}`}
+      >
         <span>{config.icon}</span>
         {config.label}
       </span>
@@ -231,8 +249,8 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
       <select
         value={formData[field]}
         onChange={(e) => handleInputChange(field, e.target.value)}
-        className={`form-select ${validationErrors[field] ? 'border-red-500' : ''}`}
-        disabled={formStatus === 'submitted'}
+        className={`form-select ${validationErrors[field] ? "border-red-500" : ""}`}
+        disabled={formStatus === "submitted"}
       >
         <option value="">Select rating...</option>
         <option value="5">5 - Exceptional</option>
@@ -247,7 +265,13 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
     </div>
   );
 
-  const renderTextArea = (field, label, placeholder, required = false, minWords = 0) => (
+  const renderTextArea = (
+    field,
+    label,
+    placeholder,
+    required = false,
+    minWords = 0,
+  ) => (
     <div className="form-field">
       <label className="block text-sm font-medium text-gray-700 mb-2">
         {label} {required && <span className="text-red-500">*</span>}
@@ -260,10 +284,10 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
       <textarea
         value={formData[field]}
         onChange={(e) => handleInputChange(field, e.target.value)}
-        className={`form-textarea ${validationErrors[field] ? 'border-red-500' : ''}`}
+        className={`form-textarea ${validationErrors[field] ? "border-red-500" : ""}`}
         placeholder={placeholder}
         rows={4}
-        disabled={formStatus === 'submitted'}
+        disabled={formStatus === "submitted"}
       />
       {validationErrors[field] && (
         <p className="text-red-500 text-xs mt-1">{validationErrors[field]}</p>
@@ -273,14 +297,15 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh] overflow-hidden">
-        
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh]  overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold mb-2">Annual Self-Appraisal</h1>
-              <p className="text-blue-100">Review Period: {formData.reviewPeriod}</p>
+              <p className="text-blue-100">
+                Review Period: {formData.reviewPeriod}
+              </p>
             </div>
             <div className="flex items-center gap-4">
               {getStatusBadge()}
@@ -289,19 +314,27 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
                 className="text-white hover:text-blue-200 transition-colors p-2 rounded-full hover:bg-white/10"
                 disabled={isSubmitting}
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
           </div>
-          
+
           {/* Status Info */}
           <div className="mt-4 text-sm text-blue-100">
-            {lastSaved && (
-              <p>Last saved: {lastSaved.toLocaleString()}</p>
-            )}
-            {formStatus === 'draft' && (
+            {lastSaved && <p>Last saved: {lastSaved.toLocaleString()}</p>}
+            {formStatus === "draft" && (
               <p className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
                 Auto-saving enabled
@@ -311,9 +344,11 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
         </div>
 
         {/* Form Content */}
-        <div className="overflow-y-auto" style={{ maxHeight: 'calc(95vh - 200px)' }}>
+        <div
+          className="overflow-y-auto"
+          style={{ maxHeight: "calc(95vh - 200px)" }}
+        >
           <div className="p-6 space-y-8">
-            
             {/* Personal Information (Read-Only) */}
             <div className="bg-gray-50 rounded-xl p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
@@ -322,28 +357,52 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="info-item">
-                  <label className="text-sm font-medium text-gray-500">Employee ID</label>
-                  <p className="text-gray-900 font-semibold">{formData.employeeId}</p>
+                  <label className="text-sm font-medium text-gray-500">
+                    Employee ID
+                  </label>
+                  <p className="text-gray-900 font-semibold">
+                    {formData.employeeId}
+                  </p>
                 </div>
                 <div className="info-item">
-                  <label className="text-sm font-medium text-gray-500">Full Name</label>
-                  <p className="text-gray-900 font-semibold">{formData.fullName}</p>
+                  <label className="text-sm font-medium text-gray-500">
+                    Full Name
+                  </label>
+                  <p className="text-gray-900 font-semibold">
+                    {formData.fullName}
+                  </p>
                 </div>
                 <div className="info-item">
-                  <label className="text-sm font-medium text-gray-500">Position</label>
-                  <p className="text-gray-900 font-semibold">{formData.position}</p>
+                  <label className="text-sm font-medium text-gray-500">
+                    Position
+                  </label>
+                  <p className="text-gray-900 font-semibold">
+                    {formData.position}
+                  </p>
                 </div>
                 <div className="info-item">
-                  <label className="text-sm font-medium text-gray-500">Department</label>
-                  <p className="text-gray-900 font-semibold">{formData.department}</p>
+                  <label className="text-sm font-medium text-gray-500">
+                    Department
+                  </label>
+                  <p className="text-gray-900 font-semibold">
+                    {formData.department}
+                  </p>
                 </div>
                 <div className="info-item">
-                  <label className="text-sm font-medium text-gray-500">Manager</label>
-                  <p className="text-gray-900 font-semibold">{formData.manager}</p>
+                  <label className="text-sm font-medium text-gray-500">
+                    Manager
+                  </label>
+                  <p className="text-gray-900 font-semibold">
+                    {formData.manager}
+                  </p>
                 </div>
                 <div className="info-item">
-                  <label className="text-sm font-medium text-gray-500">Hire Date</label>
-                  <p className="text-gray-900 font-semibold">{formData.hireDate}</p>
+                  <label className="text-sm font-medium text-gray-500">
+                    Hire Date
+                  </label>
+                  <p className="text-gray-900 font-semibold">
+                    {formData.hireDate}
+                  </p>
                 </div>
               </div>
             </div>
@@ -356,26 +415,26 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {renderTextArea(
-                  'keyAccomplishments',
-                  'Key Accomplishments',
-                  'Describe your major achievements this year...',
+                  "keyAccomplishments",
+                  "Key Accomplishments",
+                  "Describe your major achievements this year...",
                   true,
-                  50
+                  50,
                 )}
                 {renderTextArea(
-                  'projectsCompleted',
-                  'Projects Completed',
-                  'List and describe significant projects you completed...'
+                  "projectsCompleted",
+                  "Projects Completed",
+                  "List and describe significant projects you completed...",
                 )}
                 {renderTextArea(
-                  'skillsDeveloped',
-                  'Skills Developed',
-                  'What new skills or competencies have you gained?...'
+                  "skillsDeveloped",
+                  "Skills Developed",
+                  "What new skills or competencies have you gained?...",
                 )}
                 {renderTextArea(
-                  'quantifiableResults',
-                  'Quantifiable Results',
-                  'Include metrics, percentages, or measurable outcomes...'
+                  "quantifiableResults",
+                  "Quantifiable Results",
+                  "Include metrics, percentages, or measurable outcomes...",
                 )}
               </div>
             </div>
@@ -388,26 +447,26 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {renderTextArea(
-                  'challengesFaced',
-                  'Challenges Faced',
-                  'What obstacles or difficulties did you encounter?...',
+                  "challengesFaced",
+                  "Challenges Faced",
+                  "What obstacles or difficulties did you encounter?...",
                   true,
-                  30
+                  30,
                 )}
                 {renderTextArea(
-                  'lessonsLearned',
-                  'Lessons Learned',
-                  'What did you learn from these challenges?...'
+                  "lessonsLearned",
+                  "Lessons Learned",
+                  "What did you learn from these challenges?...",
                 )}
                 {renderTextArea(
-                  'areasForImprovement',
-                  'Areas for Improvement',
-                  'Where do you see opportunities for growth?...'
+                  "areasForImprovement",
+                  "Areas for Improvement",
+                  "Where do you see opportunities for growth?...",
                 )}
                 {renderTextArea(
-                  'supportNeeded',
-                  'Support Needed',
-                  'What support or resources would help you improve?...'
+                  "supportNeeded",
+                  "Support Needed",
+                  "What support or resources would help you improve?...",
                 )}
               </div>
             </div>
@@ -420,26 +479,26 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {renderTextArea(
-                  'shortTermGoals',
-                  'Short-term Goals (Next 6-12 months)',
-                  'What do you want to achieve in the near term?...',
+                  "shortTermGoals",
+                  "Short-term Goals (Next 6-12 months)",
+                  "What do you want to achieve in the near term?...",
                   true,
-                  30
+                  30,
                 )}
                 {renderTextArea(
-                  'longTermGoals',
-                  'Long-term Goals (1-3 years)',
-                  'What are your longer-term professional objectives?...'
+                  "longTermGoals",
+                  "Long-term Goals (1-3 years)",
+                  "What are your longer-term professional objectives?...",
                 )}
                 {renderTextArea(
-                  'careerAspirations',
-                  'Career Aspirations',
-                  'Where do you see your career heading?...'
+                  "careerAspirations",
+                  "Career Aspirations",
+                  "Where do you see your career heading?...",
                 )}
                 {renderTextArea(
-                  'learningObjectives',
-                  'Learning & Development Objectives',
-                  'What skills or knowledge do you want to develop?...'
+                  "learningObjectives",
+                  "Learning & Development Objectives",
+                  "What skills or knowledge do you want to develop?...",
                 )}
               </div>
             </div>
@@ -451,20 +510,49 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
                 Self-Assessment Ratings
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {renderRatingField('performanceRating', 'Overall Performance')}
-                {renderRatingField('communicationRating', 'Communication Skills')}
-                {renderRatingField('teamworkRating', 'Teamwork & Collaboration')}
-                {renderRatingField('innovationRating', 'Innovation & Creativity')}
-                {renderRatingField('reliabilityRating', 'Reliability & Accountability')}
+                {renderRatingField("performanceRating", "Overall Performance")}
+                {renderRatingField(
+                  "communicationRating",
+                  "Communication Skills",
+                )}
+                {renderRatingField(
+                  "teamworkRating",
+                  "Teamwork & Collaboration",
+                )}
+                {renderRatingField(
+                  "innovationRating",
+                  "Innovation & Creativity",
+                )}
+                {renderRatingField(
+                  "reliabilityRating",
+                  "Reliability & Accountability",
+                )}
               </div>
               <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-medium text-blue-900 mb-2">Rating Scale:</h4>
+                <h4 className="font-medium text-blue-900 mb-2">
+                  Rating Scale:
+                </h4>
                 <div className="text-sm text-blue-700 space-y-1">
-                  <p><strong>5 - Exceptional:</strong> Consistently exceeds expectations</p>
-                  <p><strong>4 - Exceeds Expectations:</strong> Frequently performs above requirements</p>
-                  <p><strong>3 - Meets Expectations:</strong> Consistently meets job requirements</p>
-                  <p><strong>2 - Below Expectations:</strong> Sometimes meets requirements</p>
-                  <p><strong>1 - Needs Improvement:</strong> Rarely meets requirements</p>
+                  <p>
+                    <strong>5 - Exceptional:</strong> Consistently exceeds
+                    expectations
+                  </p>
+                  <p>
+                    <strong>4 - Exceeds Expectations:</strong> Frequently
+                    performs above requirements
+                  </p>
+                  <p>
+                    <strong>3 - Meets Expectations:</strong> Consistently meets
+                    job requirements
+                  </p>
+                  <p>
+                    <strong>2 - Below Expectations:</strong> Sometimes meets
+                    requirements
+                  </p>
+                  <p>
+                    <strong>1 - Needs Improvement:</strong> Rarely meets
+                    requirements
+                  </p>
                 </div>
               </div>
             </div>
@@ -477,50 +565,50 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
               </h2>
               <div className="space-y-6">
                 {renderTextArea(
-                  'managerComments',
-                  'Manager Comments',
-                  'Manager feedback will be added here...'
+                  "managerComments",
+                  "Manager Comments",
+                  "Manager feedback will be added here...",
                 )}
                 {renderTextArea(
-                  'managerRecommendations',
-                  'Manager Recommendations',
-                  'Development recommendations from your manager...'
+                  "managerRecommendations",
+                  "Manager Recommendations",
+                  "Development recommendations from your manager...",
                 )}
                 {renderTextArea(
-                  'developmentPlan',
-                  'Development Plan',
-                  'Agreed upon development plan and next steps...'
+                  "developmentPlan",
+                  "Development Plan",
+                  "Agreed upon development plan and next steps...",
                 )}
               </div>
               <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="text-yellow-800 text-sm">
-                  <strong>Note:</strong> This section will be completed by your manager during the review process.
+                  <strong>Note:</strong> This section will be completed by your
+                  manager during the review process.
                 </p>
               </div>
             </div>
-
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+        <div className="bg-gray-50 w-full px-6 py-4 overflow-visible border-t border-gray-200 ">
           <div className="flex flex-col sm:flex-row gap-3 justify-between">
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 ">
               <button
                 onClick={handleReset}
                 className="btn btn-secondary flex items-center gap-2"
-                disabled={isSubmitting || formStatus === 'submitted'}
+                disabled={isSubmitting || formStatus === "submitted"}
               >
                 <span>🔄</span>
                 Reset Form
               </button>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 onClick={handleSave}
                 className="btn btn-secondary flex items-center gap-2"
-                disabled={isSubmitting || formStatus === 'submitted'}
+                disabled={isSubmitting || formStatus === "submitted"}
               >
                 {isSubmitting ? (
                   <span className="animate-spin">⏳</span>
@@ -529,11 +617,11 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
                 )}
                 Save Draft
               </button>
-              
+
               <button
                 onClick={handleSubmit}
                 className="btn btn-primary flex items-center gap-2"
-                disabled={isSubmitting || formStatus === 'submitted'}
+                disabled={isSubmitting || formStatus === "submitted"}
               >
                 {isSubmitting ? (
                   <>
@@ -549,11 +637,12 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
               </button>
             </div>
           </div>
-          
-          {formStatus === 'submitted' && (
+
+          {formStatus === "submitted" && (
             <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
               <p className="text-green-800 text-sm font-medium">
-                ✅ Your self-appraisal has been submitted successfully! Your manager will review it and provide feedback.
+                ✅ Your self-appraisal has been submitted successfully! Your
+                manager will review it and provide feedback.
               </p>
             </div>
           )}

@@ -501,7 +501,7 @@ export default function ActivityFeed({ taskId }) {
                 {formatDayHeader(date)}
               </h3>
             </div>
-            
+
             {/* Day Activities */}
             <div className="space-y-1">
               {dayActivities.map((activity, index) => (
