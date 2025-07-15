@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import StatsCard from "./StatsCard";
 import RecentActivity from "./RecentActivity";
 import CreateTask from "./CreateTask";
-import AnnualSelfAppraisal from './AnnualSelfAppraisal';
-import ApprovalTaskCreator from './ApprovalTaskCreator';
+import AnnualSelfAppraisal from "./AnnualSelfAppraisal";
+import ApprovalTaskCreator from "./ApprovalTaskCreator";
 
 export default function Dashboard() {
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [selectedTaskType, setSelectedTaskType] = useState("regular");
   const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
-  const [showNotifications, setShowNotifications] = React.useState(false)
+  const [showNotifications, setShowNotifications] = React.useState(false);
   const [notifications, setNotifications] = React.useState([
     {
       id: 1,
@@ -56,11 +56,10 @@ export default function Dashboard() {
       read: false,
       priority: "critical",
     },
-  ])
+  ]);
 
-  const unreadCount = notifications.filter(n => !n.read).length
+  const unreadCount = notifications.filter((n) => !n.read).length;
   const [showSelfAppraisal, setShowSelfAppraisal] = useState(false);
-
 
   const handleCreateTask = (taskType) => {
     if (taskType === "approval") {
@@ -72,7 +71,7 @@ export default function Dashboard() {
   };
 
   const handleCreateApprovalTask = (approvalTaskData) => {
-    console.log('Approval task created:', approvalTaskData);
+    console.log("Approval task created:", approvalTaskData);
     setShowApprovalTaskModal(false);
   };
   const stats = [
@@ -154,38 +153,42 @@ export default function Dashboard() {
   };
 
   const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, read: true })));
+    setNotifications(notifications.map((n) => ({ ...n, read: true })));
   };
 
   const markAsRead = (notificationId) => {
-    setNotifications(notifications.map(n => 
-      n.id === notificationId ? { ...n, read: true } : n
-    ));
+    setNotifications(
+      notifications.map((n) =>
+        n.id === notificationId ? { ...n, read: true } : n,
+      ),
+    );
   };
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event) => {
-      if (showNotifications && !event.target.closest('.notification-dropdown')) {
+      if (
+        showNotifications &&
+        !event.target.closest(".notification-dropdown")
+      ) {
         setShowNotifications(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showNotifications]);
 
-    // Sample employee data for demo
-    const sampleEmployeeData = {
-      employeeId: 'EMP001',
-      fullName: 'John Smith',
-      position: 'Senior Developer',
-      department: 'Engineering',
-      manager: 'Sarah Wilson',
-      reviewPeriod: '2024',
-      hireDate: '2022-01-15'
-    };
-
+  // Sample employee data for demo
+  const sampleEmployeeData = {
+    employeeId: "EMP001",
+    fullName: "John Smith",
+    position: "Senior Developer",
+    department: "Engineering",
+    manager: "Sarah Wilson",
+    reviewPeriod: "2024",
+    hireDate: "2022-01-15",
+  };
 
   return (
     <div className="min-h-full overflow-scroll bg-gray-50">
@@ -202,10 +205,9 @@ export default function Dashboard() {
               className="p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors relative"
               onClick={() => setShowNotifications(!showNotifications)}
             >
-
               {/* Proper bell icon */}
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
               </svg>
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
@@ -214,14 +216,15 @@ export default function Dashboard() {
               )}
             </button>
 
-
             {/* Notification Dropdown */}
             {showNotifications && (
               <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-lg rounded-lg z-50 max-h-96 overflow-y-auto">
                 {/* Header */}
                 <div className="p-4 border-b border-gray-200 bg-gray-50">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Notifications
+                    </h3>
                     {unreadCount > 0 && (
                       <button
                         onClick={markAllAsRead}
@@ -240,8 +243,8 @@ export default function Dashboard() {
                       <div
                         key={notification.id}
                         className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${
-                          !notification.read 
-                            ? "bg-blue-50 hover:bg-blue-100" 
+                          !notification.read
+                            ? "bg-blue-50 hover:bg-blue-100"
                             : "hover:bg-gray-50"
                         }`}
                         onClick={() => markAsRead(notification.id)}
@@ -268,7 +271,9 @@ export default function Dashboard() {
                                   <span
                                     className="text-xs font-medium"
                                     style={{
-                                      color: getPriorityColor(notification.priority),
+                                      color: getPriorityColor(
+                                        notification.priority,
+                                      ),
                                     }}
                                   >
                                     {notification.priority}
@@ -351,86 +356,89 @@ export default function Dashboard() {
               />
             </div>
           </div>
-        </div></div>
-        {/* Main Dashboard Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Tasks */}
-          <div className="lg:col-span-2">
-            <div className="card">
-              <div className="card-header">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Recent Tasks
-                </h3>
-              </div>
-              <div className="space-y-4">
-                {[1, 2, 3, 4, 5].map((task) => (
-                  <div
-                    key={task}
-                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <span className="text-blue-600 text-sm">T{task}</span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">
-                          Task Title {task}
-                        </p>
-                        <p className="text-sm text-gray-500">Due tomorrow</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="status-badge status-progress">
-                        In Progress
-                      </span>
-                      <span className="priority-badge priority-medium">
-                        Medium
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Activity Feed */}
-          <div>
-            <RecentActivity />
-          </div>
         </div>
-
-        {/* Task Creation Tiles */}
-
-        {/* Quick Actions */}
-        <div className="mt-8">
+      </div>
+      {/* Main Dashboard Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Tasks */}
+        <div className="lg:col-span-2">
           <div className="card">
             <div className="card-header">
               <h3 className="text-lg font-semibold text-gray-900">
-                Quick Actions
+                Recent Tasks
               </h3>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <button className="btn btn-secondary">
-                <span className="mr-2">📊</span>
-                View Reports
-              </button>
-              <button className="btn btn-secondary">
-                <span className="mr-2">👥</span>
-                Team Tasks
-              </button>
-              <button className="btn btn-secondary"  onClick={() => setShowSelfAppraisal(true)}>
-                <span className="mr-2">📝</span>
-                Self-Appraisal
-              </button>
-              <button className="btn btn-secondary">
-                <span className="mr-2">⚙️</span>
-                Settings
-              </button>
-              <button className="btn btn-secondary">
-                <span className="mr-2">📅</span>
-                Calendar
-              </button>
+            <div className="space-y-4">
+              {[1, 2, 3, 4, 5].map((task) => (
+                <div
+                  key={task}
+                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <span className="text-blue-600 text-sm">T{task}</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">
+                        Task Title {task}
+                      </p>
+                      <p className="text-sm text-gray-500">Due tomorrow</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="status-badge status-progress">
+                      In Progress
+                    </span>
+                    <span className="priority-badge priority-medium">
+                      Medium
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
+          </div>
+        </div>
+
+        {/* Activity Feed */}
+        <div>
+          <RecentActivity />
+        </div>
+      </div>
+
+      {/* Task Creation Tiles */}
+
+      {/* Quick Actions */}
+      <div className="mt-8">
+        <div className="card">
+          <div className="card-header">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Quick Actions
+            </h3>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <button className="btn btn-secondary">
+              <span className="mr-2">📊</span>
+              View Reports
+            </button>
+            <button className="btn btn-secondary">
+              <span className="mr-2">👥</span>
+              Team Tasks
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setShowSelfAppraisal(true)}
+            >
+              <span className="mr-2">📝</span>
+              Self-Appraisal
+            </button>
+            <button className="btn btn-secondary">
+              <span className="mr-2">⚙️</span>
+              Settings
+            </button>
+            <button className="btn btn-secondary">
+              <span className="mr-2">📅</span>
+              Calendar
+            </button>
           </div>
         </div>
       </div>
@@ -497,7 +505,9 @@ export default function Dashboard() {
             }}
           >
             <div className="drawer-header">
-              <h2 className="text-2xl font-bold text-white">Create Approval Task</h2>
+              <h2 className="text-2xl font-bold text-white">
+                Create Approval Task
+              </h2>
               <button
                 onClick={() => setShowApprovalTaskModal(false)}
                 className="close-btn"
@@ -530,14 +540,32 @@ export default function Dashboard() {
       {/* Annual Self-Appraisal Form */}
       {showSelfAppraisal && (
         <div className="fixed inset-0 z-50 overflow-hidden">
-          <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={() => setShowSelfAppraisal(false)}></div>
+          <div
+            className="absolute inset-0 bg-gray-500 opacity-75"
+            onClick={() => setShowSelfAppraisal(false)}
+          ></div>
           <div className="flex items-center justify-center min-h-screen px-4 py-8">
             <div className="relative bg-white rounded shadow-lg max-w-3xl mx-auto">
               <div className="flex justify-between items-center bg-gray-100 p-4 border-b">
-                <h2 className="text-lg font-semibold">Annual Self-Appraisal Form</h2>
-                <button onClick={() => setShowSelfAppraisal(false)} className="text-gray-500 hover:text-gray-700">
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                <h2 className="text-lg font-semibold">
+                  Annual Self-Appraisal Form
+                </h2>
+                <button
+                  onClick={() => setShowSelfAppraisal(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    ></path>
                   </svg>
                 </button>
               </div>
@@ -586,10 +614,10 @@ function TaskCreationTile({ type, title, description, icon, color, onClick }) {
           <span className="text-lg">{icon}</span>
         </div>
         {/* <div className="flex-1 min-w-0"> */}
-          <h4 className="text-lg font-semibold text-gray-900 group-hover:text-gray-700 ">
-            {title}
-          </h4>
-          {/* <p className="text-sm text-gray-600 group-hover:text-gray-700">
+        <h4 className="text-lg font-semibold text-gray-900 group-hover:text-gray-700 ">
+          {title}
+        </h4>
+        {/* <p className="text-sm text-gray-600 group-hover:text-gray-700">
             {description}
           </p> */}
         {/* </div> */}
