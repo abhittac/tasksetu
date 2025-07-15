@@ -3,10 +3,12 @@ import StatsCard from "./StatsCard";
 import RecentActivity from "./RecentActivity";
 import CreateTask from "./CreateTask";
 import AnnualSelfAppraisal from './AnnualSelfAppraisal';
+import ApprovalTaskCreator from './ApprovalTaskCreator';
 
 export default function Dashboard() {
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [selectedTaskType, setSelectedTaskType] = useState("regular");
+  const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
   const [showNotifications, setShowNotifications] = React.useState(false)
   const [notifications, setNotifications] = React.useState([
     {
@@ -61,8 +63,17 @@ export default function Dashboard() {
 
 
   const handleCreateTask = (taskType) => {
-    setSelectedTaskType(taskType);
-    setShowCreateTask(true);
+    if (taskType === "approval") {
+      setShowApprovalTaskModal(true);
+    } else {
+      setSelectedTaskType(taskType);
+      setShowCreateTask(true);
+    }
+  };
+
+  const handleCreateApprovalTask = (approvalTaskData) => {
+    console.log('Approval task created:', approvalTaskData);
+    setShowApprovalTaskModal(false);
   };
   const stats = [
     {
@@ -309,7 +320,7 @@ export default function Dashboard() {
         </div>
         <div className="mt-8 mb-4">
           <div className="card">
-            <div className="grid grid-cols-3 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <TaskCreationTile
                 type="regular"
                 title="Simple Task"
@@ -331,9 +342,16 @@ export default function Dashboard() {
                 color="purple"
                 onClick={() => handleCreateTask("milestone")}
               />
+              <TaskCreationTile
+                type="approval"
+                title="Approval Task"
+                icon="✅"
+                color="orange"
+                onClick={() => handleCreateTask("approval")}
+              />
             </div>
           </div>
-        </div>
+        </div></div>
         {/* Main Dashboard Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Tasks */}
@@ -462,6 +480,53 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Approval Task Modal */}
+      {showApprovalTaskModal && (
+        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
+          <div
+            className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowApprovalTaskModal(false)}
+          ></div>
+          <div
+            className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right"
+            style={{
+              width: "min(90vw, 600px)",
+              boxShadow: "-10px 0 50px rgba(0,0,0,0.2)",
+              borderLeft: "1px solid rgba(255,255,255,0.2)",
+            }}
+          >
+            <div className="drawer-header">
+              <h2 className="text-2xl font-bold text-white">Create Approval Task</h2>
+              <button
+                onClick={() => setShowApprovalTaskModal(false)}
+                className="close-btn"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="drawer-body">
+              <ApprovalTaskCreator
+                onClose={() => setShowApprovalTaskModal(false)}
+                onSubmit={handleCreateApprovalTask}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Annual Self-Appraisal Form */}
       {showSelfAppraisal && (
         <div className="fixed inset-0 z-50 overflow-hidden">
@@ -498,12 +563,15 @@ function TaskCreationTile({ type, title, description, icon, color, onClick }) {
       "border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 cursor-pointer",
     purple:
       "border-purple-500 bg-gradient-to-br from-purple-50 to-violet-50 hover:from-purple-100 hover:to-violet-100 cursor-pointer",
+    orange:
+      "border-orange-500 bg-gradient-to-br from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100 cursor-pointer",
   };
 
   const iconColorClasses = {
     blue: "bg-blue-500 text-white",
     green: "bg-green-500 text-white",
     purple: "bg-purple-500 text-white",
+    orange: "bg-orange-500 text-white",
   };
 
   return (
