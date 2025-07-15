@@ -7,6 +7,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
+  const [taskTypeFilter, setTaskTypeFilter] = useState('all')
   const [sortBy, setSortBy] = useState('dueDate')
   const [selectedTaskId, setSelectedTaskId] = useState(null)
   const [showSnooze, setShowSnooze] = useState(false);
@@ -217,6 +218,45 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       recurringFromTaskId: 1002,
       subtasks: []
     },
+    {
+      id: 7,
+      title: "Project Alpha Launch",
+      assignee: "Project Manager",
+      assigneeId: 7,
+      status: "OPEN",
+      priority: "High",
+      dueDate: "2024-02-15",
+      category: "Milestone",
+      progress: 0,
+      subtaskCount: 0,
+      collaborators: [1, 2, 3],
+      createdBy: "Current User",
+      creatorId: 1,
+      type: "milestone",
+      subtasks: []
+    },
+    {
+      id: 8,
+      title: "Budget Approval for Q2",
+      assignee: "Finance Team",
+      assigneeId: 8,
+      status: "OPEN",
+      priority: "High",
+      dueDate: "2024-01-31",
+      category: "Approval",
+      progress: 0,
+      subtaskCount: 0,
+      collaborators: [],
+      createdBy: "Current User",
+      creatorId: 1,
+      isApprovalTask: true,
+      approvers: [
+        { id: 1, name: 'Current User', role: 'Admin', status: 'pending' },
+        { id: 9, name: 'Finance Director', role: 'Director', status: 'pending' }
+      ],
+      approvalMode: 'all',
+      subtasks: []
+    },
   ]);
 
   // Company-defined statuses with comprehensive management
@@ -310,6 +350,14 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [statusMappings] = useState([
     // Example: { oldStatusCode: 'OLD_STATUS', newStatusCode: 'OPEN', mappedAt: '2024-01-15T00:00:00Z' }
   ]);
+
+  // Task type detection function
+  const getTaskType = (task) => {
+    if (task.isApprovalTask) return 'Approval Task';
+    if (task.isRecurring || task.recurringFromTaskId) return 'Recurring Task';
+    if (task.category === 'Milestone' || task.type === 'milestone') return 'Milestone';
+    return 'Simple Task';
+  };
 
   const getStatusLabel = (statusCode) => {
     const status = companyStatuses.find(s => s.code === statusCode);
@@ -1099,6 +1147,18 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               <option value="urgent">Urgent</option>
             </select>
 
+            <select
+              value={taskTypeFilter}
+              onChange={(e) => setTaskTypeFilter(e.target.value)}
+              className="form-select"
+            >
+              <option value="all">All Task Types</option>
+              <option value="Simple Task">Simple Task</option>
+              <option value="Recurring Task">Recurring Task</option>
+              <option value="Milestone">Milestone</option>
+              <option value="Approval Task">Approval Task</option>
+            </select>
+
             <select className="form-select">
               <option>All Categories</option>
               <option>Development</option>
@@ -1154,7 +1214,28 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {tasks.map((task) => (
+              {tasks.filter(task => {
+                // Apply search filter
+                const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    task.assignee.toLowerCase().includes(searchTerm.toLowerCase());
+                
+                // Apply status filter
+                const matchesStatus = statusFilter === 'all' || 
+                                    (statusFilter === 'todo' && task.status === 'OPEN') ||
+                                    (statusFilter === 'progress' && task.status === 'INPROGRESS') ||
+                                    (statusFilter === 'review' && task.status === 'ONHOLD') ||
+                                    (statusFilter === 'completed' && task.status === 'DONE');
+                
+                // Apply priority filter
+                const matchesPriority = priorityFilter === 'all' || 
+                                      task.priority.toLowerCase() === priorityFilter.toLowerCase();
+                
+                // Apply task type filter
+                const taskType = getTaskType(task);
+                const matchesTaskType = taskTypeFilter === 'all' || taskType === taskTypeFilter;
+                
+                return matchesSearch && matchesStatus && matchesPriority && matchesTaskType;
+              }).map((task) => (
                 <React.Fragment key={task.id}>
                   <tr
                     className={`hover:bg-gray-50 transition-colors ${
@@ -1203,6 +1284,22 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                                   title="Recurring Task – generated from a pattern"
                                 >
                                   🔁
+                                </span>
+                              )}
+                              {task.isApprovalTask && (
+                                <span 
+                                  className="text-orange-600 cursor-help"
+                                  title="Approval Task – requires approval workflow"
+                                >
+                                  ✅
+                                </span>
+                              )}
+                              {(task.category === 'Milestone' || task.type === 'milestone') && (
+                                <span 
+                                  className="text-purple-600 cursor-help"
+                                  title="Milestone – project checkpoint"
+                                >
+                                  🎯
                                 </span>
                               )}
                               <span
