@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import CreateTask from './CreateTask'
-import ApprovalTaskCreator from './ApprovalTaskCreator'
-import Toast from './Toast'
+import React, { useState, useEffect } from "react";
+import CreateTask from "./CreateTask";
+import ApprovalTaskCreator from "./ApprovalTaskCreator";
+import Toast from "./Toast";
 
 export default function AllTasks({ onCreateTask, onNavigateToTask }) {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [priorityFilter, setPriorityFilter] = useState('all')
-  const [taskTypeFilter, setTaskTypeFilter] = useState('all')
-  const [sortBy, setSortBy] = useState('dueDate')
-  const [selectedTaskId, setSelectedTaskId] = useState(null)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [taskTypeFilter, setTaskTypeFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("dueDate");
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [showSnooze, setShowSnooze] = useState(false);
   const [showCreateTaskDrawer, setShowCreateTaskDrawer] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
@@ -18,12 +18,17 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [editingTask, setEditingTask] = useState(null);
   const [selectedTasks, setSelectedTasks] = useState([]);
   const [showBulkActions, setShowBulkActions] = useState(false);
-  const [currentUser] = useState({ id: 1, name: 'Current User', role: 'admin' });
+  const [currentUser] = useState({
+    id: 1,
+    name: "Current User",
+    role: "admin",
+  });
   const [showStatusConfirmation, setShowStatusConfirmation] = useState(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(null);
-  const [showDeleteSubtaskConfirmation, setShowDeleteSubtaskConfirmation] = useState(null);
+  const [showDeleteSubtaskConfirmation, setShowDeleteSubtaskConfirmation] =
+    useState(null);
   const [showTaskTypeDropdown, setShowTaskTypeDropdown] = useState(false);
-  const [selectedTaskType, setSelectedTaskType] = useState('regular');
+  const [selectedTaskType, setSelectedTaskType] = useState("regular");
   const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
   const [expandedTasks, setExpandedTasks] = useState(new Set());
   const [showSubtaskCreator, setShowSubtaskCreator] = useState(null);
@@ -32,7 +37,11 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [selectedDateForTask, setSelectedDateForTask] = useState(null);
   // const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
   const [selectedApprovalTask, setSelectedApprovalTask] = useState(null);
-  const [toast, setToast] = useState({ message: '', type: 'success', isVisible: false });
+  const [toast, setToast] = useState({
+    message: "",
+    type: "success",
+    isVisible: false,
+  });
   const [tasks, setTasks] = useState([
     {
       id: 1,
@@ -50,46 +59,46 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       creatorId: 1,
       isRecurring: false,
       subtasks: [
-        { 
-          id: 101, 
+        {
+          id: 101,
           title: "Setup OAuth providers",
           assignee: "John Doe",
           assigneeId: 2,
-          status: "DONE", 
+          status: "DONE",
           priority: "High",
           dueDate: "2024-01-22",
           progress: 100,
           parentTaskId: 1,
           createdBy: "Current User",
-          createdAt: "2024-01-15T09:00:00Z"
+          createdAt: "2024-01-15T09:00:00Z",
         },
-        { 
-          id: 102, 
+        {
+          id: 102,
           title: "Implement session management",
           assignee: "Jane Smith",
           assigneeId: 3,
-          status: "INPROGRESS", 
+          status: "INPROGRESS",
           priority: "High",
           dueDate: "2024-01-24",
           progress: 75,
           parentTaskId: 1,
           createdBy: "Current User",
-          createdAt: "2024-01-16T10:00:00Z"
+          createdAt: "2024-01-16T10:00:00Z",
         },
-        { 
-          id: 103, 
+        {
+          id: 103,
           title: "Add password reset flow",
           assignee: "Mike Johnson",
           assigneeId: 4,
-          status: "OPEN", 
+          status: "OPEN",
           priority: "Medium",
           dueDate: "2024-01-26",
           progress: 0,
           parentTaskId: 1,
           createdBy: "Current User",
-          createdAt: "2024-01-17T11:00:00Z"
-        }
-      ]
+          createdAt: "2024-01-17T11:00:00Z",
+        },
+      ],
     },
     {
       id: 2,
@@ -105,7 +114,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       collaborators: [],
       createdBy: "Current User",
       creatorId: 1,
-      subtasks: []
+      subtasks: [],
     },
     {
       id: 3,
@@ -123,8 +132,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       creatorId: 3,
       subtasks: [
         { id: 201, status: "completed" },
-        { id: 202, status: "completed" }
-      ]
+        { id: 202, status: "completed" },
+      ],
     },
     {
       id: 4,
@@ -141,46 +150,46 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       createdBy: "Current User",
       creatorId: 1,
       subtasks: [
-        { 
-          id: 301, 
+        {
+          id: 301,
           title: "Prepare interview questions",
           assignee: "Sarah Wilson",
           assigneeId: 5,
-          status: "DONE", 
+          status: "DONE",
           priority: "High",
           dueDate: "2024-01-25",
           progress: 100,
           parentTaskId: 4,
           createdBy: "Current User",
-          createdAt: "2024-01-20T09:00:00Z"
+          createdAt: "2024-01-20T09:00:00Z",
         },
-        { 
-          id: 302, 
+        {
+          id: 302,
           title: "Schedule participant sessions",
           assignee: "Emily Davis",
           assigneeId: 6,
-          status: "INPROGRESS", 
+          status: "INPROGRESS",
           priority: "Medium",
           dueDate: "2024-01-27",
           progress: 60,
           parentTaskId: 4,
           createdBy: "Sarah Wilson",
-          createdAt: "2024-01-21T10:00:00Z"
+          createdAt: "2024-01-21T10:00:00Z",
         },
-        { 
-          id: 303, 
+        {
+          id: 303,
           title: "Analyze interview data",
           assignee: "Sarah Wilson",
           assigneeId: 5,
-          status: "OPEN", 
+          status: "OPEN",
           priority: "High",
           dueDate: "2024-01-30",
           progress: 0,
           parentTaskId: 4,
           createdBy: "Current User",
-          createdAt: "2024-01-22T11:00:00Z"
-        }
-      ]
+          createdAt: "2024-01-22T11:00:00Z",
+        },
+      ],
     },
     {
       id: 5,
@@ -198,7 +207,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       creatorId: 0,
       isRecurring: true,
       recurringFromTaskId: 1001,
-      subtasks: []
+      subtasks: [],
     },
     {
       id: 6,
@@ -216,7 +225,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       creatorId: 0,
       isRecurring: true,
       recurringFromTaskId: 1002,
-      subtasks: []
+      subtasks: [],
     },
     {
       id: 7,
@@ -233,7 +242,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       createdBy: "Current User",
       creatorId: 1,
       type: "milestone",
-      subtasks: []
+      subtasks: [],
     },
     {
       id: 8,
@@ -251,11 +260,16 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       creatorId: 1,
       isApprovalTask: true,
       approvers: [
-        { id: 1, name: 'Current User', role: 'Admin', status: 'pending' },
-        { id: 9, name: 'Finance Director', role: 'Director', status: 'pending' }
+        { id: 1, name: "Current User", role: "Admin", status: "pending" },
+        {
+          id: 9,
+          name: "Finance Director",
+          role: "Director",
+          status: "pending",
+        },
       ],
-      approvalMode: 'all',
-      subtasks: []
+      approvalMode: "all",
+      subtasks: [],
     },
   ]);
 
@@ -263,84 +277,84 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [companyStatuses] = useState([
     {
       id: 1,
-      code: 'OPEN',
-      label: 'Open',
-      description: 'Task is created but not yet started',
-      color: '#6c757d',
+      code: "OPEN",
+      label: "Open",
+      description: "Task is created but not yet started",
+      color: "#6c757d",
       isFinal: false,
       isDefault: true,
       active: true,
       order: 1,
-      systemMapping: 'SYS_OPEN',
-      allowedTransitions: ['INPROGRESS', 'ONHOLD', 'CANCELLED'],
+      systemMapping: "SYS_OPEN",
+      allowedTransitions: ["INPROGRESS", "ONHOLD", "CANCELLED"],
       isSystem: false,
-      createdAt: '2024-01-01T00:00:00Z',
-      tooltip: 'New task ready to be started'
+      createdAt: "2024-01-01T00:00:00Z",
+      tooltip: "New task ready to be started",
     },
     {
       id: 2,
-      code: 'INPROGRESS',
-      label: 'In Progress',
-      description: 'Task is being actively worked on',
-      color: '#3498db',
+      code: "INPROGRESS",
+      label: "In Progress",
+      description: "Task is being actively worked on",
+      color: "#3498db",
       isFinal: false,
       isDefault: false,
       active: true,
       order: 2,
-      systemMapping: 'SYS_INPROGRESS',
-      allowedTransitions: ['ONHOLD', 'DONE', 'CANCELLED'],
+      systemMapping: "SYS_INPROGRESS",
+      allowedTransitions: ["ONHOLD", "DONE", "CANCELLED"],
       isSystem: false,
-      createdAt: '2024-01-01T00:00:00Z',
-      tooltip: 'Work is currently in progress on this task'
+      createdAt: "2024-01-01T00:00:00Z",
+      tooltip: "Work is currently in progress on this task",
     },
     {
       id: 3,
-      code: 'ONHOLD',
-      label: 'On Hold',
-      description: 'Task is temporarily paused',
-      color: '#f39c12',
+      code: "ONHOLD",
+      label: "On Hold",
+      description: "Task is temporarily paused",
+      color: "#f39c12",
       isFinal: false,
       isDefault: false,
       active: true,
       order: 3,
-      systemMapping: 'SYS_ONHOLD',
-      allowedTransitions: ['INPROGRESS', 'CANCELLED'],
+      systemMapping: "SYS_ONHOLD",
+      allowedTransitions: ["INPROGRESS", "CANCELLED"],
       isSystem: false,
-      createdAt: '2024-01-01T00:00:00Z',
-      tooltip: 'Task is paused temporarily'
+      createdAt: "2024-01-01T00:00:00Z",
+      tooltip: "Task is paused temporarily",
     },
     {
       id: 4,
-      code: 'DONE',
-      label: 'Completed',
-      description: 'Task has been completed successfully',
-      color: '#28a745',
+      code: "DONE",
+      label: "Completed",
+      description: "Task has been completed successfully",
+      color: "#28a745",
       isFinal: true,
       isDefault: false,
       active: true,
       order: 4,
-      systemMapping: 'SYS_DONE',
+      systemMapping: "SYS_DONE",
       allowedTransitions: [],
       isSystem: false,
-      createdAt: '2024-01-01T00:00:00Z',
-      tooltip: 'Task has been successfully completed'
+      createdAt: "2024-01-01T00:00:00Z",
+      tooltip: "Task has been successfully completed",
     },
     {
       id: 5,
-      code: 'CANCELLED',
-      label: 'Cancelled',
-      description: 'Task was terminated intentionally',
-      color: '#dc3545',
+      code: "CANCELLED",
+      label: "Cancelled",
+      description: "Task was terminated intentionally",
+      color: "#dc3545",
       isFinal: true,
       isDefault: false,
       active: true,
       order: 5,
-      systemMapping: 'SYS_CANCELLED',
+      systemMapping: "SYS_CANCELLED",
       allowedTransitions: [],
       isSystem: false,
-      createdAt: '2024-01-01T00:00:00Z',
-      tooltip: 'Task was cancelled and will not be completed'
-    }
+      createdAt: "2024-01-01T00:00:00Z",
+      tooltip: "Task was cancelled and will not be completed",
+    },
   ]);
 
   // Status change history for activity tracking
@@ -353,37 +367,39 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
   // Task type detection function
   const getTaskType = (task) => {
-    if (task.isApprovalTask) return 'Approval Task';
-    if (task.isRecurring || task.recurringFromTaskId) return 'Recurring Task';
-    if (task.category === 'Milestone' || task.type === 'milestone') return 'Milestone';
-    return 'Simple Task';
+    if (task.isApprovalTask) return "Approval Task";
+    if (task.isRecurring || task.recurringFromTaskId) return "Recurring Task";
+    if (task.category === "Milestone" || task.type === "milestone")
+      return "Milestone";
+    return "Simple Task";
   };
 
   const getStatusLabel = (statusCode) => {
-    const status = companyStatuses.find(s => s.code === statusCode);
+    const status = companyStatuses.find((s) => s.code === statusCode);
     return status ? status.label : statusCode;
   };
 
   const getStatusColor = (statusCode) => {
-    const status = companyStatuses.find(s => s.code === statusCode);
-    return status ? status.color : '#6c757d';
+    const status = companyStatuses.find((s) => s.code === statusCode);
+    return status ? status.color : "#6c757d";
   };
 
   const getStatusBadge = (statusCode) => {
-    const status = companyStatuses.find(s => s.code === statusCode);
-    const baseClass = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium";
+    const status = companyStatuses.find((s) => s.code === statusCode);
+    const baseClass =
+      "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium";
 
     if (!status) return `${baseClass} bg-gray-100 text-gray-800`;
 
     // Convert hex to RGB for background opacity
-    const hex = status.color.replace('#', '');
+    const hex = status.color.replace("#", "");
     const r = parseInt(hex.substr(0, 2), 16);
     const g = parseInt(hex.substr(2, 2), 16);
     const b = parseInt(hex.substr(4, 2), 16);
 
     return {
       className: `${baseClass} text-white`,
-      style: { backgroundColor: status.color }
+      style: { backgroundColor: status.color },
     };
   };
 
@@ -392,7 +408,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     return (
       task.assigneeId === currentUser.id ||
       task.collaborators?.includes(currentUser.id) ||
-      currentUser.role === 'admin' ||
+      currentUser.role === "admin" ||
       task.creatorId === currentUser.id
     );
   };
@@ -401,8 +417,9 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const canMarkAsCompleted = (task) => {
     if (!task.subtasks || task.subtasks.length === 0) return true;
 
-    const incompleteSubtasks = task.subtasks.filter(subtask => 
-      subtask.status !== 'completed' && subtask.status !== 'cancelled'
+    const incompleteSubtasks = task.subtasks.filter(
+      (subtask) =>
+        subtask.status !== "completed" && subtask.status !== "cancelled",
     );
 
     return incompleteSubtasks.length === 0;
@@ -410,23 +427,32 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
   // Get valid status transitions based on business rules
   const getValidStatusTransitions = (currentStatusCode, task = null) => {
-    const currentStatus = companyStatuses.find(s => s.code === currentStatusCode && s.active);
+    const currentStatus = companyStatuses.find(
+      (s) => s.code === currentStatusCode && s.active,
+    );
     if (!currentStatus) return [];
 
-    let validTransitions = currentStatus.allowedTransitions.filter(transitionCode => {
-      const targetStatus = companyStatuses.find(s => s.code === transitionCode && s.active);
-      return targetStatus !== null;
-    });
+    let validTransitions = currentStatus.allowedTransitions.filter(
+      (transitionCode) => {
+        const targetStatus = companyStatuses.find(
+          (s) => s.code === transitionCode && s.active,
+        );
+        return targetStatus !== null;
+      },
+    );
 
     // Apply sub-task completion logic for parent tasks
     if (task && task.subtasks && task.subtasks.length > 0) {
-      const hasIncompleteSubtasks = task.subtasks.some(subtask => 
-        subtask.status !== 'DONE' && subtask.status !== 'CANCELLED'
+      const hasIncompleteSubtasks = task.subtasks.some(
+        (subtask) =>
+          subtask.status !== "DONE" && subtask.status !== "CANCELLED",
       );
 
       // Block completion if sub-tasks are incomplete
       if (hasIncompleteSubtasks) {
-        validTransitions = validTransitions.filter(transition => transition !== 'DONE');
+        validTransitions = validTransitions.filter(
+          (transition) => transition !== "DONE",
+        );
       }
     }
 
@@ -434,7 +460,13 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   };
 
   // Log status change for activity tracking and audit trail
-  const logStatusChange = (taskId, oldStatusCode, newStatusCode, userId, reason = null) => {
+  const logStatusChange = (
+    taskId,
+    oldStatusCode,
+    newStatusCode,
+    userId,
+    reason = null,
+  ) => {
     const historyEntry = {
       id: Date.now(),
       taskId,
@@ -444,49 +476,64 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       changedAt: new Date().toISOString(),
       reason,
       oldStatusLabel: getStatusLabel(oldStatusCode),
-      newStatusLabel: getStatusLabel(newStatusCode)
+      newStatusLabel: getStatusLabel(newStatusCode),
     };
 
-    setStatusHistory(prev => [...prev, historyEntry]);
+    setStatusHistory((prev) => [...prev, historyEntry]);
 
     // In real app, this would be sent to backend for permanent storage
-    console.log('Status Change Logged:', historyEntry);
+    console.log("Status Change Logged:", historyEntry);
   };
 
   // Apply legacy status mapping for retroactive compatibility
   const applyStatusMapping = (statusCode) => {
-    const mapping = statusMappings.find(m => m.oldStatusCode === statusCode);
+    const mapping = statusMappings.find((m) => m.oldStatusCode === statusCode);
     return mapping ? mapping.newStatusCode : statusCode;
   };
 
   // Handle status change with comprehensive validation
-  const handleStatusChange = (taskId, newStatusCode, requiresConfirmation = false, reason = null) => {
-    const task = tasks.find(t => t.id === taskId);
-    const newStatus = companyStatuses.find(s => s.code === newStatusCode && s.active);
+  const handleStatusChange = (
+    taskId,
+    newStatusCode,
+    requiresConfirmation = false,
+    reason = null,
+  ) => {
+    const task = tasks.find((t) => t.id === taskId);
+    const newStatus = companyStatuses.find(
+      (s) => s.code === newStatusCode && s.active,
+    );
 
     if (!task || !newStatus) {
-      console.error('Invalid task or status code provided');
+      console.error("Invalid task or status code provided");
       return;
     }
 
     // Check edit permissions
     if (!canEditTaskStatus(task)) {
-      alert('You do not have permission to edit this task status.');
+      alert("You do not have permission to edit this task status.");
       return;
     }
 
     // Validate status transition
     const validTransitions = getValidStatusTransitions(task.status, task);
     if (!validTransitions.includes(newStatusCode)) {
-      const currentStatusObj = companyStatuses.find(s => s.code === task.status);
-      alert(`Invalid status transition from "${currentStatusObj?.label || task.status}" to "${newStatus.label}". Please follow the allowed workflow.`);
+      const currentStatusObj = companyStatuses.find(
+        (s) => s.code === task.status,
+      );
+      alert(
+        `Invalid status transition from "${currentStatusObj?.label || task.status}" to "${newStatus.label}". Please follow the allowed workflow.`,
+      );
       return;
     }
 
     // Check sub-task completion logic
-    if (newStatusCode === 'DONE' && !canMarkAsCompleted(task)) {
-      const incompleteCount = task.subtasks.filter(s => s.status !== 'completed' && s.status !== 'cancelled').length;
-      alert(`Cannot mark task as completed. There are ${incompleteCount} incomplete sub-tasks that must be completed or cancelled first.`);
+    if (newStatusCode === "DONE" && !canMarkAsCompleted(task)) {
+      const incompleteCount = task.subtasks.filter(
+        (s) => s.status !== "completed" && s.status !== "cancelled",
+      ).length;
+      alert(
+        `Cannot mark task as completed. There are ${incompleteCount} incomplete sub-tasks that must be completed or cancelled first.`,
+      );
       return;
     }
 
@@ -497,7 +544,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
         newStatusCode,
         taskTitle: task.title,
         statusLabel: newStatus.label,
-        reason
+        reason,
       });
       return;
     }
@@ -508,31 +555,39 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
   // Execute the actual status change
   const executeStatusChange = (taskId, newStatusCode, reason = null) => {
-    const task = tasks.find(t => t.id === taskId);
+    const task = tasks.find((t) => t.id === taskId);
     const oldStatusCode = task.status;
 
     // Update task status with autosave
-    setTasks(prevTasks => 
-      prevTasks.map(t => 
-        t.id === taskId 
-          ? { 
-              ...t, 
-              status: newStatusCode, 
-              progress: newStatusCode === 'DONE' ? 100 : t.progress,
+    setTasks((prevTasks) =>
+      prevTasks.map((t) =>
+        t.id === taskId
+          ? {
+              ...t,
+              status: newStatusCode,
+              progress: newStatusCode === "DONE" ? 100 : t.progress,
               lastModified: new Date().toISOString(),
-              lastModifiedBy: currentUser.name
+              lastModifiedBy: currentUser.name,
             }
-          : t
-      )
+          : t,
+      ),
     );
 
     // Log the status change for audit trail
-    logStatusChange(taskId, oldStatusCode, newStatusCode, currentUser.id, reason);
+    logStatusChange(
+      taskId,
+      oldStatusCode,
+      newStatusCode,
+      currentUser.id,
+      reason,
+    );
 
     // Show success notification (in real app, would be a toast notification)
-    const oldStatus = companyStatuses.find(s => s.code === oldStatusCode);
-    const newStatus = companyStatuses.find(s => s.code === newStatusCode);
-    console.log(`✅ Status updated: "${task.title}" changed from "${oldStatus?.label || oldStatusCode}" to "${newStatus.label}"`);
+    const oldStatus = companyStatuses.find((s) => s.code === oldStatusCode);
+    const newStatus = companyStatuses.find((s) => s.code === newStatusCode);
+    console.log(
+      `✅ Status updated: "${task.title}" changed from "${oldStatus?.label || oldStatusCode}" to "${newStatus.label}"`,
+    );
   };
 
   // Permission check for task deletion
@@ -540,22 +595,22 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     return (
       task.creatorId === currentUser.id ||
       task.assigneeId === currentUser.id ||
-      currentUser.role === 'admin'
+      currentUser.role === "admin"
     );
   };
 
   // Handle task deletion with integrity checks
   const handleDeleteTask = (taskId, options = {}) => {
-    const task = tasks.find(t => t.id === taskId);
+    const task = tasks.find((t) => t.id === taskId);
 
     if (!task) {
-      console.error('Task not found');
+      console.error("Task not found");
       return;
     }
 
     // Check permissions
     if (!canDeleteTask(task)) {
-      alert('You do not have permission to delete this task.');
+      alert("You do not have permission to delete this task.");
       return;
     }
 
@@ -566,39 +621,47 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
         deleteSubtasks: false,
         deleteAttachments: false,
         deleteLinkedItems: false,
-        ...options
-      }
+        ...options,
+      },
     });
   };
 
   // Execute task deletion
   const executeTaskDeletion = (taskId, options) => {
-    const task = tasks.find(t => t.id === taskId);
+    const task = tasks.find((t) => t.id === taskId);
 
     // Remove task from list
-    setTasks(prevTasks => prevTasks.filter(t => t.id !== taskId));
+    setTasks((prevTasks) => prevTasks.filter((t) => t.id !== taskId));
 
     // Handle subtasks deletion
     if (options.deleteSubtasks && task.subtasks && task.subtasks.length > 0) {
-      console.log(`Deleted ${task.subtasks.length} subtasks for task: ${task.title}`);
+      console.log(
+        `Deleted ${task.subtasks.length} subtasks for task: ${task.title}`,
+      );
     }
 
     // Handle attachments/linked items
-    if (options.deleteAttachments && task.linkedItems && task.linkedItems.length > 0) {
-      console.log(`Deleted ${task.linkedItems.length} linked items for task: ${task.title}`);
+    if (
+      options.deleteAttachments &&
+      task.linkedItems &&
+      task.linkedItems.length > 0
+    ) {
+      console.log(
+        `Deleted ${task.linkedItems.length} linked items for task: ${task.title}`,
+      );
     }
 
     // Log activity for audit trail
-    logActivity('task_deleted', {
+    logActivity("task_deleted", {
       taskId: task.id,
       taskTitle: task.title,
       deletedBy: currentUser.name,
       timestamp: new Date().toISOString(),
-      options: options
+      options: options,
     });
 
     // Show success toast notification
-    showToast(`Task "${task.title}" deleted successfully`, 'success');
+    showToast(`Task "${task.title}" deleted successfully`, "success");
 
     // Close confirmation modal
     setShowDeleteConfirmation(null);
@@ -606,25 +669,36 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
   // Handle bulk task deletion
   const handleBulkDeleteTasks = () => {
-    const selectedTaskObjects = tasks.filter(t => selectedTasks.includes(t.id));
+    const selectedTaskObjects = tasks.filter((t) =>
+      selectedTasks.includes(t.id),
+    );
     const errors = [];
 
-    selectedTaskObjects.forEach(task => {
+    selectedTaskObjects.forEach((task) => {
       if (!canDeleteTask(task)) {
         errors.push(`No permission to delete: ${task.title}`);
       }
     });
 
     if (errors.length > 0) {
-      alert(`Cannot delete some tasks:\n${errors.join('\n')}`);
+      alert(`Cannot delete some tasks:\n${errors.join("\n")}`);
       return;
     }
 
-    if (window.confirm(`Are you sure you want to delete ${selectedTasks.length} selected tasks? This action cannot be undone.`)) {
-      setTasks(prevTasks => prevTasks.filter(task => !selectedTasks.includes(task.id)));
+    if (
+      window.confirm(
+        `Are you sure you want to delete ${selectedTasks.length} selected tasks? This action cannot be undone.`,
+      )
+    ) {
+      setTasks((prevTasks) =>
+        prevTasks.filter((task) => !selectedTasks.includes(task.id)),
+      );
       setSelectedTasks([]);
       setShowBulkActions(false);
-      showToast(`${selectedTaskObjects.length} tasks deleted successfully`, 'success');
+      showToast(
+        `${selectedTaskObjects.length} tasks deleted successfully`,
+        "success",
+      );
     }
   };
 
@@ -633,63 +707,75 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     // In real app, this would be sent to backend for permanent audit trail
   };
 
-  const showToast = (message, type = 'success') => {
+  const showToast = (message, type = "success") => {
     setToast({ message, type, isVisible: true });
   };
 
   // Handle bulk status update
   const handleBulkStatusUpdate = (newStatusCode) => {
-    const selectedTaskObjects = tasks.filter(t => selectedTasks.includes(t.id));
+    const selectedTaskObjects = tasks.filter((t) =>
+      selectedTasks.includes(t.id),
+    );
     const errors = [];
 
-    selectedTaskObjects.forEach(task => {
+    selectedTaskObjects.forEach((task) => {
       if (!canEditTaskStatus(task)) {
         errors.push(`No permission to edit: ${task.title}`);
         return;
       }
 
-      if (newStatusCode === 'DONE' && !canMarkAsCompleted(task)) {
-        const incompleteCount = task.subtasks.filter(s => s.status !== 'completed' && s.status !== 'cancelled').length;
-        errors.push(`"${task.title}" has ${incompleteCount} incomplete sub-tasks`);
+      if (newStatusCode === "DONE" && !canMarkAsCompleted(task)) {
+        const incompleteCount = task.subtasks.filter(
+          (s) => s.status !== "completed" && s.status !== "cancelled",
+        ).length;
+        errors.push(
+          `"${task.title}" has ${incompleteCount} incomplete sub-tasks`,
+        );
         return;
       }
     });
 
     if (errors.length > 0) {
-      alert(`Cannot update some tasks:\n${errors.join('\n')}`);
+      alert(`Cannot update some tasks:\n${errors.join("\n")}`);
       return;
     }
 
     // Update all selected tasks
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
         selectedTasks.includes(task.id)
-          ? { ...task, status: newStatusCode, progress: newStatusCode === 'DONE' ? 100 : task.progress }
-          : task
-      )
+          ? {
+              ...task,
+              status: newStatusCode,
+              progress: newStatusCode === "DONE" ? 100 : task.progress,
+            }
+          : task,
+      ),
     );
 
     // Clear selection
     setSelectedTasks([]);
     setShowBulkActions(false);
 
-    const newStatus = companyStatuses.find(s => s.code === newStatusCode);
-    console.log(`Bulk updated ${selectedTasks.length} tasks to ${newStatus.label} by ${currentUser.name}`);
+    const newStatus = companyStatuses.find((s) => s.code === newStatusCode);
+    console.log(
+      `Bulk updated ${selectedTasks.length} tasks to ${newStatus.label} by ${currentUser.name}`,
+    );
   };
 
   // Handle task selection
   const handleTaskSelection = (taskId, isSelected) => {
     if (isSelected) {
-      setSelectedTasks(prev => [...prev, taskId]);
+      setSelectedTasks((prev) => [...prev, taskId]);
     } else {
-      setSelectedTasks(prev => prev.filter(id => id !== taskId));
+      setSelectedTasks((prev) => prev.filter((id) => id !== taskId));
     }
   };
 
   // Handle select all
   const handleSelectAll = (isSelected) => {
     if (isSelected) {
-      setSelectedTasks(tasks.map(t => t.id));
+      setSelectedTasks(tasks.map((t) => t.id));
     } else {
       setSelectedTasks([]);
     }
@@ -756,24 +842,24 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   };
 
   const handleViewTask = (taskId) => {
-    const task = tasks.find(t => t.id === taskId);
-    
+    const task = tasks.find((t) => t.id === taskId);
+
     // If it's an approval task, show the approval modal
     if (task && task.isApprovalTask) {
       setSelectedApprovalTask(task);
       setShowApprovalTaskModal(true);
       return;
     }
-    
+
     // Navigate to task detail page for regular tasks
     if (onNavigateToTask) {
-      onNavigateToTask(taskId)
+      onNavigateToTask(taskId);
     }
-  }
+  };
 
   // Toggle task expansion
   const handleToggleTaskExpansion = (taskId) => {
-    setExpandedTasks(prev => {
+    setExpandedTasks((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(taskId)) {
         newSet.delete(taskId);
@@ -791,114 +877,116 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       title: subtaskData.title,
       assignee: subtaskData.assignee || currentUser.name,
       assigneeId: subtaskData.assigneeId || currentUser.id,
-      status: subtaskData.status || 'OPEN',
-      priority: subtaskData.priority || 'Medium',
+      status: subtaskData.status || "OPEN",
+      priority: subtaskData.priority || "Medium",
       dueDate: subtaskData.dueDate,
       progress: 0,
       parentTaskId: parentTaskId,
       createdBy: currentUser.name,
       createdAt: new Date().toISOString(),
-      description: subtaskData.description || ''
+      description: subtaskData.description || "",
     };
 
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === parentTaskId 
-          ? { 
-              ...task, 
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === parentTaskId
+          ? {
+              ...task,
               subtasks: [...(task.subtasks || []), newSubtask],
-              subtaskCount: (task.subtaskCount || 0) + 1
+              subtaskCount: (task.subtaskCount || 0) + 1,
             }
-          : task
-      )
+          : task,
+      ),
     );
 
     setShowSubtaskCreator(null);
-    
+
     // Auto-expand parent task to show new subtask
-    setExpandedTasks(prev => new Set([...prev, parentTaskId]));
+    setExpandedTasks((prev) => new Set([...prev, parentTaskId]));
   };
 
   // Update subtask
   const handleUpdateSubtask = (parentTaskId, updatedSubtask) => {
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === parentTaskId 
-          ? { 
-              ...task, 
-              subtasks: task.subtasks.map(subtask => 
-                subtask.id === updatedSubtask.id ? updatedSubtask : subtask
-              )
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === parentTaskId
+          ? {
+              ...task,
+              subtasks: task.subtasks.map((subtask) =>
+                subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
+              ),
             }
-          : task
-      )
+          : task,
+      ),
     );
     setSelectedSubtask(null);
   };
 
   // Delete subtask
   const handleDeleteSubtask = (parentTaskId, subtaskId) => {
-    const parentTask = tasks.find(t => t.id === parentTaskId);
-    const subtask = parentTask?.subtasks.find(s => s.id === subtaskId);
-    
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === parentTaskId 
-          ? { 
-              ...task, 
-              subtasks: task.subtasks.filter(subtask => subtask.id !== subtaskId),
-              subtaskCount: Math.max(0, (task.subtaskCount || 0) - 1)
+    const parentTask = tasks.find((t) => t.id === parentTaskId);
+    const subtask = parentTask?.subtasks.find((s) => s.id === subtaskId);
+
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === parentTaskId
+          ? {
+              ...task,
+              subtasks: task.subtasks.filter(
+                (subtask) => subtask.id !== subtaskId,
+              ),
+              subtaskCount: Math.max(0, (task.subtaskCount || 0) - 1),
             }
-          : task
-      )
+          : task,
+      ),
     );
-    
+
     // Show success toast notification
     if (subtask) {
-      showToast(`Sub-task "${subtask.title}" deleted successfully`, 'success');
+      showToast(`Sub-task "${subtask.title}" deleted successfully`, "success");
     }
-    
+
     setSelectedSubtask(null);
     setShowDeleteSubtaskConfirmation(null);
   };
 
   // Handle subtask status change
   const handleSubtaskStatusChange = (parentTaskId, subtaskId, newStatus) => {
-    setTasks(prevTasks => 
-      prevTasks.map(task => 
-        task.id === parentTaskId 
-          ? { 
-              ...task, 
-              subtasks: task.subtasks.map(subtask => 
-                subtask.id === subtaskId 
-                  ? { 
-                      ...subtask, 
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === parentTaskId
+          ? {
+              ...task,
+              subtasks: task.subtasks.map((subtask) =>
+                subtask.id === subtaskId
+                  ? {
+                      ...subtask,
                       status: newStatus,
-                      progress: newStatus === 'DONE' ? 100 : subtask.progress
+                      progress: newStatus === "DONE" ? 100 : subtask.progress,
                     }
-                  : subtask
-              )
+                  : subtask,
+              ),
             }
-          : task
-      )
+          : task,
+      ),
     );
   };
 
   const handleAddSubtask = (taskId) => {
     setShowSubtaskCreator(taskId);
-  }
+  };
 
   const handleToggleSubtasks = (taskId) => {
     handleToggleTaskExpansion(taskId);
-  }
+  };
 
   // Handle calendar date selection
   const handleCalendarDateSelect = (selectedDate) => {
     setSelectedDateForTask(selectedDate);
     setShowCalendarModal(false);
-    
+
     // Open appropriate task creation modal based on selected type
-    if (selectedTaskType === 'approval') {
+    if (selectedTaskType === "approval") {
       setShowApprovalTaskModal(true);
     } else {
       setShowCreateTaskDrawer(true);
@@ -909,7 +997,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const handleTaskTypeSelect = (taskType) => {
     setSelectedTaskType(taskType);
     setShowTaskTypeDropdown(false);
-    
+
     // Always show calendar first for all task types
     setShowCalendarModal(true);
   };
@@ -919,29 +1007,29 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     const newTask = {
       id: Date.now(),
       title: approvalTaskData.title,
-      assignee: 'Current User',
+      assignee: "Current User",
       assigneeId: 1,
-      status: 'OPEN',
-      priority: approvalTaskData.priority || 'Medium',
+      status: "OPEN",
+      priority: approvalTaskData.priority || "Medium",
       dueDate: approvalTaskData.dueDate,
-      category: 'Approval',
+      category: "Approval",
       progress: 0,
       subtaskCount: 0,
       collaborators: [],
-      createdBy: 'Current User',
+      createdBy: "Current User",
       creatorId: 1,
       isApprovalTask: true,
       approvers: approvalTaskData.approvers || [],
-      approvalMode: approvalTaskData.approvalMode || 'any',
-      description: approvalTaskData.description || '',
-      subtasks: []
-    }
-    
-    setTasks(prevTasks => [...prevTasks, newTask])
-    setShowApprovalTaskModal(false)
-    setSelectedDateForTask(null)
-    console.log('Approval task created:', newTask)
-  }
+      approvalMode: approvalTaskData.approvalMode || "any",
+      description: approvalTaskData.description || "",
+      subtasks: [],
+    };
+
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+    setShowApprovalTaskModal(false);
+    setSelectedDateForTask(null);
+    console.log("Approval task created:", newTask);
+  };
 
   return (
     <div className="space-y-6 px-4 py-6 h-auto overflow-scroll">
@@ -976,7 +1064,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
           <div className="relative">
             <button
               className="btn btn-primary"
-              onClick={() => handleTaskTypeSelect('regular')}
+              onClick={() => handleTaskTypeSelect("regular")}
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -998,55 +1086,76 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               onClick={() => setShowTaskTypeDropdown(!showTaskTypeDropdown)}
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
               </svg>
             </button>
-            
+
             {showTaskTypeDropdown && (
               <>
-                <div className="fixed inset-0 z-10" onClick={() => setShowTaskTypeDropdown(false)} />
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowTaskTypeDropdown(false)}
+                />
                 <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
                   <div className="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide border-b border-gray-200">
                     Task Types
                   </div>
                   <button
                     className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
-                    onClick={() => handleTaskTypeSelect('regular')}
+                    onClick={() => handleTaskTypeSelect("regular")}
                   >
                     <span className="text-lg">📋</span>
                     <div>
-                      <div className="font-medium text-gray-900">Simple Task</div>
-                      <div className="text-sm text-gray-500">Standard one-time task</div>
+                      <div className="font-medium text-gray-900">
+                        Simple Task
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Standard one-time task
+                      </div>
                     </div>
                   </button>
                   <button
                     className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
-                    onClick={() => handleTaskTypeSelect('recurring')}
+                    onClick={() => handleTaskTypeSelect("recurring")}
                   >
                     <span className="text-lg">🔄</span>
                     <div>
-                      <div className="font-medium text-gray-900">Recurring Task</div>
-                      <div className="text-sm text-gray-500">Repeats on schedule</div>
+                      <div className="font-medium text-gray-900">
+                        Recurring Task
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Repeats on schedule
+                      </div>
                     </div>
                   </button>
                   <button
                     className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
-                    onClick={() => handleTaskTypeSelect('milestone')}
+                    onClick={() => handleTaskTypeSelect("milestone")}
                   >
                     <span className="text-lg">🎯</span>
                     <div>
                       <div className="font-medium text-gray-900">Milestone</div>
-                      <div className="text-sm text-gray-500">Project checkpoint</div>
+                      <div className="text-sm text-gray-500">
+                        Project checkpoint
+                      </div>
                     </div>
                   </button>
                   <button
                     className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
-                    onClick={() => handleTaskTypeSelect('approval')}
+                    onClick={() => handleTaskTypeSelect("approval")}
                   >
                     <span className="text-lg">✅</span>
                     <div>
-                      <div className="font-medium text-gray-900">Approval Task</div>
-                      <div className="text-sm text-gray-500">Requires approval workflow</div>
+                      <div className="font-medium text-gray-900">
+                        Approval Task
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Requires approval workflow
+                      </div>
                     </div>
                   </button>
                 </div>
@@ -1094,13 +1203,13 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                 onChange={(e) => {
                   if (e.target.value) {
                     handleBulkStatusUpdate(e.target.value);
-                    e.target.value = '';
+                    e.target.value = "";
                   }
                 }}
                 defaultValue=""
               >
                 <option value="">Bulk Update Status</option>
-                {companyStatuses.map(status => (
+                {companyStatuses.map((status) => (
                   <option key={status.code} value={status.code}>
                     {status.label}
                   </option>
@@ -1185,7 +1294,9 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12 text-nowrap">
                   <input
                     type="checkbox"
-                    checked={selectedTasks.length === tasks.length && tasks.length > 0}
+                    checked={
+                      selectedTasks.length === tasks.length && tasks.length > 0
+                    }
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
@@ -1214,296 +1325,412 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {tasks.filter(task => {
-                // Apply search filter
-                const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                    task.assignee.toLowerCase().includes(searchTerm.toLowerCase());
-                
-                // Apply status filter
-                const matchesStatus = statusFilter === 'all' || 
-                                    (statusFilter === 'todo' && task.status === 'OPEN') ||
-                                    (statusFilter === 'progress' && task.status === 'INPROGRESS') ||
-                                    (statusFilter === 'review' && task.status === 'ONHOLD') ||
-                                    (statusFilter === 'completed' && task.status === 'DONE');
-                
-                // Apply priority filter
-                const matchesPriority = priorityFilter === 'all' || 
-                                      task.priority.toLowerCase() === priorityFilter.toLowerCase();
-                
-                // Apply task type filter
-                const taskType = getTaskType(task);
-                const matchesTaskType = taskTypeFilter === 'all' || taskType === taskTypeFilter;
-                
-                return matchesSearch && matchesStatus && matchesPriority && matchesTaskType;
-              }).map((task) => (
-                <React.Fragment key={task.id}>
-                  <tr
-                    className={`hover:bg-gray-50 transition-colors ${
-                      selectedTasks.includes(task.id) ? 'bg-blue-50' : ''
-                    }`}
-                  >
-                  <td className="px-6 py-4 text-nowrap">
-                    <input
-                      type="checkbox"
-                      checked={selectedTasks.includes(task.id)}
-                      onChange={(e) => handleTaskSelection(task.id, e.target.checked)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                  </td>
-                  <td className="px-6 py-4 text-nowrap">
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        <div className="flex items-center gap-2">
-                          {/* Expansion control for tasks with subtasks */}
-                          {task.subtasks && task.subtasks.length > 0 && (
-                            <button
-                              onClick={() => handleToggleTaskExpansion(task.id)}
-                              className="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
-                              title={expandedTasks.has(task.id) ? 'Collapse subtasks' : 'Expand subtasks'}
-                            >
-                              {expandedTasks.has(task.id) ? '▼' : '▶'}
-                            </button>
-                          )}
-                          
-                          {editingTaskId === task.id ? (
-                            <input
-                              type="text"
-                              value={editingTitle}
-                              onChange={(e) => setEditingTitle(e.target.value)}
-                              onBlur={() => handleTitleSave(task.id)}
-                              onKeyDown={(e) => handleTitleKeyDown(e, task.id)}
-                              className="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all duration-200"
-                              autoFocus
-                              maxLength={100}
-                            />
-                          ) : (
-                            <>
-                              {task.isRecurring && (
-                                <span 
-                                  className="text-green-600 cursor-help"
-                                  title="Recurring Task – generated from a pattern"
-                                >
-                                  🔁
-                                </span>
-                              )}
-                              {task.isApprovalTask && (
-                                <span 
-                                  className="text-orange-600 cursor-help"
-                                  title="Approval Task – requires approval workflow"
-                                >
-                                  ✅
-                                </span>
-                              )}
-                              {(task.category === 'Milestone' || task.type === 'milestone') && (
-                                <span 
-                                  className="text-purple-600 cursor-help"
-                                  title="Milestone – project checkpoint"
-                                >
-                                  🎯
-                                </span>
-                              )}
-                              <span
-                                className="cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-all duration-200 inline-block flex-1 editable-task-title"
-                                onClick={() => handleTaskTitleClick(task)}
-                                title="Click to edit"
-                              >
-                                {task.title}
-                              </span>
-                              {task.subtasks && task.subtasks.length > 0 && (
-                                <span 
-                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200 transition-colors"
-                                  title={`${task.subtasks.length} sub-tasks - Click to ${expandedTasks.has(task.id) ? 'collapse' : 'expand'}`}
-                                  onClick={() => handleToggleTaskExpansion(task.id)}
-                                >
-                                  🗂️ {task.subtasks.length}
-                                </span>
-                              )}
-                              {task.recurringFromTaskId && (
-                                <span 
-                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 cursor-pointer hover:bg-green-200 transition-colors"
-                                  title={`Recurring from Task #${task.recurringFromTaskId}`}
-                                  onClick={() => console.log(`View master task ${task.recurringFromTaskId}`)}
-                                >
-                                  📋 #{task.recurringFromTaskId}
-                                </span>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {task.category}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mr-3">
-                        <span className="text-xs font-medium text-gray-600">
-                          {task.assignee
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </span>
-                      </div>
-                      <span className="text-sm text-gray-900">
-                        {task.assignee}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-nowrap">
-                    <TaskStatusDropdown
-                      task={task}
-                      currentStatus={task.status}
-                      statuses={companyStatuses}
-                      onStatusChange={(newStatus) => handleStatusChange(task.id, newStatus, true)}
-                      canEdit={canEditTaskStatus(task)}
-                      canMarkCompleted={canMarkAsCompleted(task)}
-                    />
-                  </td>
-                  <td className="px-6 py-4 text-nowrap">
-                    <span className={getPriorityBadge(task.priority)}>
-                      {task.priority}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900 text-nowrap">
-                    {task.dueDate}
-                  </td>
-                  <td className="px-6 py-4 text-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
-                        <div
-                          className="bg-primary-600 h-2 rounded-full"
-                          style={{ width: `${task.progress}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-xs text-gray-600 min-w-[3rem]">
-                        {task.progress}%
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-nowrap">
-                    <div className="flex items-center space-x-3">
-                      <button
-                        className="text-gray-400 cursor-pointer hover:text-blue-600 transition-colors p-1"
-                        onClick={() => handleViewTask(task.id)}
-                        title="View task details"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      </button>
-                      
-                      <button
-                        className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
-                        onClick={() => handleDeleteTask(task.id)}
-                        title="Delete Task"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+              {tasks
+                .filter((task) => {
+                  // Apply search filter
+                  const matchesSearch =
+                    task.title
+                      .toLowerCase()
+                      .includes(searchTerm.toLowerCase()) ||
+                    task.assignee
+                      .toLowerCase()
+                      .includes(searchTerm.toLowerCase());
 
-                {/* Subtask Rows */}
-                {expandedTasks.has(task.id) && task.subtasks &&                  task.subtasks.map((subtask) => (
-                  <tr
-                    key={`subtask-${subtask.id}`}
-                    className="bg-gray-50 hover:bg-gray-100 transition-colors border-l-4 border-l-blue-300"
-                  >
-                    <td className="px-6 py-3"></td>
-                    <td className="px-6 py-3">
-                      <div className="pl-8">
-                        <div className="flex items-center gap-2">
-                          <span className="text-blue-500">↳</span>
-                          <span 
-                            className="font-medium text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
-                            onClick={() => setSelectedSubtask({ ...subtask, parentTaskId: task.id })}
-                            title="Click to view/edit subtask"
+                  // Apply status filter
+                  const matchesStatus =
+                    statusFilter === "all" ||
+                    (statusFilter === "todo" && task.status === "OPEN") ||
+                    (statusFilter === "progress" &&
+                      task.status === "INPROGRESS") ||
+                    (statusFilter === "review" && task.status === "ONHOLD") ||
+                    (statusFilter === "completed" && task.status === "DONE");
+
+                  // Apply priority filter
+                  const matchesPriority =
+                    priorityFilter === "all" ||
+                    task.priority.toLowerCase() ===
+                      priorityFilter.toLowerCase();
+
+                  // Apply task type filter
+                  const taskType = getTaskType(task);
+                  const matchesTaskType =
+                    taskTypeFilter === "all" || taskType === taskTypeFilter;
+
+                  return (
+                    matchesSearch &&
+                    matchesStatus &&
+                    matchesPriority &&
+                    matchesTaskType
+                  );
+                })
+                .map((task) => (
+                  <React.Fragment key={task.id}>
+                    <tr
+                      className={`hover:bg-gray-50 transition-colors ${
+                        selectedTasks.includes(task.id) ? "bg-blue-50" : ""
+                      }`}
+                    >
+                      <td className="px-6 py-4 text-nowrap">
+                        <input
+                          type="checkbox"
+                          checked={selectedTasks.includes(task.id)}
+                          onChange={(e) =>
+                            handleTaskSelection(task.id, e.target.checked)
+                          }
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                      </td>
+                      <td className="px-6 py-4 text-nowrap">
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            <div className="flex items-center gap-2">
+                              {/* Expansion control for tasks with subtasks */}
+                              {task.subtasks && task.subtasks.length > 0 && (
+                                <button
+                                  onClick={() =>
+                                    handleToggleTaskExpansion(task.id)
+                                  }
+                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200 transition-colors hover:text-gray-600 transition-colors"
+                                  title={
+                                    expandedTasks.has(task.id)
+                                      ? "Collapse subtasks"
+                                      : "Expand subtasks"
+                                  }
+                                >
+                                  {/* {expandedTasks.has(task.id) ? "▼" : "▶"} */}
+                                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      
+                                        <circle cx="5" cy="5" r="2" fill="currentColor"/>
+                                        <circle cx="5" cy="12" r="2" fill="currentColor"/>
+                                        <circle cx="5" cy="19" r="2" fill="currentColor"/>
+
+                                       
+                                        <path d="M5 7V10" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M5 14V17" stroke="currentColor" stroke-width="2"/>
+
+                                      
+                                        <path d="M7 12H14" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M7 19H14" stroke="currentColor" stroke-width="2"/>
+                                      </svg>
+
+
+                                  {task.subtasks.length}
+                                </button>
+                              )}
+
+                              {editingTaskId === task.id ? (
+                                <input
+                                  type="text"
+                                  value={editingTitle}
+                                  onChange={(e) =>
+                                    setEditingTitle(e.target.value)
+                                  }
+                                  onBlur={() => handleTitleSave(task.id)}
+                                  onKeyDown={(e) =>
+                                    handleTitleKeyDown(e, task.id)
+                                  }
+                                  className="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all duration-200"
+                                  autoFocus
+                                  maxLength={100}
+                                />
+                              ) : (
+                                <>
+                                  {task.isRecurring && (
+                                    <span
+                                      className="text-green-600 cursor-help"
+                                      title="Recurring Task – generated from a pattern"
+                                    >
+                                      🔁
+                                    </span>
+                                  )}
+                                  {task.isApprovalTask && (
+                                    <span
+                                      className="text-orange-600 cursor-help"
+                                      title="Approval Task – requires approval workflow"
+                                    >
+                                      ✅
+                                    </span>
+                                  )}
+                                  {(task.category === "Milestone" ||
+                                    task.type === "milestone") && (
+                                    <span
+                                      className="text-purple-600 cursor-help"
+                                      title="Milestone – project checkpoint"
+                                    >
+                                      🎯
+                                    </span>
+                                  )}
+                                  <span
+                                    className="cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-all duration-200 inline-block flex-1 editable-task-title"
+                                    onClick={() => handleTaskTitleClick(task)}
+                                    title="Click to edit"
+                                  >
+                                    {task.title}
+                                  </span>
+
+                                  {task.recurringFromTaskId && (
+                                    <span
+                                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 cursor-pointer hover:bg-green-200 transition-colors"
+                                      title={`Recurring from Task #${task.recurringFromTaskId}`}
+                                      onClick={() =>
+                                        console.log(
+                                          `View master task ${task.recurringFromTaskId}`,
+                                        )
+                                      }
+                                    >
+                                      📋 #{task.recurringFromTaskId}
+                                    </span>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {task.category}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-nowrap">
+                        <div className="flex items-center">
+                          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mr-3">
+                            <span className="text-xs font-medium text-gray-600">
+                              {task.assignee
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </span>
+                          </div>
+                          <span className="text-sm text-gray-900">
+                            {task.assignee}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-nowrap">
+                        <TaskStatusDropdown
+                          task={task}
+                          currentStatus={task.status}
+                          statuses={companyStatuses}
+                          onStatusChange={(newStatus) =>
+                            handleStatusChange(task.id, newStatus, true)
+                          }
+                          canEdit={canEditTaskStatus(task)}
+                          canMarkCompleted={canMarkAsCompleted(task)}
+                        />
+                      </td>
+                      <td className="px-6 py-4 text-nowrap">
+                        <span className={getPriorityBadge(task.priority)}>
+                          {task.priority}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900 text-nowrap">
+                        {task.dueDate}
+                      </td>
+                      <td className="px-6 py-4 text-nowrap">
+                        <div className="flex items-center">
+                          <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                            <div
+                              className="bg-primary-600 h-2 rounded-full"
+                              style={{ width: `${task.progress}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-xs text-gray-600 min-w-[3rem]">
+                            {task.progress}%
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-nowrap">
+                        <div className="flex items-center space-x-3">
+                          <button
+                            className="text-gray-400 cursor-pointer hover:text-blue-600 transition-colors p-1"
+                            onClick={() => handleViewTask(task.id)}
+                            title="View task details"
                           >
-                            {subtask.title}
-                          </span>
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                              />
+                            </svg>
+                          </button>
+
+                          <button
+                            className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
+                            onClick={() => handleDeleteTask(task.id)}
+                            title="Delete Task"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
+                            </svg>
+                          </button>
                         </div>
-                        <div className="text-xs text-gray-500 pl-7">
-                          Sub-task of "{task.title}"
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex items-center">
-                        <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center mr-2">
-                          <span className="text-xs font-medium text-gray-600">
-                            {subtask.assignee
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
-                          </span>
-                        </div>
-                        <span className="text-sm text-gray-700">
-                          {subtask.assignee}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <TaskStatusDropdown
-                        task={subtask}
-                        currentStatus={subtask.status}
-                        statuses={companyStatuses}
-                        onStatusChange={(newStatus) => handleSubtaskStatusChange(task.id, subtask.id, newStatus)}
-                        canEdit={canEditTaskStatus(subtask)}
-                        canMarkCompleted={true}
-                      />
-                    </td>
-                    <td className="px-6 py-3">
-                      <span className={getPriorityBadge(subtask.priority)}>
-                        {subtask.priority}
-                      </span>
-                    </td>
-                    <td className="px-6 py-3 text-sm text-gray-700">
-                      {subtask.dueDate}
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex items-center">
-                        <div className="w-full bg-gray-200 rounded-full h-1.5 mr-2">
-                          <div
-                            className="bg-primary-600 h-1.5 rounded-full"
-                            style={{ width: `${subtask.progress}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-xs text-gray-600 min-w-[3rem]">
-                          {subtask.progress}%
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          className="text-gray-400 cursor-pointer hover:text-blue-600 transition-colors p-1"
-                          onClick={() => setSelectedSubtask({ ...subtask, parentTaskId: task.id })}
-                          title="View/Edit subtask"
+                      </td>
+                    </tr>
+
+                    {/* Subtask Rows */}
+                    {expandedTasks.has(task.id) &&
+                      task.subtasks &&
+                      task.subtasks.map((subtask) => (
+                        <tr
+                          key={`subtask-${subtask.id}`}
+                          className="bg-gray-50 hover:bg-gray-100 transition-colors border-l-4 border-l-blue-300"
                         >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                        </button>
-                        <button
-                          className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
-                          onClick={() => setShowDeleteSubtaskConfirmation({ taskId: task.id, subtaskId: subtask.id, subtaskTitle: subtask.title })}
-                          title="Delete Sub-task"
-                        >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                          <td className="px-6 py-3"></td>
+                          <td className="px-6 py-3">
+                            <div className="pl-8">
+                              <div className="flex items-center gap-2">
+                                <span className="text-blue-500">↳</span>
+                                <span
+                                  className="font-medium text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
+                                  onClick={() =>
+                                    setSelectedSubtask({
+                                      ...subtask,
+                                      parentTaskId: task.id,
+                                    })
+                                  }
+                                  title="Click to view/edit subtask"
+                                >
+                                  {subtask.title}
+                                </span>
+                              </div>
+                              <div className="text-xs text-gray-500 pl-7">
+                                Sub-task of "{task.title}"
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-3">
+                            <div className="flex items-center">
+                              <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center mr-2">
+                                <span className="text-xs font-medium text-gray-600">
+                                  {subtask.assignee
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")}
+                                </span>
+                              </div>
+                              <span className="text-sm text-gray-700">
+                                {subtask.assignee}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-3">
+                            <TaskStatusDropdown
+                              task={subtask}
+                              currentStatus={subtask.status}
+                              statuses={companyStatuses}
+                              onStatusChange={(newStatus) =>
+                                handleSubtaskStatusChange(
+                                  task.id,
+                                  subtask.id,
+                                  newStatus,
+                                )
+                              }
+                              canEdit={canEditTaskStatus(subtask)}
+                              canMarkCompleted={true}
+                            />
+                          </td>
+                          <td className="px-6 py-3">
+                            <span
+                              className={getPriorityBadge(subtask.priority)}
+                            >
+                              {subtask.priority}
+                            </span>
+                          </td>
+                          <td className="px-6 py-3 text-sm text-gray-700">
+                            {subtask.dueDate}
+                          </td>
+                          <td className="px-6 py-3">
+                            <div className="flex items-center">
+                              <div className="w-full bg-gray-200 rounded-full h-1.5 mr-2">
+                                <div
+                                  className="bg-primary-600 h-1.5 rounded-full"
+                                  style={{ width: `${subtask.progress}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-xs text-gray-600 min-w-[3rem]">
+                                {subtask.progress}%
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-3">
+                            <div className="flex items-center space-x-2">
+                              <button
+                                className="text-gray-400 cursor-pointer hover:text-blue-600 transition-colors p-1"
+                                onClick={() =>
+                                  setSelectedSubtask({
+                                    ...subtask,
+                                    parentTaskId: task.id,
+                                  })
+                                }
+                                title="View/Edit subtask"
+                              >
+                                <svg
+                                  className="w-3 h-3"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                  />
+                                </svg>
+                              </button>
+                              <button
+                                className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
+                                onClick={() =>
+                                  setShowDeleteSubtaskConfirmation({
+                                    taskId: task.id,
+                                    subtaskId: subtask.id,
+                                    subtaskTitle: subtask.title,
+                                  })
+                                }
+                                title="Delete Sub-task"
+                              >
+                                <svg
+                                  className="w-3 h-3"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                  />
+                                </svg>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </React.Fragment>
                 ))}
-              </React.Fragment>
-              ))}
             </tbody>
           </table>
         </div>
@@ -1534,11 +1761,23 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       {/* Slide-in Drawer */}
       {showCreateTaskDrawer && (
         <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
-          <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreateTaskDrawer(false)}></div>
-          <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 600px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
+          <div
+            className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowCreateTaskDrawer(false)}
+          ></div>
+          <div
+            className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right"
+            style={{
+              width: "min(90vw, 600px)",
+              boxShadow: "-10px 0 50px rgba(0,0,0,0.2)",
+              borderLeft: "1px solid rgba(255,255,255,0.2)",
+            }}
+          >
             <div className="drawer-header">
               <h2 className="text-2xl font-bold text-white">
-                Create New Task{selectedDateForTask && ` for ${new Date(selectedDateForTask).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
+                Create New Task
+                {selectedDateForTask &&
+                  ` for ${new Date(selectedDateForTask).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`}
               </h2>
               <button
                 onClick={() => setShowCreateTaskDrawer(false)}
@@ -1560,11 +1799,11 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               </button>
             </div>
             <div className="drawer-body">
-              <CreateTask 
+              <CreateTask
                 onClose={() => {
-                  setShowCreateTaskDrawer(false)
-                  setSelectedDateForTask(null)
-                }} 
+                  setShowCreateTaskDrawer(false);
+                  setSelectedDateForTask(null);
+                }}
                 initialTaskType={selectedTaskType}
                 preFilledDate={selectedDateForTask}
               />
@@ -1592,9 +1831,9 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
           statusLabel={showStatusConfirmation.statusLabel}
           onConfirm={() => {
             handleStatusChange(
-              showStatusConfirmation.taskId, 
-              showStatusConfirmation.newStatusCode, 
-              false
+              showStatusConfirmation.taskId,
+              showStatusConfirmation.newStatusCode,
+              false,
             );
             setShowStatusConfirmation(null);
           }}
@@ -1607,7 +1846,9 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
         <TaskDeleteConfirmationModal
           task={showDeleteConfirmation.task}
           options={showDeleteConfirmation.options}
-          onConfirm={(finalOptions) => executeTaskDeletion(showDeleteConfirmation.task.id, finalOptions)}
+          onConfirm={(finalOptions) =>
+            executeTaskDeletion(showDeleteConfirmation.task.id, finalOptions)
+          }
           onCancel={() => setShowDeleteConfirmation(null)}
           currentUser={currentUser}
         />
@@ -1617,8 +1858,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       {showCalendarModal && (
         <CalendarDatePicker
           onClose={() => {
-            setShowCalendarModal(false)
-            setSelectedTaskType('regular')
+            setShowCalendarModal(false);
+            setSelectedTaskType("regular");
           }}
           onDateSelect={handleCalendarDateSelect}
           taskType={selectedTaskType}
@@ -1628,11 +1869,23 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       {/* Approval Task Creator Modal */}
       {showApprovalTaskModal && !selectedApprovalTask && (
         <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
-          <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowApprovalTaskModal(false)}></div>
-          <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 600px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
+          <div
+            className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowApprovalTaskModal(false)}
+          ></div>
+          <div
+            className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right"
+            style={{
+              width: "min(90vw, 600px)",
+              boxShadow: "-10px 0 50px rgba(0,0,0,0.2)",
+              borderLeft: "1px solid rgba(255,255,255,0.2)",
+            }}
+          >
             <div className="drawer-header">
               <h2 className="text-2xl font-bold text-white">
-                Create Approval Task{selectedDateForTask && ` for ${new Date(selectedDateForTask).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
+                Create Approval Task
+                {selectedDateForTask &&
+                  ` for ${new Date(selectedDateForTask).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`}
               </h2>
               <button
                 onClick={() => setShowApprovalTaskModal(false)}
@@ -1656,8 +1909,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
             <div className="drawer-body">
               <ApprovalTaskCreator
                 onClose={() => {
-                  setShowApprovalTaskModal(false)
-                  setSelectedDateForTask(null)
+                  setShowApprovalTaskModal(false);
+                  setSelectedDateForTask(null);
                 }}
                 onSubmit={handleCreateApprovalTask}
                 preFilledDate={selectedDateForTask}
@@ -1671,9 +1924,11 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       {/* Subtask Creator Modal */}
       {showSubtaskCreator && (
         <SubtaskCreator
-          parentTask={tasks.find(t => t.id === showSubtaskCreator)}
+          parentTask={tasks.find((t) => t.id === showSubtaskCreator)}
           onClose={() => setShowSubtaskCreator(null)}
-          onSubmit={(subtaskData) => handleCreateSubtask(showSubtaskCreator, subtaskData)}
+          onSubmit={(subtaskData) =>
+            handleCreateSubtask(showSubtaskCreator, subtaskData)
+          }
           currentUser={currentUser}
         />
       )}
@@ -1682,10 +1937,17 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       {selectedSubtask && (
         <SubtaskDetailPanel
           subtask={selectedSubtask}
-          parentTask={tasks.find(t => t.id === selectedSubtask.parentTaskId)}
+          parentTask={tasks.find((t) => t.id === selectedSubtask.parentTaskId)}
           onClose={() => setSelectedSubtask(null)}
-          onUpdate={(updatedSubtask) => handleUpdateSubtask(selectedSubtask.parentTaskId, updatedSubtask)}
-          onDelete={() => handleDeleteSubtask(selectedSubtask.parentTaskId, selectedSubtask.id)}
+          onUpdate={(updatedSubtask) =>
+            handleUpdateSubtask(selectedSubtask.parentTaskId, updatedSubtask)
+          }
+          onDelete={() =>
+            handleDeleteSubtask(
+              selectedSubtask.parentTaskId,
+              selectedSubtask.id,
+            )
+          }
           currentUser={currentUser}
         />
       )}
@@ -1701,17 +1963,17 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
           currentUser={currentUser}
           onApproval={(taskId, approverId, action, comment) => {
             // Handle approval action
-            setTasks(prevTasks => 
-              prevTasks.map(task => {
+            setTasks((prevTasks) =>
+              prevTasks.map((task) => {
                 if (task.id !== taskId) return task;
-                
-                const updatedApprovers = task.approvers.map(approver => {
+
+                const updatedApprovers = task.approvers.map((approver) => {
                   if (approver.id === approverId) {
                     return {
                       ...approver,
                       status: action,
                       comment: comment || null,
-                      approvedAt: new Date().toISOString()
+                      approvedAt: new Date().toISOString(),
                     };
                   }
                   return approver;
@@ -1719,25 +1981,27 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
                 // Determine overall task status based on approval mode
                 let newStatus = task.status;
-                if (action === 'approved') {
-                  if (task.approvalMode === 'any') {
-                    newStatus = 'DONE';
-                  } else if (task.approvalMode === 'all') {
-                    const allApproved = updatedApprovers.every(a => a.status === 'approved');
-                    if (allApproved) newStatus = 'DONE';
+                if (action === "approved") {
+                  if (task.approvalMode === "any") {
+                    newStatus = "DONE";
+                  } else if (task.approvalMode === "all") {
+                    const allApproved = updatedApprovers.every(
+                      (a) => a.status === "approved",
+                    );
+                    if (allApproved) newStatus = "DONE";
                   }
-                } else if (action === 'rejected') {
-                  newStatus = 'CANCELLED';
+                } else if (action === "rejected") {
+                  newStatus = "CANCELLED";
                 }
 
                 return {
                   ...task,
                   approvers: updatedApprovers,
-                  status: newStatus
+                  status: newStatus,
                 };
-              })
+              }),
             );
-            
+
             // Close modal after action
             setShowApprovalTaskModal(false);
             setSelectedApprovalTask(null);
@@ -1749,7 +2013,12 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       {showDeleteSubtaskConfirmation && (
         <SubtaskDeleteConfirmationModal
           subtaskTitle={showDeleteSubtaskConfirmation.subtaskTitle}
-          onConfirm={() => handleDeleteSubtask(showDeleteSubtaskConfirmation.taskId, showDeleteSubtaskConfirmation.subtaskId)}
+          onConfirm={() =>
+            handleDeleteSubtask(
+              showDeleteSubtaskConfirmation.taskId,
+              showDeleteSubtaskConfirmation.subtaskId,
+            )
+          }
           onCancel={() => setShowDeleteSubtaskConfirmation(null)}
         />
       )}
@@ -1759,43 +2028,63 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
         message={toast.message}
         type={toast.type}
         isVisible={toast.isVisible}
-        onClose={() => setToast(prev => ({ ...prev, isVisible: false }))}
+        onClose={() => setToast((prev) => ({ ...prev, isVisible: false }))}
       />
     </div>
-  )
+  );
 }
 
 // Task Status Dropdown Component with Enhanced Logic
-function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, canEdit, canMarkCompleted }) {
+function TaskStatusDropdown({
+  task,
+  currentStatus,
+  statuses,
+  onStatusChange,
+  canEdit,
+  canMarkCompleted,
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [validTransitions, setValidTransitions] = useState([]);
 
-  const currentStatusObj = statuses.find(s => s.code === currentStatus && s.active);
-  const badgeStyle = currentStatusObj ? {
-    backgroundColor: currentStatusObj.color,
-    color: 'white'
-  } : {};
+  const currentStatusObj = statuses.find(
+    (s) => s.code === currentStatus && s.active,
+  );
+  const badgeStyle = currentStatusObj
+    ? {
+        backgroundColor: currentStatusObj.color,
+        color: "white",
+      }
+    : {};
 
   // Calculate valid transitions when dropdown opens
   React.useEffect(() => {
     if (isOpen && currentStatusObj) {
-      const transitions = currentStatusObj.allowedTransitions.filter(transitionCode => {
-        const targetStatus = statuses.find(s => s.code === transitionCode && s.active);
-
-        // Check if target status exists and is active
-        if (!targetStatus) return false;
-
-        // Check sub-task completion logic for DONE status
-        if (transitionCode === 'DONE' && task.subtasks && task.subtasks.length > 0) {
-          const hasIncompleteSubtasks = task.subtasks.some(subtask => 
-            subtask.status !== 'DONE' && subtask.status !== 'CANCELLED'
+      const transitions = currentStatusObj.allowedTransitions.filter(
+        (transitionCode) => {
+          const targetStatus = statuses.find(
+            (s) => s.code === transitionCode && s.active,
           );
-          return !hasIncompleteSubtasks;
-        }
 
-        return true;
-      });
+          // Check if target status exists and is active
+          if (!targetStatus) return false;
+
+          // Check sub-task completion logic for DONE status
+          if (
+            transitionCode === "DONE" &&
+            task.subtasks &&
+            task.subtasks.length > 0
+          ) {
+            const hasIncompleteSubtasks = task.subtasks.some(
+              (subtask) =>
+                subtask.status !== "DONE" && subtask.status !== "CANCELLED",
+            );
+            return !hasIncompleteSubtasks;
+          }
+
+          return true;
+        },
+      );
 
       setValidTransitions(transitions);
     }
@@ -1804,20 +2093,28 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
   if (!canEdit) {
     return (
       <div className="relative">
-        <span 
+        <span
           className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-help"
           style={badgeStyle}
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
         >
           {currentStatusObj?.label || currentStatus}
-          <svg className="ml-1 w-3 h-3 opacity-50" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+          <svg
+            className="ml-1 w-3 h-3 opacity-50"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+              clipRule="evenodd"
+            />
           </svg>
         </span>
         {showTooltip && (
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-10 max-w-xs">
-            {currentStatusObj?.tooltip || 'No permission to edit'}
+            {currentStatusObj?.tooltip || "No permission to edit"}
           </div>
         )}
       </div>
@@ -1835,7 +2132,11 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
       >
         {currentStatusObj?.label || currentStatus}
         <svg className="ml-1 w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+          <path
+            fillRule="evenodd"
+            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+            clipRule="evenodd"
+          />
         </svg>
       </button>
 
@@ -1848,16 +2149,21 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setIsOpen(false)}
+          />
           <div className="absolute top-full left-0 mt-1 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
             {/* Current Status */}
             <div className="px-3 py-2 bg-gray-50 border-b border-gray-200">
               <div className="flex items-center gap-2 text-xs text-gray-600">
-                <span 
+                <span
                   className="w-3 h-3 rounded-full"
                   style={{ backgroundColor: currentStatusObj?.color }}
                 />
-                <span className="font-medium">Current: {currentStatusObj?.label}</span>
+                <span className="font-medium">
+                  Current: {currentStatusObj?.label}
+                </span>
               </div>
             </div>
 
@@ -1867,8 +2173,10 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
                 <div className="px-3 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
                   Available Transitions
                 </div>
-                {validTransitions.map(transitionCode => {
-                  const targetStatus = statuses.find(s => s.code === transitionCode && s.active);
+                {validTransitions.map((transitionCode) => {
+                  const targetStatus = statuses.find(
+                    (s) => s.code === transitionCode && s.active,
+                  );
                   if (!targetStatus) return null;
 
                   return (
@@ -1880,14 +2188,18 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
                         setIsOpen(false);
                       }}
                     >
-                      <span 
+                      <span
                         className="w-3 h-3 rounded-full"
                         style={{ backgroundColor: targetStatus.color }}
                       />
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900">{targetStatus.label}</div>
+                        <div className="font-medium text-gray-900">
+                          {targetStatus.label}
+                        </div>
                         {targetStatus.description && (
-                          <div className="text-xs text-gray-500">{targetStatus.description}</div>
+                          <div className="text-xs text-gray-500">
+                            {targetStatus.description}
+                          </div>
                         )}
                       </div>
                       {targetStatus.isFinal && (
@@ -1901,12 +2213,16 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
               </div>
             ) : (
               <div className="px-3 py-4 text-center">
-                <div className="text-sm text-gray-500">No valid transitions available</div>
+                <div className="text-sm text-gray-500">
+                  No valid transitions available
+                </div>
                 <div className="text-xs text-gray-400 mt-1">
-                  {task.subtasks?.length > 0 && task.subtasks.some(s => s.status !== 'DONE' && s.status !== 'CANCELLED') 
-                    ? 'Complete all sub-tasks first' 
-                    : 'This status cannot be changed further'
-                  }
+                  {task.subtasks?.length > 0 &&
+                  task.subtasks.some(
+                    (s) => s.status !== "DONE" && s.status !== "CANCELLED",
+                  )
+                    ? "Complete all sub-tasks first"
+                    : "This status cannot be changed further"}
                 </div>
               </div>
             )}
@@ -1916,30 +2232,42 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
               <div className="px-3 py-1 text-xs font-medium text-gray-500 uppercase tracking-wide">
                 All Available Statuses
               </div>
-              {statuses.filter(s => s.active).map(status => (
-                <div
-                  key={status.code}
-                  className={`px-3 py-2 text-sm flex items-center gap-2 ${
-                    status.code === currentStatus ? 'bg-blue-50 text-blue-700' : 'text-gray-600'
-                  }`}
-                >
-                  <span 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: status.color }}
-                  />
-                  <span className="font-medium">{status.label}</span>
-                  {status.code === currentStatus && (
-                    <svg className="ml-auto w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                  {status.isFinal && status.code !== currentStatus && (
-                    <span className="ml-auto text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                      Final
-                    </span>
-                  )}
-                </div>
-              ))}
+              {statuses
+                .filter((s) => s.active)
+                .map((status) => (
+                  <div
+                    key={status.code}
+                    className={`px-3 py-2 text-sm flex items-center gap-2 ${
+                      status.code === currentStatus
+                        ? "bg-blue-50 text-blue-700"
+                        : "text-gray-600"
+                    }`}
+                  >
+                    <span
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: status.color }}
+                    />
+                    <span className="font-medium">{status.label}</span>
+                    {status.code === currentStatus && (
+                      <svg
+                        className="ml-auto w-4 h-4 text-blue-600"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                    {status.isFinal && status.code !== currentStatus && (
+                      <span className="ml-auto text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                        Final
+                      </span>
+                    )}
+                  </div>
+                ))}
             </div>
           </div>
         </>
@@ -1949,7 +2277,13 @@ function TaskStatusDropdown({ task, currentStatus, statuses, onStatusChange, can
 }
 
 // Simple Task Delete Confirmation Modal Component
-function TaskDeleteConfirmationModal({ task, options, onConfirm, onCancel, currentUser }) {
+function TaskDeleteConfirmationModal({
+  task,
+  options,
+  onConfirm,
+  onCancel,
+  currentUser,
+}) {
   const [deleteSubtasks, setDeleteSubtasks] = useState(false);
 
   const hasSubtasks = task?.subtasks && task.subtasks.length > 0;
@@ -1975,26 +2309,20 @@ function TaskDeleteConfirmationModal({ task, options, onConfirm, onCancel, curre
                   onChange={(e) => setDeleteSubtasks(e.target.checked)}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-gray-700">Also delete all subtasks and attached forms</span>
+                <span className="text-gray-700">
+                  Also delete all subtasks and attached forms
+                </span>
               </label>
             </div>
           )}
 
-          <p className="text-gray-600 mb-6">
-            This action is irreversible.
-          </p>
+          <p className="text-gray-600 mb-6">This action is irreversible.</p>
 
           <div className="flex gap-3 justify-end">
-            <button
-              className="btn btn-secondary"
-              onClick={onCancel}
-            >
+            <button className="btn btn-secondary" onClick={onCancel}>
               Cancel
             </button>
-            <button
-              className="btn btn-danger"
-              onClick={handleConfirm}
-            >
+            <button className="btn btn-danger" onClick={handleConfirm}>
               Delete
             </button>
           </div>
@@ -2005,35 +2333,47 @@ function TaskDeleteConfirmationModal({ task, options, onConfirm, onCancel, curre
 }
 
 // Status Confirmation Modal Component
-function StatusConfirmationModal({ taskTitle, statusLabel, onConfirm, onCancel }) {
+function StatusConfirmationModal({
+  taskTitle,
+  statusLabel,
+  onConfirm,
+  onCancel,
+}) {
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4 mt-0">
       <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
         <div className="p-6">
           <div className="flex items-center mb-4">
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-6 h-6 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">Confirm Status Change</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Confirm Status Change
+            </h3>
           </div>
 
           <p className="text-gray-600 mb-6">
-            Are you sure you want to mark "<strong>{taskTitle}</strong>" as <strong>{statusLabel}</strong>?
+            Are you sure you want to mark "<strong>{taskTitle}</strong>" as{" "}
+            <strong>{statusLabel}</strong>?
           </p>
 
           <div className="flex gap-3 justify-end">
-            <button
-              className="btn btn-secondary"
-              onClick={onCancel}
-            >
+            <button className="btn btn-secondary" onClick={onCancel}>
               Cancel
             </button>
-            <button
-              className="btn btn-primary"
-              onClick={onConfirm}
-            >
+            <button className="btn btn-primary" onClick={onConfirm}>
               Confirm
             </button>
           </div>
@@ -2075,14 +2415,27 @@ function TaskContextMenu({ taskId, onDelete, canDelete }) {
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setIsOpen(false)}
+          />
           <div className="absolute right-0 top-8 z-20 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
             <button
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
               onClick={handleAddSubtask}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               Add Sub-task
             </button>
@@ -2090,8 +2443,18 @@ function TaskContextMenu({ taskId, onDelete, canDelete }) {
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
               onClick={handleViewSubtasks}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
               View Sub-tasks
             </button>
@@ -2102,8 +2465,18 @@ function TaskContextMenu({ taskId, onDelete, canDelete }) {
                   className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                   onClick={handleDeleteTask}
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
                   </svg>
                   Delete Task
                 </button>
@@ -2279,20 +2652,20 @@ function TaskEditModal({ task, onSave, onClose }) {
 // Subtask Creator Component
 function SubtaskCreator({ parentTask, onClose, onSubmit, currentUser }) {
   const [formData, setFormData] = useState({
-    title: '',
+    title: "",
     assignee: currentUser.name,
     assigneeId: currentUser.id,
-    priority: 'Medium',
+    priority: "Medium",
     dueDate: parentTask.dueDate,
-    description: ''
+    description: "",
   });
 
   const teamMembers = [
-    { id: 1, name: 'Current User' },
-    { id: 2, name: 'John Doe' },
-    { id: 3, name: 'Jane Smith' },
-    { id: 4, name: 'Mike Johnson' },
-    { id: 5, name: 'Sarah Wilson' }
+    { id: 1, name: "Current User" },
+    { id: 2, name: "John Doe" },
+    { id: 3, name: "Jane Smith" },
+    { id: 4, name: "Mike Johnson" },
+    { id: 5, name: "Sarah Wilson" },
   ];
 
   const handleSubmit = (e) => {
@@ -2308,15 +2681,29 @@ function SubtaskCreator({ parentTask, onClose, onSubmit, currentUser }) {
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Create Sub-task</h3>
-              <p className="text-sm text-gray-600">Parent: {parentTask.title}</p>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Create Sub-task
+              </h3>
+              <p className="text-sm text-gray-600">
+                Parent: {parentTask.title}
+              </p>
             </div>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -2330,7 +2717,9 @@ function SubtaskCreator({ parentTask, onClose, onSubmit, currentUser }) {
             <input
               type="text"
               value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, title: e.target.value }))
+              }
               className="form-input w-full"
               placeholder="Enter sub-task title..."
               required
@@ -2346,16 +2735,18 @@ function SubtaskCreator({ parentTask, onClose, onSubmit, currentUser }) {
               <select
                 value={formData.assigneeId}
                 onChange={(e) => {
-                  const member = teamMembers.find(m => m.id === parseInt(e.target.value));
-                  setFormData(prev => ({ 
-                    ...prev, 
+                  const member = teamMembers.find(
+                    (m) => m.id === parseInt(e.target.value),
+                  );
+                  setFormData((prev) => ({
+                    ...prev,
                     assigneeId: member.id,
-                    assignee: member.name
+                    assignee: member.name,
                   }));
                 }}
                 className="form-select w-full"
               >
-                {teamMembers.map(member => (
+                {teamMembers.map((member) => (
                   <option key={member.id} value={member.id}>
                     {member.name}
                   </option>
@@ -2369,7 +2760,9 @@ function SubtaskCreator({ parentTask, onClose, onSubmit, currentUser }) {
               </label>
               <select
                 value={formData.priority}
-                onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, priority: e.target.value }))
+                }
                 className="form-select w-full"
               >
                 <option value="Low">Low</option>
@@ -2387,7 +2780,9 @@ function SubtaskCreator({ parentTask, onClose, onSubmit, currentUser }) {
             <input
               type="date"
               value={formData.dueDate}
-              onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, dueDate: e.target.value }))
+              }
               className="form-input w-full"
             />
           </div>
@@ -2398,7 +2793,12 @@ function SubtaskCreator({ parentTask, onClose, onSubmit, currentUser }) {
             </label>
             <textarea
               value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               className="form-textarea w-full"
               rows="3"
               placeholder="Add sub-task description..."
@@ -2429,87 +2829,111 @@ function SubtaskCreator({ parentTask, onClose, onSubmit, currentUser }) {
 
 // Calendar Date Picker Component
 function CalendarDatePicker({ onClose, onDateSelect, taskType }) {
-  const [currentDate, setCurrentDate] = useState(new Date())
-  const [selectedDate, setSelectedDate] = useState(null)
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const getDaysInMonth = (date) => {
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
-    const daysInMonth = lastDay.getDate()
-    const startDayOfWeek = firstDay.getDay()
-    
-    const days = []
-    
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDayOfWeek = firstDay.getDay();
+
+    const days = [];
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startDayOfWeek; i++) {
-      days.push(null)
+      days.push(null);
     }
-    
+
     // Add all days of the month
     for (let day = 1; day <= daysInMonth; day++) {
-      days.push(new Date(year, month, day))
+      days.push(new Date(year, month, day));
     }
-    
-    return days
-  }
+
+    return days;
+  };
 
   const navigateMonth = (direction) => {
-    const newDate = new Date(currentDate)
-    newDate.setMonth(newDate.getMonth() + direction)
-    setCurrentDate(newDate)
-  }
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() + direction);
+    setCurrentDate(newDate);
+  };
 
   const handleDateClick = (date) => {
     if (date && date >= new Date().setHours(0, 0, 0, 0)) {
-      setSelectedDate(date)
+      setSelectedDate(date);
     }
-  }
+  };
 
   const handleConfirmDate = () => {
     if (selectedDate) {
-      const dateStr = selectedDate.toISOString().split('T')[0]
-      onDateSelect(dateStr)
+      const dateStr = selectedDate.toISOString().split("T")[0];
+      onDateSelect(dateStr);
     }
-  }
+  };
 
   const getTaskTypeInfo = (type) => {
     const types = {
-      regular: { icon: '📋', label: 'Simple Task', color: 'blue' },
-      recurring: { icon: '🔄', label: 'Recurring Task', color: 'green' },
-      milestone: { icon: '🎯', label: 'Milestone', color: 'purple' },
-      approval: { icon: '✅', label: 'Approval Task', color: 'orange' }
-    }
-    return types[type] || types.regular
-  }
+      regular: { icon: "📋", label: "Simple Task", color: "blue" },
+      recurring: { icon: "🔄", label: "Recurring Task", color: "green" },
+      milestone: { icon: "🎯", label: "Milestone", color: "purple" },
+      approval: { icon: "✅", label: "Approval Task", color: "orange" },
+    };
+    return types[type] || types.regular;
+  };
 
-  const typeInfo = getTaskTypeInfo(taskType)
+  const typeInfo = getTaskTypeInfo(taskType);
   const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ]
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 overlay-animate">
       <div className="bg-white rounded-2xl shadow-xl max-w-md w-full modal-animate-slide-up">
         {/* Header */}
-        <div className={`p-6 border-b border-gray-200 bg-gradient-to-r from-${typeInfo.color}-500 to-${typeInfo.color}-600 text-white rounded-t-2xl`}>
+        <div
+          className={`p-6 border-b border-gray-200 bg-gradient-to-r from-${typeInfo.color}-500 to-${typeInfo.color}-600 text-white rounded-t-2xl`}
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-2xl">{typeInfo.icon}</span>
               <div>
                 <h3 className="text-lg font-semibold">Select Date</h3>
-                <p className="text-sm opacity-90">Choose a date for your {typeInfo.label.toLowerCase()}</p>
+                <p className="text-sm opacity-90">
+                  Choose a date for your {typeInfo.label.toLowerCase()}
+                </p>
               </div>
             </div>
             <button
               onClick={onClose}
               className="text-white/80 hover:text-white transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -2523,31 +2947,52 @@ function CalendarDatePicker({ onClose, onDateSelect, taskType }) {
               onClick={() => navigateMonth(-1)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
-            
+
             <h4 className="text-lg font-semibold text-gray-900">
               {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
             </h4>
-            
+
             <button
-
-
               onClick={() => navigateMonth(1)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
 
           {/* Day headers */}
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {dayNames.map(day => (
-              <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+            {dayNames.map((day) => (
+              <div
+                key={day}
+                className="text-center text-xs font-medium text-gray-500 py-2"
+              >
                 {day}
               </div>
             ))}
@@ -2556,10 +3001,14 @@ function CalendarDatePicker({ onClose, onDateSelect, taskType }) {
           {/* Calendar days */}
           <div className="grid grid-cols-7 gap-1 mb-4">
             {getDaysInMonth(currentDate).map((date, index) => {
-              const isToday = date && date.toDateString() === new Date().toDateString()
-              const isSelected = selectedDate && date && date.toDateString() === selectedDate.toDateString()
-              const isPast = date && date < new Date().setHours(0, 0, 0, 0)
-              const isSelectable = date && !isPast
+              const isToday =
+                date && date.toDateString() === new Date().toDateString();
+              const isSelected =
+                selectedDate &&
+                date &&
+                date.toDateString() === selectedDate.toDateString();
+              const isPast = date && date < new Date().setHours(0, 0, 0, 0);
+              const isSelectable = date && !isPast;
 
               return (
                 <button
@@ -2568,17 +3017,17 @@ function CalendarDatePicker({ onClose, onDateSelect, taskType }) {
                   disabled={!isSelectable}
                   className={`
                     h-10 text-sm rounded-lg transition-all duration-200
-                    ${!date ? 'invisible' : ''}
-                    ${isPast ? 'text-gray-300 cursor-not-allowed' : ''}
-                    ${isSelectable && !isSelected && !isToday ? 'text-gray-900 hover:bg-gray-100' : ''}
-                    ${isToday && !isSelected ? 'bg-blue-100 text-blue-800 font-medium' : ''}
-                    ${isSelected ? `bg-${typeInfo.color}-500 text-white font-medium shadow-lg` : ''}
-                    ${isSelectable ? 'cursor-pointer' : ''}
+                    ${!date ? "invisible" : ""}
+                    ${isPast ? "text-gray-300 cursor-not-allowed" : ""}
+                    ${isSelectable && !isSelected && !isToday ? "text-gray-900 hover:bg-gray-100" : ""}
+                    ${isToday && !isSelected ? "bg-blue-100 text-blue-800 font-medium" : ""}
+                    ${isSelected ? `bg-${typeInfo.color}-500 text-white font-medium shadow-lg` : ""}
+                    ${isSelectable ? "cursor-pointer" : ""}
                   `}
                 >
                   {date && date.getDate()}
                 </button>
-              )
+              );
             })}
           </div>
 
@@ -2586,11 +3035,11 @@ function CalendarDatePicker({ onClose, onDateSelect, taskType }) {
             <div className="mb-4 p-3 bg-gray-50 rounded-lg">
               <div className="text-sm text-gray-600">Selected Date:</div>
               <div className="font-medium text-gray-900">
-                {selectedDate.toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
+                {selectedDate.toLocaleDateString("en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
               </div>
             </div>
@@ -2598,16 +3047,13 @@ function CalendarDatePicker({ onClose, onDateSelect, taskType }) {
 
           {/* Actions */}
           <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 btn btn-secondary"
-            >
+            <button onClick={onClose} className="flex-1 btn btn-secondary">
               Cancel
             </button>
             <button
               onClick={handleConfirmDate}
               disabled={!selectedDate}
-              className={`flex-1 btn ${selectedDate ? 'btn-primary' : 'btn-disabled'}`}
+              className={`flex-1 btn ${selectedDate ? "btn-primary" : "btn-disabled"}`}
             >
               Continue
             </button>
@@ -2615,11 +3061,18 @@ function CalendarDatePicker({ onClose, onDateSelect, taskType }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Subtask Detail Panel Component
-function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, currentUser }) {
+function SubtaskDetailPanel({
+  subtask,
+  parentTask,
+  onClose,
+  onUpdate,
+  onDelete,
+  currentUser,
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     title: subtask.title,
@@ -2628,21 +3081,21 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
     status: subtask.status,
     priority: subtask.priority,
     dueDate: subtask.dueDate,
-    description: subtask.description || ''
+    description: subtask.description || "",
   });
 
   const teamMembers = [
-    { id: 1, name: 'Current User' },
-    { id: 2, name: 'John Doe' },
-    { id: 3, name: 'Jane Smith' },
-    { id: 4, name: 'Mike Johnson' },
-    { id: 5, name: 'Sarah Wilson' }
+    { id: 1, name: "Current User" },
+    { id: 2, name: "John Doe" },
+    { id: 3, name: "Jane Smith" },
+    { id: 4, name: "Mike Johnson" },
+    { id: 5, name: "Sarah Wilson" },
   ];
 
   const handleSave = () => {
     const updatedSubtask = {
       ...subtask,
-      ...formData
+      ...formData,
     };
     onUpdate(updatedSubtask);
     setIsEditing(false);
@@ -2656,30 +3109,30 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
       status: subtask.status,
       priority: subtask.priority,
       dueDate: subtask.dueDate,
-      description: subtask.description || ''
+      description: subtask.description || "",
     });
     setIsEditing(false);
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      'OPEN': 'bg-gray-100 text-gray-800',
-      'INPROGRESS': 'bg-blue-100 text-blue-800',
-      'DONE': 'bg-green-100 text-green-800',
-      'ONHOLD': 'bg-yellow-100 text-yellow-800',
-      'CANCELLED': 'bg-red-100 text-red-800'
+      OPEN: "bg-gray-100 text-gray-800",
+      INPROGRESS: "bg-blue-100 text-blue-800",
+      DONE: "bg-green-100 text-green-800",
+      ONHOLD: "bg-yellow-100 text-yellow-800",
+      CANCELLED: "bg-red-100 text-red-800",
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || "bg-gray-100 text-gray-800";
   };
 
   const getPriorityColor = (priority) => {
     const colors = {
-      'Low': 'bg-green-100 text-green-800',
-      'Medium': 'bg-yellow-100 text-yellow-800',
-      'High': 'bg-orange-100 text-orange-800',
-      'Urgent': 'bg-red-100 text-red-800'
+      Low: "bg-green-100 text-green-800",
+      Medium: "bg-yellow-100 text-yellow-800",
+      High: "bg-orange-100 text-orange-800",
+      Urgent: "bg-red-100 text-red-800",
     };
-    return colors[priority] || 'bg-gray-100 text-gray-800';
+    return colors[priority] || "bg-gray-100 text-gray-800";
   };
 
   return (
@@ -2688,22 +3141,36 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Sub-task Details</h3>
-              <p className="text-sm text-gray-600">Parent: {parentTask.title}</p>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Sub-task Details
+              </h3>
+              <p className="text-sm text-gray-600">
+                Parent: {parentTask.title}
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsEditing(!isEditing)}
                 className="btn btn-secondary btn-sm"
               >
-                {isEditing ? 'Cancel' : 'Edit'}
+                {isEditing ? "Cancel" : "Edit"}
               </button>
               <button
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -2720,11 +3187,15 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
               <input
                 type="text"
                 value={formData.title}
-                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, title: e.target.value }))
+                }
                 className="form-input w-full"
               />
             ) : (
-              <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{subtask.title}</p>
+              <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
+                {subtask.title}
+              </p>
             )}
           </div>
 
@@ -2738,23 +3209,27 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
                 <select
                   value={formData.assigneeId}
                   onChange={(e) => {
-                    const member = teamMembers.find(m => m.id === parseInt(e.target.value));
-                    setFormData(prev => ({ 
-                      ...prev, 
+                    const member = teamMembers.find(
+                      (m) => m.id === parseInt(e.target.value),
+                    );
+                    setFormData((prev) => ({
+                      ...prev,
                       assigneeId: member.id,
-                      assignee: member.name
+                      assignee: member.name,
                     }));
                   }}
                   className="form-select w-full"
                 >
-                  {teamMembers.map(member => (
+                  {teamMembers.map((member) => (
                     <option key={member.id} value={member.id}>
                       {member.name}
                     </option>
                   ))}
                 </select>
               ) : (
-                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{subtask.assignee}</p>
+                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
+                  {subtask.assignee}
+                </p>
               )}
             </div>
 
@@ -2766,7 +3241,9 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
               {isEditing ? (
                 <select
                   value={formData.status}
-                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, status: e.target.value }))
+                  }
                   className="form-select w-full"
                 >
                   <option value="OPEN">Open</option>
@@ -2776,7 +3253,9 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
                   <option value="CANCELLED">Cancelled</option>
                 </select>
               ) : (
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(subtask.status)}`}>
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(subtask.status)}`}
+                >
                   {subtask.status}
                 </span>
               )}
@@ -2792,7 +3271,12 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
               {isEditing ? (
                 <select
                   value={formData.priority}
-                  onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      priority: e.target.value,
+                    }))
+                  }
                   className="form-select w-full"
                 >
                   <option value="Low">Low</option>
@@ -2801,7 +3285,9 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
                   <option value="Urgent">Urgent</option>
                 </select>
               ) : (
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(subtask.priority)}`}>
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getPriorityColor(subtask.priority)}`}
+                >
                   {subtask.priority}
                 </span>
               )}
@@ -2816,11 +3302,18 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
                 <input
                   type="date"
                   value={formData.dueDate}
-                  onChange={(e) => setFormData(prev => ({ ...prev, dueDate: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      dueDate: e.target.value,
+                    }))
+                  }
                   className="form-input w-full"
                 />
               ) : (
-                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{subtask.dueDate}</p>
+                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
+                  {subtask.dueDate}
+                </p>
               )}
             </div>
           </div>
@@ -2833,13 +3326,18 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
             {isEditing ? (
               <textarea
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 className="form-textarea w-full"
                 rows="4"
               />
             ) : (
               <p className="text-gray-900 bg-gray-50 p-3 rounded-lg min-h-[100px]">
-                {subtask.description || 'No description provided'}
+                {subtask.description || "No description provided"}
               </p>
             )}
           </div>
@@ -2854,7 +3352,9 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
               </div>
               <div>
                 <span className="text-gray-500">Created at:</span>
-                <p className="text-gray-900">{new Date(subtask.createdAt).toLocaleDateString()}</p>
+                <p className="text-gray-900">
+                  {new Date(subtask.createdAt).toLocaleDateString()}
+                </p>
               </div>
             </div>
           </div>
@@ -2869,19 +3369,13 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
                 >
                   Cancel
                 </button>
-                <button
-                  onClick={handleSave}
-                  className="btn btn-primary flex-1"
-                >
+                <button onClick={handleSave} className="btn btn-primary flex-1">
                   Save Changes
                 </button>
               </>
             ) : (
               <>
-                <button
-                  onClick={onDelete}
-                  className="btn btn-danger"
-                >
+                <button onClick={onDelete} className="btn btn-danger">
                   Delete Sub-task
                 </button>
                 <button
@@ -2899,8 +3393,6 @@ function SubtaskDetailPanel({ subtask, parentTask, onClose, onUpdate, onDelete, 
   );
 }
 
-
-
 // Subtask Delete Confirmation Modal Component
 function SubtaskDeleteConfirmationModal({ subtaskTitle, onConfirm, onCancel }) {
   return (
@@ -2909,28 +3401,35 @@ function SubtaskDeleteConfirmationModal({ subtaskTitle, onConfirm, onCancel }) {
         <div className="p-6">
           <div className="flex items-center mb-4">
             <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <svg
+                className="w-6 h-6 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900">Delete Sub-task</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Delete Sub-task
+            </h3>
           </div>
 
           <p className="text-gray-600 mb-6">
-            Are you sure you want to delete this sub-task: "<strong>{subtaskTitle}</strong>"?
+            Are you sure you want to delete this sub-task: "
+            <strong>{subtaskTitle}</strong>"?
           </p>
 
           <div className="flex gap-3 justify-end">
-            <button
-              className="btn btn-secondary"
-              onClick={onCancel}
-            >
+            <button className="btn btn-secondary" onClick={onCancel}>
               Cancel
             </button>
-            <button
-              className="btn btn-danger"
-              onClick={onConfirm}
-            >
+            <button className="btn btn-danger" onClick={onConfirm}>
               Delete
             </button>
           </div>
@@ -2942,39 +3441,43 @@ function SubtaskDeleteConfirmationModal({ subtaskTitle, onConfirm, onCancel }) {
 
 // Approval Task Detail Modal Component
 function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
   const [showApprovalConfirm, setShowApprovalConfirm] = useState(null);
 
-  const userApprover = task.approvers?.find(a => a.id === currentUser.id);
-  const canUserApprove = userApprover && userApprover.status === 'pending';
+  const userApprover = task.approvers?.find((a) => a.id === currentUser.id);
+  const canUserApprove = userApprover && userApprover.status === "pending";
 
   const getApprovalModeDescription = (mode) => {
     switch (mode) {
-      case 'any': return 'Any single approver can approve/reject';
-      case 'all': return 'All approvers must approve';
-      case 'sequential': return 'Approvers must act in order';
-      default: return '';
+      case "any":
+        return "Any single approver can approve/reject";
+      case "all":
+        return "All approvers must approve";
+      case "sequential":
+        return "Approvers must act in order";
+      default:
+        return "";
     }
   };
 
   const getOverallStatus = () => {
-    if (!task.approvers) return 'pending';
+    if (!task.approvers) return "pending";
 
-    const hasRejected = task.approvers.some(a => a.status === 'rejected');
-    if (hasRejected) return 'rejected';
+    const hasRejected = task.approvers.some((a) => a.status === "rejected");
+    if (hasRejected) return "rejected";
 
-    const allApproved = task.approvers.every(a => a.status === 'approved');
-    if (allApproved) return 'approved';
+    const allApproved = task.approvers.every((a) => a.status === "approved");
+    if (allApproved) return "approved";
 
-    const hasApproved = task.approvers.some(a => a.status === 'approved');
-    if (hasApproved && task.approvalMode === 'any') return 'approved';
+    const hasApproved = task.approvers.some((a) => a.status === "approved");
+    if (hasApproved && task.approvalMode === "any") return "approved";
 
-    return 'pending';
+    return "pending";
   };
 
   const handleApprovalAction = (action) => {
-    if (!comment.trim() && action === 'rejected') {
-      alert('Please provide a comment when rejecting');
+    if (!comment.trim() && action === "rejected") {
+      alert("Please provide a comment when rejecting");
       return;
     }
 
@@ -2983,9 +3486,14 @@ function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
 
   const confirmApproval = () => {
     if (showApprovalConfirm) {
-      onApproval(task.id, currentUser.id, showApprovalConfirm.action, showApprovalConfirm.comment);
+      onApproval(
+        task.id,
+        currentUser.id,
+        showApprovalConfirm.action,
+        showApprovalConfirm.comment,
+      );
       setShowApprovalConfirm(null);
-      setComment('');
+      setComment("");
     }
   };
 
@@ -2994,7 +3502,10 @@ function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose}></div>
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      ></div>
 
       {/* Sliding Panel */}
       <div className="absolute right-0 top-0 h-full w-full max-w-4xl bg-white shadow-2xl flex flex-col animate-slide-in-right">
@@ -3006,14 +3517,21 @@ function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
                 <span className="text-2xl">✅</span>
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-2xl font-bold mb-2 break-words">{task.title}</h2>
+                <h2 className="text-2xl font-bold mb-2 break-words">
+                  {task.title}
+                </h2>
                 <div className="flex flex-wrap items-center gap-3 text-sm">
-                  <span className={`px-3 py-1 rounded-full font-medium ${
-                    overallStatus === 'approved' ? 'bg-green-500/20 text-green-100' :
-                    overallStatus === 'rejected' ? 'bg-red-500/20 text-red-100' :
-                    'bg-yellow-500/20 text-yellow-100'
-                  }`}>
-                    {overallStatus.charAt(0).toUpperCase() + overallStatus.slice(1)}
+                  <span
+                    className={`px-3 py-1 rounded-full font-medium ${
+                      overallStatus === "approved"
+                        ? "bg-green-500/20 text-green-100"
+                        : overallStatus === "rejected"
+                          ? "bg-red-500/20 text-red-100"
+                          : "bg-yellow-500/20 text-yellow-100"
+                    }`}
+                  >
+                    {overallStatus.charAt(0).toUpperCase() +
+                      overallStatus.slice(1)}
                   </span>
                   <span className="text-blue-100">Approval Task</span>
                   <span className="text-blue-200">Due: {task.dueDate}</span>
@@ -3024,8 +3542,18 @@ function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
               onClick={onClose}
               className="text-white/80 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -3036,46 +3564,83 @@ function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
           {/* Task Details Section */}
           <div className="bg-gray-50 rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <svg
+                className="w-5 h-5 mr-2 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
               Task Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Created By</label>
-                <p className="text-gray-900">{task.createdBy || 'Unknown'}</p>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Created By
+                </label>
+                <p className="text-gray-900">{task.createdBy || "Unknown"}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Created Date</label>
-                <p className="text-gray-900">{task.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'Unknown'}</p>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Created Date
+                </label>
+                <p className="text-gray-900">
+                  {task.createdAt
+                    ? new Date(task.createdAt).toLocaleDateString()
+                    : "Unknown"}
+                </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  task.priority === 'critical' ? 'bg-red-100 text-red-800' :
-                  task.priority === 'high' ? 'bg-orange-100 text-orange-800' :
-                  task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-green-100 text-green-800'
-                }`}>
-                  {task.priority?.charAt(0).toUpperCase() + task.priority?.slice(1) || 'Medium'}
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Priority
+                </label>
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    task.priority === "critical"
+                      ? "bg-red-100 text-red-800"
+                      : task.priority === "high"
+                        ? "bg-orange-100 text-orange-800"
+                        : task.priority === "medium"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-green-100 text-green-800"
+                  }`}
+                >
+                  {task.priority?.charAt(0).toUpperCase() +
+                    task.priority?.slice(1) || "Medium"}
                 </span>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  task.visibility === 'public' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {task.visibility?.charAt(0).toUpperCase() + task.visibility?.slice(1) || 'Private'}
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Visibility
+                </label>
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                    task.visibility === "public"
+                      ? "bg-blue-100 text-blue-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {task.visibility?.charAt(0).toUpperCase() +
+                    task.visibility?.slice(1) || "Private"}
                 </span>
               </div>
             </div>
 
             {task.description && (
               <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
                 <div className="bg-white p-4 rounded-lg border border-gray-200">
-                  <p className="text-gray-900 whitespace-pre-wrap">{task.description}</p>
+                  <p className="text-gray-900 whitespace-pre-wrap">
+                    {task.description}
+                  </p>
                 </div>
               </div>
             )}
@@ -3084,8 +3649,18 @@ function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
           {/* Approval Workflow Section */}
           <div className="bg-white border border-gray-200 rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-5 h-5 mr-2 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               Approval Workflow
             </h3>
@@ -3094,59 +3669,91 @@ function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-medium text-blue-900">Approval Mode</h4>
-                  <p className="text-sm text-blue-700">{getApprovalModeDescription(task.approvalMode)}</p>
+                  <p className="text-sm text-blue-700">
+                    {getApprovalModeDescription(task.approvalMode)}
+                  </p>
                 </div>
                 <span className="px-3 py-1 bg-blue-200 text-blue-800 rounded-full text-sm font-medium">
-                  {task.approvalMode?.toUpperCase() || 'ANY'}
+                  {task.approvalMode?.toUpperCase() || "ANY"}
                 </span>
               </div>
             </div>
 
             {/* Approvers List */}
             <div className="space-y-4">
-              <h4 className="font-medium text-gray-900">Approvers ({task.approvers?.length || 0})</h4>
+              <h4 className="font-medium text-gray-900">
+                Approvers ({task.approvers?.length || 0})
+              </h4>
               {task.approvers?.map((approver, index) => (
-                <div key={approver.id} className={`p-4 rounded-lg border-2 transition-all ${
-                  approver.status === 'approved' ? 'border-green-200 bg-green-50' :
-                  approver.status === 'rejected' ? 'border-red-200 bg-red-50' :
-                  approver.status === 'pending' ? 'border-blue-200 bg-blue-50' :
-                  'border-gray-200 bg-gray-50'
-                }`}>
+                <div
+                  key={approver.id}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    approver.status === "approved"
+                      ? "border-green-200 bg-green-50"
+                      : approver.status === "rejected"
+                        ? "border-red-200 bg-red-50"
+                        : approver.status === "pending"
+                          ? "border-blue-200 bg-blue-50"
+                          : "border-gray-200 bg-gray-50"
+                  }`}
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="flex-shrink-0">
                         <span className="text-2xl">
-                          {approver.avatar || (approver.status === 'approved' ? '✅' : 
-                           approver.status === 'rejected' ? '❌' : 
-                           approver.status === 'pending' ? '⏳' : '⏸️')}
+                          {approver.avatar ||
+                            (approver.status === "approved"
+                              ? "✅"
+                              : approver.status === "rejected"
+                                ? "❌"
+                                : approver.status === "pending"
+                                  ? "⏳"
+                                  : "⏸️")}
                         </span>
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center space-x-2">
-                          <h5 className="font-medium text-gray-900">{approver.name}</h5>
-                          <span className="text-sm text-gray-500">({approver.role})</span>
+                          <h5 className="font-medium text-gray-900">
+                            {approver.name}
+                          </h5>
+                          <span className="text-sm text-gray-500">
+                            ({approver.role})
+                          </span>
                           {approver.id === currentUser.id && (
-                            <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">You</span>
+                            <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                              You
+                            </span>
                           )}
                         </div>
                         <div className="mt-1">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            approver.status === 'approved' ? 'bg-green-100 text-green-800' :
-                            approver.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                            approver.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {approver.status?.charAt(0).toUpperCase() + approver.status?.slice(1) || 'Waiting'}
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              approver.status === "approved"
+                                ? "bg-green-100 text-green-800"
+                                : approver.status === "rejected"
+                                  ? "bg-red-100 text-red-800"
+                                  : approver.status === "pending"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {approver.status?.charAt(0).toUpperCase() +
+                              approver.status?.slice(1) || "Waiting"}
                           </span>
                           {approver.approvedAt && (
                             <span className="ml-2 text-xs text-gray-500">
-                              on {new Date(approver.approvedAt).toLocaleDateString()}
+                              on{" "}
+                              {new Date(
+                                approver.approvedAt,
+                              ).toLocaleDateString()}
                             </span>
                           )}
                         </div>
                         {approver.comment && (
                           <div className="mt-2 p-2 bg-white rounded border">
-                            <p className="text-sm text-gray-700">"{approver.comment}"</p>
+                            <p className="text-sm text-gray-700">
+                              "{approver.comment}"
+                            </p>
                           </div>
                         )}
                       </div>
@@ -3165,18 +3772,35 @@ function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
           {task.attachments && task.attachments.length > 0 && (
             <div className="bg-white border border-gray-200 rounded-xl p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                <svg
+                  className="w-5 h-5 mr-2 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                  />
                 </svg>
                 Attachments ({task.attachments.length})
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {task.attachments.map((attachment) => (
-                  <div key={attachment.id} className="flex items-center p-3 bg-gray-50 rounded-lg border">
+                  <div
+                    key={attachment.id}
+                    className="flex items-center p-3 bg-gray-50 rounded-lg border"
+                  >
                     <span className="text-lg mr-3">📄</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{attachment.name}</p>
-                      <p className="text-xs text-gray-500">{(attachment.size / 1024).toFixed(1)} KB</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {attachment.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {(attachment.size / 1024).toFixed(1)} KB
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -3188,8 +3812,18 @@ function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
           {canUserApprove && (
             <div className="bg-white border border-gray-200 rounded-xl p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                <svg
+                  className="w-5 h-5 mr-2 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
                 </svg>
                 Your Review
               </h3>
@@ -3210,20 +3844,40 @@ function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
-                    onClick={() => handleApprovalAction('approved')}
+                    onClick={() => handleApprovalAction("approved")}
                     className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center"
                   >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                     Approve
                   </button>
                   <button
-                    onClick={() => handleApprovalAction('rejected')}
+                    onClick={() => handleApprovalAction("rejected")}
                     className="flex-1 bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center"
                   >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                     Reject
                   </button>
@@ -3240,26 +3894,57 @@ function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
             <div className="p-6">
               <div className="flex items-center mb-4">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${
-                  showApprovalConfirm.action === 'approved' ? 'bg-green-100' : 'bg-red-100'
-                }`}>
-                  {showApprovalConfirm.action === 'approved' ? (
-                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${
+                    showApprovalConfirm.action === "approved"
+                      ? "bg-green-100"
+                      : "bg-red-100"
+                  }`}
+                >
+                  {showApprovalConfirm.action === "approved" ? (
+                    <svg
+                      className="w-6 h-6 text-green-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   ) : (
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-6 h-6 text-red-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   )}
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Confirm {showApprovalConfirm.action === 'approved' ? 'Approval' : 'Rejection'}
+                  Confirm{" "}
+                  {showApprovalConfirm.action === "approved"
+                    ? "Approval"
+                    : "Rejection"}
                 </h3>
               </div>
 
               <p className="text-gray-600 mb-6">
-                Are you sure you want to {showApprovalConfirm.action === 'approved' ? 'approve' : 'reject'} this task?
+                Are you sure you want to{" "}
+                {showApprovalConfirm.action === "approved"
+                  ? "approve"
+                  : "reject"}{" "}
+                this task?
                 {showApprovalConfirm.comment && (
                   <span className="block mt-2 font-medium">
                     Comment: "{showApprovalConfirm.comment}"
@@ -3277,12 +3962,15 @@ function ApprovalTaskDetailModal({ task, onClose, currentUser, onApproval }) {
                 <button
                   onClick={confirmApproval}
                   className={`flex-1 px-4 py-2 text-white rounded-lg transition-colors ${
-                    showApprovalConfirm.action === 'approved' 
-                      ? 'bg-green-600 hover:bg-green-700' 
-                      : 'bg-red-600 hover:bg-red-700'
+                    showApprovalConfirm.action === "approved"
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-red-600 hover:bg-red-700"
                   }`}
                 >
-                  Confirm {showApprovalConfirm.action === 'approved' ? 'Approval' : 'Rejection'}
+                  Confirm{" "}
+                  {showApprovalConfirm.action === "approved"
+                    ? "Approval"
+                    : "Rejection"}
                 </button>
               </div>
             </div>
