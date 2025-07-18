@@ -37,6 +37,9 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [selectedDateForTask, setSelectedDateForTask] = useState(null);
   // const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
   const [selectedApprovalTask, setSelectedApprovalTask] = useState(null);
+  const [showFullCalendar, setShowFullCalendar] = useState(false);
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
+  const [calendarFilteredTasks, setCalendarFilteredTasks] = useState([]);
   const [toast, setToast] = useState({
     message: "",
     type: "success",
@@ -1031,6 +1034,19 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     console.log("Approval task created:", newTask);
   };
 
+  // Handle calendar date selection for filtering
+  const handleCalendarDateSelect = (date) => {
+    setSelectedCalendarDate(date);
+    const dateStr = date.toISOString().split('T')[0];
+    
+    // Filter tasks for the selected date
+    const filtered = tasks.filter(task => {
+      return task.dueDate === dateStr;
+    });
+    
+    setCalendarFilteredTasks(filtered);
+  };
+
   return (
     <div className="space-y-6 px-4 py-6 h-auto overflow-scroll">
       {/* Header */}
@@ -1061,10 +1077,11 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
             </svg>
             {showSnooze ? "Hide" : "Show"} Snoozed Tasks
           </button>
-          <div className="relative">
+          <div className="flex gap-3">
             <button
-              className="btn btn-primary"
-              onClick={() => handleTaskTypeSelect("regular")}
+              className="btn btn-secondary"
+              onClick={() => setShowFullCalendar(true)}
+              title="Open Calendar View"
             >
               <svg
                 className="w-4 h-4 mr-2"
@@ -1076,11 +1093,32 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M12 4v16m8-8H4"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              Create Task
+              Calendar
             </button>
+            <div className="relative">
+              <button
+                className="btn btn-primary"
+                onClick={() => handleTaskTypeSelect("regular")}
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Create Task
+              </button></div_str>
+          </div>
             <button
               className="btn btn-primary ml-1 px-2"
               onClick={() => setShowTaskTypeDropdown(!showTaskTypeDropdown)}
@@ -2020,6 +2058,21 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
             )
           }
           onCancel={() => setShowDeleteSubtaskConfirmation(null)}
+        />
+      )}
+
+      {/* Full Calendar Modal */}
+      {showFullCalendar && (
+        <FullPageCalendar
+          tasks={tasks}
+          onClose={() => {
+            setShowFullCalendar(false);
+            setSelectedCalendarDate(null);
+            setCalendarFilteredTasks([]);
+          }}
+          onDateSelect={handleCalendarDateSelect}
+          selectedDate={selectedCalendarDate}
+          filteredTasks={calendarFilteredTasks}
         />
       )}
 
@@ -3434,6 +3487,312 @@ function SubtaskDeleteConfirmationModal({ subtaskTitle, onConfirm, onCancel }) {
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Full Page Calendar Component
+function FullPageCalendar({ tasks, onClose, onDateSelect, selectedDate, filteredTasks }) {
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState('month');
+
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDayOfWeek = firstDay.getDay();
+    
+    const days = [];
+    
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startDayOfWeek; i++) {
+      days.push(null);
+    }
+    
+    // Add all days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+    
+    return days;
+  };
+
+  const getTasksForDate = (date) => {
+    if (!date) return [];
+    const dateStr = date.toISOString().split('T')[0];
+    return tasks.filter(task => task.dueDate === dateStr);
+  };
+
+  const navigateMonth = (direction) => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() + direction);
+    setCurrentDate(newDate);
+  };
+
+  const handleDateClick = (date) => {
+    if (date && onDateSelect) {
+      onDateSelect(date);
+    }
+  };
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  const getStatusColor = (status) => {
+    const colors = {
+      OPEN: "#6c757d",
+      INPROGRESS: "#3498db", 
+      DONE: "#28a745",
+      ONHOLD: "#f39c12",
+      CANCELLED: "#dc3545"
+    };
+    return colors[status] || "#6c757d";
+  };
+
+  const getPriorityColor = (priority) => {
+    const colors = {
+      Low: "#28a745",
+      Medium: "#f39c12", 
+      High: "#fd7e14",
+      Urgent: "#dc3545"
+    };
+    return colors[priority] || "#6c757d";
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-white overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-700 text-white p-6 shadow-lg">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Task Calendar</h1>
+            <p className="text-blue-100 mt-2">View and manage tasks by date</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-white/80 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+          >
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div className="flex h-full">
+        {/* Calendar Section */}
+        <div className="flex-1 p-6 overflow-y-auto">
+          {/* Calendar Navigation */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigateMonth(-1)}
+                className="p-3 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              
+              <h2 className="text-2xl font-bold text-gray-900">
+                {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+              </h2>
+              
+              <button
+                onClick={() => navigateMonth(1)}
+                className="p-3 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentDate(new Date())}
+                className="px-4 py-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition-colors"
+              >
+                Today
+              </button>
+            </div>
+          </div>
+
+          {/* Calendar Grid */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {/* Day headers */}
+            <div className="grid grid-cols-7 gap-0 bg-gray-50 border-b border-gray-200">
+              {dayNames.map(day => (
+                <div key={day} className="text-center text-sm font-semibold text-gray-700 py-4 border-r border-gray-200 last:border-r-0">
+                  {day}
+                </div>
+              ))}
+            </div>
+
+            {/* Calendar days */}
+            <div className="grid grid-cols-7 gap-0">
+              {getDaysInMonth(currentDate).map((date, index) => {
+                const tasksForDate = getTasksForDate(date);
+                const isToday = date && date.toDateString() === new Date().toDateString();
+                const isSelected = selectedDate && date && date.toDateString() === selectedDate.toDateString();
+                const hasTasks = tasksForDate.length > 0;
+                
+                return (
+                  <div
+                    key={index}
+                    className={`
+                      min-h-[120px] p-3 border-r border-b border-gray-200 last:border-r-0
+                      ${date ? 'bg-white hover:bg-gray-50 cursor-pointer' : 'bg-gray-50'}
+                      ${isToday ? 'bg-blue-50 border-blue-200' : ''}
+                      ${isSelected ? 'bg-blue-100 border-blue-300' : ''}
+                      transition-colors
+                    `}
+                    onClick={() => handleDateClick(date)}
+                  >
+                    {date && (
+                      <>
+                        <div className={`text-sm font-medium mb-2 ${isToday ? 'text-blue-700' : 'text-gray-900'}`}>
+                          {date.getDate()}
+                        </div>
+                        <div className="space-y-1">
+                          {tasksForDate.slice(0, 3).map(task => (
+                            <div
+                              key={task.id}
+                              className="text-xs px-2 py-1 rounded-md cursor-pointer transition-colors truncate"
+                              style={{ 
+                                backgroundColor: `${getStatusColor(task.status)}20`,
+                                color: getStatusColor(task.status),
+                                borderLeft: `3px solid ${getPriorityColor(task.priority)}`
+                              }}
+                              title={`${task.title} - ${task.status} (${task.priority})`}
+                            >
+                              {task.title}
+                            </div>
+                          ))}
+                          {tasksForDate.length > 3 && (
+                            <div className="text-xs text-gray-500 font-medium">
+                              +{tasksForDate.length - 3} more
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Legend */}
+          <div className="mt-6 bg-gray-50 rounded-lg p-4">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Legend</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-100 border-l-4 border-blue-500 rounded"></div>
+                <span>Has Tasks</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-200 rounded"></div>
+                <span>Selected Date</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-50 border border-blue-300 rounded"></div>
+                <span>Today</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 border-l-4 border-red-500 bg-gray-100 rounded"></div>
+                <span>High Priority</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Task List Section */}
+        {selectedDate && (
+          <div className="w-1/3 bg-gray-50 border-l border-gray-200 p-6 overflow-y-auto">
+            <div className="sticky top-0 bg-gray-50 pb-4 mb-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Tasks for {selectedDate.toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {filteredTasks.length > 0 ? (
+                filteredTasks.map(task => (
+                  <div key={task.id} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-medium text-gray-900 text-sm leading-tight">{task.title}</h4>
+                      <span 
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                        style={{ 
+                          backgroundColor: `${getStatusColor(task.status)}20`,
+                          color: getStatusColor(task.status)
+                        }}
+                      >
+                        {task.status}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span>{task.assignee}</span>
+                      <span 
+                        className="px-2 py-1 rounded-full font-medium"
+                        style={{ 
+                          backgroundColor: `${getPriorityColor(task.priority)}20`,
+                          color: getPriorityColor(task.priority)
+                        }}
+                      >
+                        {task.priority}
+                      </span>
+                    </div>
+                    
+                    <div className="mt-2 text-xs text-gray-600">
+                      {task.category}
+                    </div>
+                    
+                    {task.progress > 0 && (
+                      <div className="mt-3">
+                        <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                          <span>Progress</span>
+                          <span>{task.progress}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div 
+                            className="bg-blue-500 h-1.5 rounded-full transition-all duration-300" 
+                            style={{ width: `${task.progress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  <p className="text-sm">No tasks scheduled for this date</p>
+                  <p className="text-xs text-gray-400 mt-1">Click on a date with highlighted tasks to view them</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
