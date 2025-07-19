@@ -35,6 +35,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [selectedSubtask, setSelectedSubtask] = useState(null);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [selectedDateForTask, setSelectedDateForTask] = useState(null);
+  const [showMilestoneModal, setShowMilestoneModal] = useState(false);
   // const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
   const [selectedApprovalTask, setSelectedApprovalTask] = useState(null);
   const [toast, setToast] = useState({
@@ -988,6 +989,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     // Open appropriate task creation modal based on selected type
     if (selectedTaskType === "approval") {
       setShowApprovalTaskModal(true);
+    } else if (selectedTaskType === "milestone") {
+      setShowMilestoneModal(true);
     } else {
       setShowCreateTaskDrawer(true);
     }
@@ -1029,6 +1032,37 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     setShowApprovalTaskModal(false);
     setSelectedDateForTask(null);
     console.log("Approval task created:", newTask);
+  };
+
+  const handleCreateMilestone = (milestoneData) => {
+    // Add the milestone to the tasks list
+    const newTask = {
+      id: Date.now(),
+      title: milestoneData.title,
+      assignee: milestoneData.assignee || "Current User",
+      assigneeId: milestoneData.assigneeId || 1,
+      status: "OPEN",
+      priority: milestoneData.priority || "Medium",
+      dueDate: milestoneData.dueDate || selectedDateForTask,
+      category: "Milestone",
+      progress: 0,
+      subtaskCount: 0,
+      collaborators: milestoneData.collaborators || [],
+      createdBy: "Current User",
+      creatorId: 1,
+      type: "milestone",
+      description: milestoneData.description || "",
+      subtasks: [],
+      isMilestone: true,
+      milestoneType: milestoneData.milestoneType || "standalone",
+      linkedTasks: milestoneData.linkedTasks || [],
+      visibility: milestoneData.visibility || "private",
+    };
+
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+    setShowMilestoneModal(false);
+    setSelectedDateForTask(null);
+    console.log("Milestone created:", newTask);
   };
 
   return (
@@ -1950,6 +1984,61 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
           }
           currentUser={currentUser}
         />
+      )}
+
+      {/* Milestone Creation Modal */}
+      {showMilestoneModal && (
+        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
+          <div
+            className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowMilestoneModal(false)}
+          ></div>
+          <div
+            className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right"
+            style={{
+              width: "min(90vw, 800px)",
+              boxShadow: "-10px 0 50px rgba(0,0,0,0.2)",
+              borderLeft: "1px solid rgba(255,255,255,0.2)",
+            }}
+          >
+            <div className="drawer-header">
+              <h2 className="text-2xl font-bold text-white">
+                Create Milestone
+                {selectedDateForTask &&
+                  ` for ${new Date(selectedDateForTask).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`}
+              </h2>
+              <button
+                onClick={() => setShowMilestoneModal(false)}
+                className="close-btn"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="drawer-body">
+              <MilestoneCreator
+                onClose={() => {
+                  setShowMilestoneModal(false);
+                  setSelectedDateForTask(null);
+                }}
+                onSubmit={handleCreateMilestone}
+                preFilledDate={selectedDateForTask}
+                selectedDate={selectedDateForTask}
+              />
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Approval Task Detail Modal */}
