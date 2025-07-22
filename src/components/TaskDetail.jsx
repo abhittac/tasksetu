@@ -590,11 +590,11 @@ export default function TaskDetail({ taskId, onClose }) {
 
 function CoreInfoPanel({ task, onUpdate, permissions }) {
   return (
-    <div className="core-info-panel">
-      <div className="info-grid">
+    <div className="core-info-panel p-2">
+      <div className="info-grid grid grid-cols-1 lg:grid-cols-4 gap-2">
         {/* Description */}
-        <div className="info-section full-width">
-          <h3>Description</h3>
+        <div className="info-section lg:col-span-4 bg-gray-50 p-2 rounded">
+          <h3 className="text-sm font-medium mb-1">Description</h3>
           <EditableTextArea
             value={task.description}
             onSave={(newDesc) => onUpdate({ ...task, description: newDesc })}
@@ -603,112 +603,117 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
           />
         </div>
 
-        {/* Date Information */}
-        <div className="info-section">
-          <h4>Timeline</h4>
-          <div className="info-field">
-            <label>Start Date:</label>
-            <EditableDateField
-              value={task.startDate}
-              onSave={(newDate) => onUpdate({ ...task, startDate: newDate })}
-              canEdit={permissions.canEdit}
-            />
-          </div>
-          <div className="info-field">
-            <label>Due Date:</label>
-            <EditableDateField
-              value={task.dueDate}
-              onSave={(newDate) => onUpdate({ ...task, dueDate: newDate })}
-              canEdit={permissions.canEdit}
-            />
-          </div>
-          <div className="info-field">
-            <label>Time Estimate:</label>
-            <EditableTextField
-              value={task.timeEstimate}
-              onSave={(newEstimate) =>
-                onUpdate({ ...task, timeEstimate: newEstimate })
-              }
-              canEdit={permissions.canEdit}
-            />
-          </div>
-        </div>
-
-        {/* Task Relationships */}
-        <div className="info-section">
-          <h4>Relationships</h4>
-          {task.parentTaskId && (
-            <div className="info-field">
-              <label>Parent Task:</label>
-              <span className="linked-task">Task #{task.parentTaskId}</span>
+        {/* Timeline - Compact */}
+        <div className="info-section bg-gray-50 p-2 rounded">
+          <h4 className="text-sm font-medium mb-1">Timeline</h4>
+          <div className="space-y-1">
+            <div className="info-field flex justify-between text-xs">
+              <label className="font-medium">Start:</label>
+              <EditableDateField
+                value={task.startDate}
+                onSave={(newDate) => onUpdate({ ...task, startDate: newDate })}
+                canEdit={permissions.canEdit}
+              />
             </div>
-          )}
-          {task.isRecurring && task.recurringFromTaskId && (
-            <div className="info-field">
-              <label>Recurring from:</label>
-              <button
-                className="linked-task cursor-pointer text-blue-600 hover:text-blue-800 hover:underline"
-                onClick={() =>
-                  console.log(`Open master task ${task.recurringFromTaskId}`)
+            <div className="info-field flex justify-between text-xs">
+              <label className="font-medium">Due:</label>
+              <EditableDateField
+                value={task.dueDate}
+                onSave={(newDate) => onUpdate({ ...task, dueDate: newDate })}
+                canEdit={permissions.canEdit}
+              />
+            </div>
+            <div className="info-field flex justify-between text-xs">
+              <label className="font-medium">Estimate:</label>
+              <EditableTextField
+                value={task.timeEstimate}
+                onSave={(newEstimate) =>
+                  onUpdate({ ...task, timeEstimate: newEstimate })
                 }
-                title="Click to view the master recurring task pattern"
-              >
-                Task #{task.recurringFromTaskId} 🔁
-              </button>
-            </div>
-          )}
-          <div className="info-field">
-            <label>Collaborators:</label>
-            <div className="collaborators-list">
-              {task.collaborators.map((collab) => (
-                <span key={collab} className="collaborator-badge">
-                  {collab}
-                </span>
-              ))}
+                canEdit={permissions.canEdit}
+              />
             </div>
           </div>
         </div>
 
-        {/* Creation Info */}
-        <div className="info-section">
-          <h4>Task Details</h4>
-          <div className="info-field">
-            <label>Created By:</label>
-            <span>{task.createdBy}</span>
-          </div>
-          <div className="info-field">
-            <label>Created:</label>
-            <span>{task.createdAt}</span>
-          </div>
-          <div className="info-field">
-            <label>Last Updated:</label>
-            <span>{task.updatedAt}</span>
+        {/* Relationships - Compact */}
+        <div className="info-section bg-gray-50 p-2 rounded">
+          <h4 className="text-sm font-medium mb-1">Relationships</h4>
+          <div className="space-y-1 text-xs">
+            {task.parentTaskId && (
+              <div className="info-field">
+                <label className="font-medium">Parent:</label>
+                <span className="linked-task text-blue-600">#{task.parentTaskId}</span>
+              </div>
+            )}
+            {task.isRecurring && task.recurringFromTaskId && (
+              <div className="info-field">
+                <label className="font-medium">Recurring:</label>
+                <button
+                  className="linked-task text-blue-600 hover:underline"
+                  onClick={() =>
+                    console.log(`Open master task ${task.recurringFromTaskId}`)
+                  }
+                  title="View master recurring task"
+                >
+                  #{task.recurringFromTaskId} 🔁
+                </button>
+              </div>
+            )}
+            <div className="info-field">
+              <label className="font-medium block mb-1">Collaborators:</label>
+              <div className="collaborators-list flex flex-wrap gap-1">
+                {task.collaborators.map((collab) => (
+                  <span key={collab} className="collaborator-badge bg-blue-100 text-blue-800 px-1 py-0.5 rounded text-xs">
+                    {collab}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Reminders */}
+        {/* Creation Info - Compact */}
+        <div className="info-section bg-gray-50 p-2 rounded">
+          <h4 className="text-sm font-medium mb-1">Details</h4>
+          <div className="space-y-1 text-xs">
+            <div className="info-field flex justify-between">
+              <label className="font-medium">Created By:</label>
+              <span className="truncate">{task.createdBy}</span>
+            </div>
+            <div className="info-field flex justify-between">
+              <label className="font-medium">Created:</label>
+              <span className="truncate">{task.createdAt}</span>
+            </div>
+            <div className="info-field flex justify-between">
+              <label className="font-medium">Updated:</label>
+              <span className="truncate">{task.updatedAt}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Reminders - Compact */}
         {task.reminders.length > 0 && (
-          <div className="info-section full-width">
-            <h4>Active Reminders</h4>
-            <div className="reminders-list">
+          <div className="info-section lg:col-span-2 bg-yellow-50 p-2 rounded">
+            <h4 className="text-sm font-medium mb-1">⏰ Reminders</h4>
+            <div className="reminders-list space-y-1">
               {task.reminders.map((reminder) => (
-                <div key={reminder.id} className="reminder-item">
-                  <span className="reminder-icon">⏰</span>
+                <div key={reminder.id} className="reminder-item flex items-center gap-1 text-xs">
                   <span>{reminder.message}</span>
-                  <span className="reminder-date">({reminder.date})</span>
+                  <span className="text-gray-500">({reminder.date})</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Milestone Information */}
+        {/* Milestone Progress - Compact */}
         {task.taskType === "milestone" && task.milestones.length > 0 && (
-          <div className="info-section full-width">
-            <h4>Milestone Progress</h4>
-            <div className="milestone-list">
+          <div className="info-section lg:col-span-2 bg-purple-50 p-2 rounded">
+            <h4 className="text-sm font-medium mb-1">🎯 Milestones</h4>
+            <div className="milestone-list space-y-1">
               {task.milestones.map((milestone) => (
-                <div key={milestone.id} className="milestone-item">
+                <div key={milestone.id} className="milestone-item flex items-center gap-1 text-xs">
                   <span className={`milestone-icon ${milestone.status}`}>
                     {milestone.status === "completed"
                       ? "✅"
@@ -716,9 +721,9 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
                         ? "🔄"
                         : "⭐"}
                   </span>
-                  <div className="milestone-info">
-                    <span className="milestone-title">{milestone.title}</span>
-                    <span className="milestone-date">{milestone.date}</span>
+                  <div className="milestone-info flex-1">
+                    <span className="milestone-title font-medium">{milestone.title}</span>
+                    <span className="milestone-date text-gray-500 ml-1">({milestone.date})</span>
                   </div>
                 </div>
               ))}
@@ -726,44 +731,41 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
           </div>
         )}
 
-        {/* Approval Information */}
+        {/* Approval Status - Compact */}
         {task.taskType === "approval" && (
-          <div className="info-section full-width">
-            <h4>Approval Status</h4>
+          <div className="info-section lg:col-span-2 bg-green-50 p-2 rounded">
+            <h4 className="text-sm font-medium mb-1">✅ Approval</h4>
             <div className="approval-info">
-              <div className="approval-status">
-                <span
-                  className={`approval-badge ${task.approvalStatus || "pending"}`}
-                >
-                  {task.approvalStatus || "Pending Approval"}
-                </span>
-              </div>
+              <span
+                className={`approval-badge px-2 py-1 rounded text-xs font-medium ${task.approvalStatus || "pending"}`}
+              >
+                {task.approvalStatus || "Pending Approval"}
+              </span>
             </div>
           </div>
         )}
 
-        {/* Risk Information */}
+        {/* Risk Information - Compact */}
         {task.isRisky && (
-          <div className="info-section full-width risk-section">
-            <h4>⚠️ Risk Information</h4>
+          <div className="info-section lg:col-span-2 bg-red-50 p-2 rounded">
+            <h4 className="text-sm font-medium mb-1">⚠️ Risk</h4>
             <div className="risk-details">
-              <p>{task.riskNote}</p>
+              <p className="text-xs">{task.riskNote}</p>
             </div>
           </div>
         )}
 
-        {/* Snooze Information */}
+        {/* Snooze Information - Compact */}
         {task.snoozedUntil && (
-          <div className="info-section full-width snooze-section">
-            <h4>😴 Snooze Information</h4>
-            <div className="snooze-details">
+          <div className="info-section lg:col-span-2 bg-orange-50 p-2 rounded">
+            <h4 className="text-sm font-medium mb-1">😴 Snoozed</h4>
+            <div className="snooze-details space-y-1 text-xs">
               <div className="snooze-field">
-                <strong>Snoozed until:</strong>{" "}
-                {new Date(task.snoozedUntil).toLocaleString()}
+                <strong>Until:</strong> {new Date(task.snoozedUntil).toLocaleString()}
               </div>
               {task.snoozeNote && (
                 <div className="snooze-field">
-                  <strong>Snooze note:</strong> {task.snoozeNote}
+                  <strong>Note:</strong> {task.snoozeNote}
                 </div>
               )}
             </div>
@@ -1605,7 +1607,7 @@ function EditableTextArea({ value, onSave, canEdit, placeholder }) {
   };
 
   if (!canEdit) {
-    return <p className="readonly-text">{value || placeholder}</p>;
+    return <p className="readonly-text text-xs text-gray-700">{value || placeholder}</p>;
   }
 
   if (isEditing) {
@@ -1616,8 +1618,8 @@ function EditableTextArea({ value, onSave, canEdit, placeholder }) {
           onChange={(e) => setEditValue(e.target.value)}
           onBlur={handleSave}
           autoFocus
-          className="editable-textarea"
-          rows="4"
+          className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-transparent resize-none"
+          rows="2"
           placeholder={placeholder}
         />
       </div>
@@ -1625,9 +1627,9 @@ function EditableTextArea({ value, onSave, canEdit, placeholder }) {
   }
 
   return (
-    <div className="editable-text-display" onClick={() => setIsEditing(true)}>
-      <p>{value || placeholder}</p>
-      <span className="edit-icon">✏️</span>
+    <div className="editable-text-display cursor-pointer text-xs p-1 rounded hover:bg-gray-100 group" onClick={() => setIsEditing(true)}>
+      <p className="text-gray-700">{value || placeholder}</p>
+      <span className="edit-icon opacity-0 group-hover:opacity-100 text-xs">✏️</span>
     </div>
   );
 }
@@ -1644,7 +1646,7 @@ function EditableTextField({ value, onSave, canEdit }) {
   };
 
   if (!canEdit) {
-    return <span className="readonly-text">{value}</span>;
+    return <span className="readonly-text text-xs">{value}</span>;
   }
 
   if (isEditing) {
@@ -1662,15 +1664,15 @@ function EditableTextField({ value, onSave, canEdit }) {
           }
         }}
         autoFocus
-        className="editable-input"
+        className="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
       />
     );
   }
 
   return (
-    <span className="editable-field" onClick={() => setIsEditing(true)}>
+    <span className="editable-field cursor-pointer text-xs hover:bg-gray-100 px-1 py-0.5 rounded group" onClick={() => setIsEditing(true)}>
       {value}
-      <span className="edit-icon">✏️</span>
+      <span className="edit-icon opacity-0 group-hover:opacity-100 ml-1 text-xs">✏️</span>
     </span>
   );
 }
@@ -1687,7 +1689,7 @@ function EditableDateField({ value, onSave, canEdit }) {
   };
 
   if (!canEdit) {
-    return <span className="readonly-text">{value}</span>;
+    return <span className="readonly-text text-xs">{value}</span>;
   }
 
   if (isEditing) {
@@ -1698,15 +1700,15 @@ function EditableDateField({ value, onSave, canEdit }) {
         onChange={(e) => setEditValue(e.target.value)}
         onBlur={handleSave}
         autoFocus
-        className="editable-input"
+        className="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
       />
     );
   }
 
   return (
-    <span className="editable-field" onClick={() => setIsEditing(true)}>
+    <span className="editable-field cursor-pointer text-xs hover:bg-gray-100 px-1 py-0.5 rounded group" onClick={() => setIsEditing(true)}>
       {value}
-      <span className="edit-icon">✏️</span>
+      <span className="edit-icon opacity-0 group-hover:opacity-100 ml-1 text-xs">✏️</span>
     </span>
   );
 }

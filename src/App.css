@@ -4347,6 +4347,66 @@
 
 /* Applying the changes to compact task detail page by reducing padding, margins, and section sizes. */
 
+/* Core Info Panel Compact Styles */
+.core-info-panel {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.info-section {
+  min-height: auto;
+}
+
+.info-field {
+  align-items: center;
+  min-height: 20px;
+}
+
+.info-field label {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.collaborator-badge,
+.approval-badge {
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.linked-task {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.linked-task:hover {
+  text-decoration: underline;
+}
+
+/* Editable field compact styles */
+.editable-field {
+  display: inline-block;
+  cursor: pointer;
+  padding: 1px 2px;
+  border-radius: 2px;
+  transition: background-color 0.2s;
+}
+
+.editable-field:hover {
+  background-color: #f3f4f6;
+}
+
+.edit-icon {
+  opacity: 0;
+  margin-left: 4px;
+  font-size: 10px;
+  transition: opacity 0.2s;
+}
+
+.editable-field:hover .edit-icon {
+  opacity: 1;
+}
+
 /* TaskComments styles */
 .task-comments {
   display: flex;
