@@ -590,17 +590,17 @@ export default function TaskDetail({ taskId, onClose }) {
 
 function CoreInfoPanel({ task, onUpdate, permissions }) {
   return (
-    <div className="core-info-panel p-2">
-      <div className="info-grid grid grid-cols-1 lg:grid-cols-4 gap-2">
+    <div className="core-info-panel p-1">
+      <div className="info-grid grid grid-cols-1 lg:grid-cols-4 gap-1">
         {/* Reminders and Description - Compact */}
-        <div className="info-section lg:col-span-4 bg-gray-50 p-2 rounded">
+        <div className="info-section lg:col-span-4 bg-gray-50 p-1 rounded">
           {task.reminders.length > 0 && (
-            <div className="bg-yellow-100 px-2 py-1 rounded text-xs mb-2">
+            <div className="bg-yellow-100 px-1 py-0.5 rounded text-xs mb-1">
               <span className="font-medium">⏰ Reminder:</span>
               <span className="ml-1">{task.reminders[0].message} ({task.reminders[0].date})</span>
             </div>
           )}
-          <h3 className="text-xs font-medium mb-1">Description</h3>
+          <h3 className="text-xs font-medium mb-0.5">Description</h3>
           <EditableTextArea
             value={task.description}
             onSave={(newDesc) => onUpdate({ ...task, description: newDesc })}
@@ -610,9 +610,9 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
         </div>
 
         {/* Timeline - Compact */}
-        <div className="info-section bg-gray-50 p-2 rounded">
-          <h4 className="text-sm font-medium mb-1">Timeline</h4>
-          <div className="space-y-1">
+        <div className="info-section bg-gray-50 p-1 rounded">
+          <h4 className="text-xs font-medium mb-0.5">Timeline</h4>
+          <div className="space-y-0.5">
             <div className="info-field flex justify-between text-xs">
               <label className="font-medium">Start:</label>
               <EditableDateField
@@ -643,9 +643,9 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
         </div>
 
         {/* Relationships - Compact */}
-        <div className="info-section bg-gray-50 p-2 rounded">
-          <h4 className="text-sm font-medium mb-1">Relationships</h4>
-          <div className="space-y-1 text-xs">
+        <div className="info-section bg-gray-50 p-1 rounded">
+          <h4 className="text-xs font-medium mb-0.5">Relationships</h4>
+          <div className="space-y-0.5 text-xs">
             {task.parentTaskId && (
               <div className="info-field">
                 <label className="font-medium">Parent:</label>
@@ -680,9 +680,9 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
         </div>
 
         {/* Creation Info - Compact */}
-        <div className="info-section bg-gray-50 p-2 rounded">
-          <h4 className="text-sm font-medium mb-1">Details</h4>
-          <div className="space-y-1 text-xs">
+        <div className="info-section bg-gray-50 p-1 rounded">
+          <h4 className="text-xs font-medium mb-0.5">Details</h4>
+          <div className="space-y-0.5 text-xs">
             <div className="info-field flex justify-between">
               <label className="font-medium">Created By:</label>
               <span className="truncate">{task.createdBy}</span>
@@ -702,9 +702,9 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
 
         {/* Milestone Progress - Compact */}
         {task.taskType === "milestone" && task.milestones.length > 0 && (
-          <div className="info-section lg:col-span-2 bg-purple-50 p-2 rounded">
-            <h4 className="text-sm font-medium mb-1">🎯 Milestones</h4>
-            <div className="milestone-list space-y-1">
+          <div className="info-section lg:col-span-2 bg-purple-50 p-1 rounded">
+            <h4 className="text-xs font-medium mb-0.5">🎯 Milestones</h4>
+            <div className="milestone-list space-y-0.5">
               {task.milestones.map((milestone) => (
                 <div key={milestone.id} className="milestone-item flex items-center gap-1 text-xs">
                   <span className={`milestone-icon ${milestone.status}`}>
@@ -726,8 +726,8 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
 
         {/* Approval Status - Compact */}
         {task.taskType === "approval" && (
-          <div className="info-section lg:col-span-2 bg-green-50 p-2 rounded">
-            <h4 className="text-sm font-medium mb-1">✅ Approval</h4>
+          <div className="info-section lg:col-span-2 bg-green-50 p-1 rounded">
+            <h4 className="text-xs font-medium mb-0.5">✅ Approval</h4>
             <div className="approval-info">
               <span
                 className={`approval-badge px-2 py-1 rounded text-xs font-medium ${task.approvalStatus || "pending"}`}
@@ -740,8 +740,8 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
 
         {/* Risk Information - Compact */}
         {task.isRisky && (
-          <div className="info-section lg:col-span-2 bg-red-50 p-2 rounded">
-            <h4 className="text-sm font-medium mb-1">⚠️ Risk</h4>
+          <div className="info-section lg:col-span-2 bg-red-50 p-1 rounded">
+            <h4 className="text-xs font-medium mb-0.5">⚠️ Risk</h4>
             <div className="risk-details">
               <p className="text-xs">{task.riskNote}</p>
             </div>
@@ -750,9 +750,9 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
 
         {/* Snooze Information - Compact */}
         {task.snoozedUntil && (
-          <div className="info-section lg:col-span-2 bg-orange-50 p-2 rounded">
-            <h4 className="text-sm font-medium mb-1">😴 Snoozed</h4>
-            <div className="snooze-details space-y-1 text-xs">
+          <div className="info-section lg:col-span-2 bg-orange-50 p-1 rounded">
+            <h4 className="text-xs font-medium mb-0.5">😴 Snoozed</h4>
+            <div className="snooze-details space-y-0.5 text-xs">
               <div className="snooze-field">
                 <strong>Until:</strong> {new Date(task.snoozedUntil).toLocaleString()}
               </div>

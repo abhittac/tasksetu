@@ -4407,22 +4407,50 @@
   opacity: 1;
 }
 
-/* Compact reminders and description styles */
+/* Ultra-compact reminders and description styles */
 .reminders-list {
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .reminder-item {
   margin: 0;
-  padding: 1px 0;
+  padding: 0;
 }
 
 .core-info-panel .info-section {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .core-info-panel .info-section:last-child {
   margin-bottom: 0;
+}
+
+/* Ultra-compact field spacing */
+.core-info-panel .info-field {
+  padding: 0.25rem 0;
+  margin-bottom: 0;
+}
+
+.core-info-panel .space-y-1 > * + * {
+  margin-top: 0.125rem;
+}
+
+.core-info-panel .space-y-0\.5 > * + * {
+  margin-top: 0.125rem;
+}
+
+/* Compact text sizes */
+.core-info-panel h3,
+.core-info-panel h4 {
+  line-height: 1.2;
+  margin-bottom: 0.25rem;
+}
+
+/* Remove extra spacing from collaborator badges */
+.collaborator-badge,
+.approval-badge {
+  margin: 0 0.125rem 0.125rem 0;
+  padding: 0.125rem 0.25rem;
 }
 
 /* TaskComments styles */
