@@ -2543,6 +2543,17 @@
           padding: 8px 7px 8px 14px;
           text-align: left;
         }
+        
+        /* Ensure all status elements are left-aligned */
+        .table-body td:nth-child(4) {
+          text-align: left;
+        }
+        
+        .status-badge,
+        .status-pill {
+          text-align: left;
+          justify-content: flex-start;
+        }
     /* Hover Effects */
     .status-dropdown-button:hover {
       transform: translateY(-1px);
