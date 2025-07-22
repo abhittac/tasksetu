@@ -309,11 +309,7 @@ export default function TaskDetail({ taskId, onClose }) {
           />
 
           <div className="header-controls">
-            <TaskTypeDropdown
-              taskType={task.taskType}
-              onChange={(newTaskType) => setTask({ ...task, taskType: newTaskType })}
-              canEdit={permissions.canEdit}
-            />
+            
 
             <StatusDropdown
               status={task.status}
@@ -1494,62 +1490,7 @@ function PriorityDropdown({ priority, onChange, canEdit }) {
   );
 }
 
-function TaskTypeDropdown({ taskType, onChange, canEdit }) {
-  const [isOpen, setIsOpen] = useState(false);
 
-  const taskTypes = [
-    { value: "normal", label: "Normal", icon: "📋", color: "#3b82f6" },
-    { value: "milestone", label: "Milestone", icon: "🎯", color: "#8b5cf6" },
-    { value: "approval", label: "Approval", icon: "✅", color: "#f59e0b" },
-  ];
-
-  const currentTaskType = taskTypes.find(t => t.value === taskType) || taskTypes[0];
-
-  if (!canEdit) {
-    return (
-      <div className="task-type-display readonly">
-        <span className="task-type-icon">{currentTaskType.icon}</span>
-        <span className="task-type-label">{currentTaskType.label}</span>
-        <span className="readonly-indicator">🔒</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="task-type-dropdown">
-      <button 
-        className="task-type-button" 
-        onClick={() => setIsOpen(!isOpen)}
-        style={{ backgroundColor: currentTaskType.color }}
-      >
-        <span className="task-type-icon">{currentTaskType.icon}</span>
-        <span className="task-type-label">{currentTaskType.label}</span>
-        <span className="dropdown-arrow">▼</span>
-      </button>
-
-      {isOpen && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="task-type-options">
-            {taskTypes.map((type) => (
-              <button
-                key={type.value}
-                className={`task-type-option ${type.value === taskType ? "selected" : ""}`}
-                onClick={() => {
-                  onChange(type.value);
-                  setIsOpen(false);
-                }}
-              >
-                <span className="task-type-icon">{type.icon}</span>
-                <span className="task-type-label">{type.label}</span>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
 
 function AssigneeSelector({ assignee, assigneeId, onChange, canEdit }) {
   const [isOpen, setIsOpen] = useState(false);
