@@ -594,12 +594,12 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
       <div className="info-grid grid grid-cols-1 lg:grid-cols-4 gap-2">
         {/* Reminders - Moved to top */}
         {task.reminders.length > 0 && (
-          <div className="info-section lg:col-span-4 bg-yellow-50 p-2 rounded mb-2">
-            <h4 className="text-sm font-medium mb-1 flex items-center gap-1">
+          <div className="info-section lg:col-span-4 bg-yellow-50 p-1 rounded mb-1">
+            <h4 className="text-xs font-medium mb-0.5 flex items-center gap-0.5">
               <span>⏰</span>
               Reminders
             </h4>
-            <div className="reminders-list space-y-1">
+            <div className="reminders-list">
               {task.reminders.map((reminder) => (
                 <div key={reminder.id} className="reminder-item flex items-center gap-1 text-xs">
                   <span>{reminder.message}</span>
@@ -611,8 +611,8 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
         )}
 
         {/* Description */}
-        <div className="info-section lg:col-span-4 bg-gray-50 p-2 rounded">
-          <h3 className="text-sm font-medium mb-1">Description</h3>
+        <div className="info-section lg:col-span-4 bg-gray-50 p-1 rounded">
+          <h3 className="text-xs font-medium mb-0.5">Description</h3>
           <EditableTextArea
             value={task.description}
             onSave={(newDesc) => onUpdate({ ...task, description: newDesc })}

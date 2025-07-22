@@ -4407,6 +4407,24 @@
   opacity: 1;
 }
 
+/* Compact reminders and description styles */
+.reminders-list {
+  line-height: 1.2;
+}
+
+.reminder-item {
+  margin: 0;
+  padding: 1px 0;
+}
+
+.core-info-panel .info-section {
+  margin-bottom: 4px;
+}
+
+.core-info-panel .info-section:last-child {
+  margin-bottom: 0;
+}
+
 /* TaskComments styles */
 .task-comments {
   display: flex;
