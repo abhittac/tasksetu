@@ -592,27 +592,15 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
   return (
     <div className="core-info-panel p-2">
       <div className="info-grid grid grid-cols-1 lg:grid-cols-4 gap-2">
-        {/* Reminders - Moved to top */}
-        {task.reminders.length > 0 && (
-          <div className="info-section lg:col-span-4 bg-yellow-50 p-1 rounded mb-1">
-            <h4 className="text-xs font-medium mb-0.5 flex items-center gap-0.5">
-              <span>⏰</span>
-              Reminders
-            </h4>
-            <div className="reminders-list">
-              {task.reminders.map((reminder) => (
-                <div key={reminder.id} className="reminder-item flex items-center gap-1 text-xs">
-                  <span>{reminder.message}</span>
-                  <span className="text-gray-500">({reminder.date})</span>
-                </div>
-              ))}
+        {/* Reminders and Description - Compact */}
+        <div className="info-section lg:col-span-4 bg-gray-50 p-2 rounded">
+          {task.reminders.length > 0 && (
+            <div className="bg-yellow-100 px-2 py-1 rounded text-xs mb-2">
+              <span className="font-medium">⏰ Reminder:</span>
+              <span className="ml-1">{task.reminders[0].message} ({task.reminders[0].date})</span>
             </div>
-          </div>
-        )}
-
-        {/* Description */}
-        <div className="info-section lg:col-span-4 bg-gray-50 p-1 rounded">
-          <h3 className="text-xs font-medium mb-0.5">Description</h3>
+          )}
+          <h3 className="text-xs font-medium mb-1">Description</h3>
           <EditableTextArea
             value={task.description}
             onSave={(newDesc) => onUpdate({ ...task, description: newDesc })}
