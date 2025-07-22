@@ -592,15 +592,15 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
   return (
     <div className="core-info-panel p-1">
       <div className="info-grid grid grid-cols-1 lg:grid-cols-4 gap-1">
-        {/* Reminders and Description - Compact */}
-        <div className="info-section lg:col-span-4 bg-gray-50 p-1 rounded">
+        {/* Reminders and Description - Ultra Compact */}
+        <div className="info-section lg:col-span-4">
           {task.reminders.length > 0 && (
-            <div className="bg-yellow-100 px-1 py-0.5 rounded text-xs mb-1">
+            <div className="bg-yellow-100 px-1 py-0.5 rounded text-xs">
               <span className="font-medium">⏰ Reminder:</span>
               <span className="ml-1">{task.reminders[0].message} ({task.reminders[0].date})</span>
             </div>
           )}
-          <h3 className="text-xs font-medium mb-0.5">Description</h3>
+          <h3 className="text-xs font-medium">Description</h3>
           <EditableTextArea
             value={task.description}
             onSave={(newDesc) => onUpdate({ ...task, description: newDesc })}

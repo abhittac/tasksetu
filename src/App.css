@@ -4356,15 +4356,20 @@
 
 .info-section {
   min-height: auto;
+  margin: 0;
+  padding: 0;
 }
 
 .info-field {
   align-items: center;
   min-height: 20px;
+  margin: 0;
+  padding: 0;
 }
 
 .info-field label {
   margin: 0;
+  padding: 0;
   white-space: nowrap;
 }
 
@@ -4372,6 +4377,8 @@
 .approval-badge {
   font-size: 10px;
   white-space: nowrap;
+  margin: 0;
+  padding: 0.125rem 0.25rem;
 }
 
 .linked-task {
@@ -4387,7 +4394,8 @@
 .editable-field {
   display: inline-block;
   cursor: pointer;
-  padding: 1px 2px;
+  padding: 0;
+  margin: 0;
   border-radius: 2px;
   transition: background-color 0.2s;
 }
@@ -4398,7 +4406,8 @@
 
 .edit-icon {
   opacity: 0;
-  margin-left: 4px;
+  margin: 0;
+  padding: 0;
   font-size: 10px;
   transition: opacity 0.2s;
 }
@@ -4410,6 +4419,8 @@
 /* Ultra-compact reminders and description styles */
 .reminders-list {
   line-height: 1.1;
+  margin: 0;
+  padding: 0;
 }
 
 .reminder-item {
@@ -4418,39 +4429,30 @@
 }
 
 .core-info-panel .info-section {
-  margin-bottom: 2px;
-}
-
-.core-info-panel .info-section:last-child {
-  margin-bottom: 0;
+  margin: 0;
+  padding: 0;
 }
 
 /* Ultra-compact field spacing */
 .core-info-panel .info-field {
-  padding: 0.25rem 0;
-  margin-bottom: 0;
+  padding: 0;
+  margin: 0;
 }
 
 .core-info-panel .space-y-1 > * + * {
-  margin-top: 0.125rem;
+  margin-top: 0;
 }
 
 .core-info-panel .space-y-0\.5 > * + * {
-  margin-top: 0.125rem;
+  margin-top: 0;
 }
 
 /* Compact text sizes */
 .core-info-panel h3,
 .core-info-panel h4 {
-  line-height: 1.2;
-  margin-bottom: 0.25rem;
-}
-
-/* Remove extra spacing from collaborator badges */
-.collaborator-badge,
-.approval-badge {
-  margin: 0 0.125rem 0.125rem 0;
-  padding: 0.125rem 0.25rem;
+  line-height: 1.1;
+  margin: 0;
+  padding: 0;
 }
 
 /* TaskComments styles */
