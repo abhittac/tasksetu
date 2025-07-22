@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import CreateTask from "./CreateTask";
 import ApprovalTaskCreator from "./ApprovalTaskCreator";
 import Toast from "./Toast";
-
+import MilestoneCreator from "./MilestoneCreator";
 export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -1432,21 +1432,54 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                                   }
                                 >
                                   {/* {expandedTasks.has(task.id) ? "▼" : "▶"} */}
-                                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      
-                                        <circle cx="5" cy="5" r="2" fill="currentColor"/>
-                                        <circle cx="5" cy="12" r="2" fill="currentColor"/>
-                                        <circle cx="5" cy="19" r="2" fill="currentColor"/>
+                                  <svg
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <circle
+                                      cx="5"
+                                      cy="5"
+                                      r="2"
+                                      fill="currentColor"
+                                    />
+                                    <circle
+                                      cx="5"
+                                      cy="12"
+                                      r="2"
+                                      fill="currentColor"
+                                    />
+                                    <circle
+                                      cx="5"
+                                      cy="19"
+                                      r="2"
+                                      fill="currentColor"
+                                    />
 
-                                       
-                                        <path d="M5 7V10" stroke="currentColor" stroke-width="2"/>
-                                        <path d="M5 14V17" stroke="currentColor" stroke-width="2"/>
+                                    <path
+                                      d="M5 7V10"
+                                      stroke="currentColor"
+                                      stroke-width="2"
+                                    />
+                                    <path
+                                      d="M5 14V17"
+                                      stroke="currentColor"
+                                      stroke-width="2"
+                                    />
 
-                                      
-                                        <path d="M7 12H14" stroke="currentColor" stroke-width="2"/>
-                                        <path d="M7 19H14" stroke="currentColor" stroke-width="2"/>
-                                      </svg>
-
+                                    <path
+                                      d="M7 12H14"
+                                      stroke="currentColor"
+                                      stroke-width="2"
+                                    />
+                                    <path
+                                      d="M7 19H14"
+                                      stroke="currentColor"
+                                      stroke-width="2"
+                                    />
+                                  </svg>
 
                                   {task.subtasks.length}
                                 </button>
