@@ -143,17 +143,17 @@ export default function CreateTask({ onClose, initialTaskType = 'regular', preFi
 
       {/* Conditional Task Forms */}
       {taskType === 'regular' && (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
         <div className="card">
           <div className="card-header">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Task Details</h3>
-            <p className="text-gray-600">Fill in the basic information for your task</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">Task Details</h3>
+            <p className="text-gray-600 text-sm">Fill in the basic information for your task</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Title */}
             <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="form-label">
                 Task Title *
               </label>
               <input
@@ -168,7 +168,7 @@ export default function CreateTask({ onClose, initialTaskType = 'regular', preFi
 
             {/* Description */}
             <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="form-label">
                 Description
               </label>
               <textarea
