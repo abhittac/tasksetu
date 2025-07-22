@@ -1603,7 +1603,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-nowrap">
+                      <td className="px-6 py-4 text-nowrap text-left">
                         <TaskStatusDropdown
                           task={task}
                           currentStatus={task.status}
@@ -1733,7 +1733,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                               </span>
                             </div>
                           </td>
-                          <td className="px-6 py-3">
+                          <td className="px-6 py-3 text-left">
                             <TaskStatusDropdown
                               task={subtask}
                               currentStatus={subtask.status}

@@ -2541,7 +2541,7 @@
         .status-dropdown button{
           width:120px;
           padding: 8px 7px 8px 14px;
-
+          text-align: left;
         }
     /* Hover Effects */
     .status-dropdown-button:hover {
