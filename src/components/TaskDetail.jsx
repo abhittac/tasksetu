@@ -1782,28 +1782,28 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
       : 0;
 
   return (
-    <div className="subtasks-panel bg-white border border-gray-200 rounded-lg">
-      {/* Collapsible Header */}
+    <div className="bg-white border border-gray-200 rounded-lg">
+      {/* Compact Header */}
       <div
-        className="subtasks-header flex items-center justify-between p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+        className="flex items-center justify-between px-3 py-2 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
-        <div className="flex items-center gap-3">
-          <button className="text-gray-500 hover:text-gray-700">
+        <div className="flex items-center gap-2">
+          <button className="text-gray-500 hover:text-gray-700 text-xs">
             {isCollapsed ? "▶" : "▼"}
           </button>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-sm font-medium text-gray-900">
             Sub-tasks ({subtaskList.length})
           </h3>
           {subtaskList.length > 0 && (
-            <div className="flex items-center gap-2">
-              <div className="w-16 bg-gray-200 rounded-full h-2">
+            <div className="flex items-center gap-1">
+              <div className="w-12 bg-gray-200 rounded-full h-1">
                 <div
-                  className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                  className="bg-green-500 h-1 rounded-full transition-all duration-300"
                   style={{ width: `${progressPercentage}%` }}
                 />
               </div>
-              <span className="text-sm text-gray-600">
+              <span className="text-xs text-gray-600">
                 {progressPercentage}%
               </span>
             </div>
@@ -1811,11 +1811,11 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
         </div>
 
         {!isCollapsed && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="text-sm border border-gray-300 rounded px-2 py-1"
+              className="text-xs border border-gray-300 rounded px-1 py-0.5"
               onClick={(e) => e.stopPropagation()}
             >
               <option value="all">All Status</option>
@@ -1824,7 +1824,7 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
               <option value="completed">Completed</option>
             </select>
             <button
-              className="btn btn-primary btn-sm"
+              className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
                 setShowInlineAdd(true);
@@ -1836,11 +1836,11 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
         )}
       </div>
 
-      {/* Collapsible Content */}
+      {/* Compact Content */}
       {!isCollapsed && (
-        <div className="subtasks-content">
+        <div>
           {showInlineAdd && (
-            <div className="p-4 border-b border-gray-100 bg-blue-50">
+            <div className="px-3 py-2 border-b border-gray-100 bg-blue-50">
               <InlineSubtaskAdd
                 parentTask={parentTask}
                 currentUser={currentUser}
@@ -1850,13 +1850,13 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
             </div>
           )}
 
-          <div className="subtasks-list">
+          <div>
             {filteredSubtasks.map((subtask, index) => (
               <div
                 key={subtask.id}
-                className={`subtask-item border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors cursor-pointer ${
+                className={`border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors cursor-pointer ${
                   selectedSubtask?.id === subtask.id
-                    ? "bg-blue-50 border-l-4 border-l-blue-500"
+                    ? "bg-blue-50 border-l-2 border-l-blue-500"
                     : ""
                 }`}
                 onClick={() =>
@@ -1865,55 +1865,42 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
                   )
                 }
               >
-                <div className="flex items-center justify-between p-4">
-                  <div className="flex items-center gap-3 flex-1">
-                    <span className="text-lg">
+                <div className="flex items-center justify-between px-3 py-2">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className="text-sm">
                       {getStatusIcon(subtask.status)}
                     </span>
 
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900 truncate">
+                      <div className="text-sm font-medium text-gray-900 truncate">
                         {subtask.title}
                       </div>
-                      <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
                         <span>Due: {subtask.dueDate}</span>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            subtask.priority === "high"
-                              ? "bg-red-100 text-red-800"
-                              : subtask.priority === "medium"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-gray-100 text-gray-800"
-                          }`}
-                        >
-                          {subtask.priority}
-                        </span>
+                        <SubtaskStatusDropdown
+                          subtask={subtask}
+                          onUpdate={handleUpdateSubtask}
+                          canEdit={canEditSubtask(subtask)}
+                        />
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <SubtaskStatusDropdown
-                        subtask={subtask}
-                        onUpdate={handleUpdateSubtask}
-                        canEdit={canEditSubtask(subtask)}
-                      />
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                          <span className="text-xs font-medium text-gray-600">
-                            {subtask.assignee?.charAt(0) || "U"}
-                          </span>
-                        </div>
-                        <span className="text-sm text-gray-600 hidden sm:inline">
-                          {subtask.assignee}
+                    <div className="flex items-center gap-1">
+                      <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-medium text-gray-600">
+                          {subtask.assignee?.charAt(0) || "U"}
                         </span>
                       </div>
+                      <span className="text-xs text-gray-600 hidden sm:inline max-w-16 truncate">
+                        {subtask.assignee}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 ml-4">
+                  <div className="flex items-center gap-1 ml-2">
                     {canDeleteSubtask(subtask) && (
                       <button
-                        className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                        className="text-gray-400 hover:text-red-600 transition-colors p-0.5"
                         onClick={(e) => {
                           e.stopPropagation();
                           if (window.confirm("Delete this sub-task?")) {
@@ -1923,7 +1910,7 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
                         title="Delete sub-task"
                       >
                         <svg
-                          className="w-4 h-4"
+                          className="w-3 h-3"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -1937,7 +1924,7 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
                         </svg>
                       </button>
                     )}
-                    <span className="text-gray-400">
+                    <span className="text-gray-400 text-xs">
                       {selectedSubtask?.id === subtask.id ? "▼" : "▶"}
                     </span>
                   </div>
@@ -1946,10 +1933,10 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
             ))}
 
             {filteredSubtasks.length === 0 && !showInlineAdd && (
-              <div className="empty-subtasks p-8 text-center">
-                <div className="text-gray-400 mb-4">
+              <div className="px-3 py-4 text-center">
+                <div className="text-gray-400 mb-2">
                   <svg
-                    className="w-12 h-12 mx-auto"
+                    className="w-8 h-8 mx-auto"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -1962,12 +1949,11 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
                     />
                   </svg>
                 </div>
-                <p className="text-gray-600 mb-4">
-                  No sub-tasks found. Break down this task into manageable
-                  pieces.
+                <p className="text-gray-600 mb-2 text-sm">
+                  No sub-tasks found.
                 </p>
                 <button
-                  className="btn btn-secondary"
+                  className="px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors"
                   onClick={() => setShowInlineAdd(true)}
                 >
                   + Create First Sub-task
