@@ -4,12 +4,14 @@ import RecentActivity from "./RecentActivity";
 import CreateTask from "./CreateTask";
 import AnnualSelfAppraisal from "./AnnualSelfAppraisal";
 import ApprovalTaskCreator from "./ApprovalTaskCreator";
+import NotificationCenter from "./NotificationCenter";
 
 export default function Dashboard() {
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [selectedTaskType, setSelectedTaskType] = useState("regular");
   const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
   const [showNotifications, setShowNotifications] = React.useState(false);
+  const [showNotificationCenter, setShowNotificationCenter] = React.useState(false);
   const [notifications, setNotifications] = React.useState([
     {
       id: 1,
@@ -302,7 +304,7 @@ export default function Dashboard() {
                     <button
                       onClick={() => {
                         setShowNotifications(false);
-                        // You can add navigation to full notifications page here
+                        setShowNotificationCenter(true);
                       }}
                       className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium"
                     >
@@ -575,6 +577,42 @@ export default function Dashboard() {
                   employeeData={sampleEmployeeData}
                 />
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notification Center Overlay */}
+      {showNotificationCenter && (
+        <div className="fixed inset-0 z-50 overflow-hidden">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowNotificationCenter(false)}
+          ></div>
+          <div className="absolute inset-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between p-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+              <h2 className="text-2xl font-bold">Notification Center</h2>
+              <button
+                onClick={() => setShowNotificationCenter(false)}
+                className="p-2 hover:bg-white/20 rounded-full transition-colors"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="h-full overflow-hidden">
+              <NotificationCenter />
             </div>
           </div>
         </div>
