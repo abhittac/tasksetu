@@ -610,7 +610,7 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
 
         {/* Timeline - Compact */}
         <div className="info-section bg-gray-50 p-1 rounded">
-          <h4 className="text-xs font-medium mb-0.5">Timeline</h4>
+          <h4 className="text-xs font-medium mb-0.5" style={{ paddingLeft: '1rem' }}>Timeline</h4>
           <div className="space-y-0.5 p-4">
             <div className="info-field flex justify-between text-xs">
               <label className="font-medium">Start:</label>
@@ -643,7 +643,7 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
 
         {/* Relationships - Compact */}
         <div className="info-section bg-gray-50  rounded">
-          <h4 className="text-xs font-medium mb-0.5 p-4">Relationships</h4>
+          <h4 className="text-xs font-medium mb-0.5 p-4" style={{ paddingLeft: '1rem' }}>Relationships</h4>
           <div className="space-y-0.5 text-xs p-4">
             {task.parentTaskId && (
               <div className="info-field">
