@@ -609,7 +609,7 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
         </div>
 
         {/* Timeline - Compact - Reduced Width */}
-        <div className="info-section bg-gray-50 p-1 rounded lg:col-span-1">
+        <div className="info-section bg-gray-50 p-1 rounded lg:col-span-1" style={{ paddingTop: '2rem' }}>
           <h4 className="text-xs font-medium mb-0.5" style={{ paddingLeft: '1rem' }}>Timeline</h4>
           <div className="space-y-0.5 p-4">
             <div className="info-field flex justify-between text-xs">
@@ -642,7 +642,7 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
         </div>
 
         {/* Creation Info - Compact - Increased Width */}
-        <div className="info-section bg-gray-50 p-1 rounded lg:col-span-2">
+        <div className="info-section bg-gray-50 p-1 rounded lg:col-span-2" style={{ paddingTop: '2rem' }}>
           <h4 className="text-xs font-medium mb-0.5" style={{ paddingLeft: '1rem' }}>Details</h4>
           <div className="space-y-0.5 text-xs p-4">
             <div className="info-field flex justify-between">
@@ -661,7 +661,7 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
         </div>
 
         {/* Relationships - Compact */}
-        <div className="info-section bg-gray-50  rounded">
+        <div className="info-section bg-gray-50  rounded" style={{ paddingTop: '2rem' }}>
           <h4 className="text-xs font-medium mb-0.5 p-4" style={{ paddingLeft: '1rem' }}>Relationships</h4>
           <div className="space-y-0.5 text-xs p-4">
             {task.parentTaskId && (
