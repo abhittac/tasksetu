@@ -1,14 +1,13 @@
-
-import React, { useState, useEffect } from 'react'
-import CreateTask from './CreateTask'
+import React, { useState, useEffect } from "react";
+import CreateTask from "./CreateTask";
 
 export default function Calendar({ onClose }) {
-  const [currentDate, setCurrentDate] = useState(new Date())
-  const [viewMode, setViewMode] = useState('month') // month, week, day
-  const [recurringTasks, setRecurringTasks] = useState([])
-  const [upcomingInstances, setUpcomingInstances] = useState([])
-  const [showCreateTask, setShowCreateTask] = useState(false)
-  const [selectedDate, setSelectedDate] = useState(null)
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState("month"); // month, week, day
+  const [recurringTasks, setRecurringTasks] = useState([]);
+  const [upcomingInstances, setUpcomingInstances] = useState([]);
+  const [showCreateTask, setShowCreateTask] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   // Mock recurring tasks data
   useEffect(() => {
@@ -22,7 +21,7 @@ export default function Calendar({ onClose }) {
         startDate: "2024-01-01",
         time: "10:00",
         status: "active",
-        nextInstance: "2024-01-29"
+        nextInstance: "2024-01-29",
       },
       {
         id: 2,
@@ -32,7 +31,7 @@ export default function Calendar({ onClose }) {
         startDate: "2024-01-01",
         time: "09:00",
         status: "active",
-        nextInstance: "2024-02-01"
+        nextInstance: "2024-02-01",
       },
       {
         id: 3,
@@ -42,87 +41,97 @@ export default function Calendar({ onClose }) {
         startDate: "2024-01-01",
         time: "23:00",
         status: "active",
-        nextInstance: "2024-01-29"
-      }
-    ]
-    setRecurringTasks(mockRecurringTasks)
-    generateUpcomingInstances(mockRecurringTasks)
-  }, [])
+        nextInstance: "2024-01-29",
+      },
+    ];
+    setRecurringTasks(mockRecurringTasks);
+    generateUpcomingInstances(mockRecurringTasks);
+  }, []);
 
   const generateUpcomingInstances = (tasks) => {
-    const instances = []
-    const today = new Date()
-    
-    tasks.forEach(task => {
-      if (task.status === 'active') {
+    const instances = [];
+    const today = new Date();
+
+    tasks.forEach((task) => {
+      if (task.status === "active") {
         // Generate only the next upcoming instance for each recurring task
-        const nextDate = new Date(task.nextInstance)
+        const nextDate = new Date(task.nextInstance);
         if (nextDate >= today) {
           instances.push({
             id: `${task.id}_${nextDate.getTime()}`,
             recurringTaskId: task.id,
             title: task.title,
-            date: nextDate.toISOString().split('T')[0],
+            date: nextDate.toISOString().split("T")[0],
             time: task.time,
             frequency: task.frequency,
-            isRecurring: true
-          })
+            isRecurring: true,
+          });
         }
       }
-    })
-    
-    setUpcomingInstances(instances)
-  }
+    });
+
+    setUpcomingInstances(instances);
+  };
 
   const getDaysInMonth = (date) => {
-    const year = date.getFullYear()
-    const month = date.getMonth()
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
-    const daysInMonth = lastDay.getDate()
-    const startDayOfWeek = firstDay.getDay()
-    
-    const days = []
-    
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDayOfWeek = firstDay.getDay();
+
+    const days = [];
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startDayOfWeek; i++) {
-      days.push(null)
+      days.push(null);
     }
-    
+
     // Add all days of the month
     for (let day = 1; day <= daysInMonth; day++) {
-      days.push(new Date(year, month, day))
+      days.push(new Date(year, month, day));
     }
-    
-    return days
-  }
+
+    return days;
+  };
 
   const getTasksForDate = (date) => {
-    if (!date) return []
-    const dateStr = date.toISOString().split('T')[0]
-    return upcomingInstances.filter(instance => instance.date === dateStr)
-  }
+    if (!date) return [];
+    const dateStr = date.toISOString().split("T")[0];
+    return upcomingInstances.filter((instance) => instance.date === dateStr);
+  };
 
   const navigateMonth = (direction) => {
-    const newDate = new Date(currentDate)
-    newDate.setMonth(newDate.getMonth() + direction)
-    setCurrentDate(newDate)
-  }
+    const newDate = new Date(currentDate);
+    newDate.setMonth(newDate.getMonth() + direction);
+    setCurrentDate(newDate);
+  };
 
   const handleDateClick = (date) => {
     if (date) {
-      const dateStr = date.toISOString().split('T')[0]
-      setShowCreateTask(true)
-      setSelectedDate(dateStr)
+      const dateStr = date.toISOString().split("T")[0];
+      setShowCreateTask(true);
+      setSelectedDate(dateStr);
     }
-  }
+  };
 
   const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ]
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
     <div className="calendar-container bg-white border border-gray-200 rounded-lg">
@@ -130,18 +139,30 @@ export default function Calendar({ onClose }) {
       <div className="calendar-header p-4 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <h2 className="text-xl font-semibold text-gray-900">📅 Recurring Tasks Calendar</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              📅 Recurring Tasks Calendar
+            </h2>
             <span className="text-sm text-gray-500">
               Showing next upcoming instances only
             </span>
           </div>
           {onClose && (
-            <button 
+            <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           )}
@@ -153,21 +174,41 @@ export default function Calendar({ onClose }) {
               onClick={() => navigateMonth(-1)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
-            
+
             <h3 className="text-lg font-medium text-gray-900">
               {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
             </h3>
-            
+
             <button
               onClick={() => navigateMonth(1)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
@@ -194,12 +235,15 @@ export default function Calendar({ onClose }) {
 
       {/* Calendar Body */}
       <div className="calendar-body p-4">
-        {viewMode === 'month' && (
+        {viewMode === "month" && (
           <div className="calendar-grid">
             {/* Day headers */}
             <div className="grid grid-cols-7 gap-1 mb-2">
-              {dayNames.map(day => (
-                <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+              {dayNames.map((day) => (
+                <div
+                  key={day}
+                  className="text-center text-sm font-medium text-gray-500 py-2"
+                >
                   {day}
                 </div>
               ))}
@@ -208,28 +252,35 @@ export default function Calendar({ onClose }) {
             {/* Calendar days */}
             <div className="grid grid-cols-7 gap-1">
               {getDaysInMonth(currentDate).map((date, index) => {
-                const tasksForDate = getTasksForDate(date)
-                const isToday = date && date.toDateString() === new Date().toDateString()
-                
+                const tasksForDate = getTasksForDate(date);
+                const isToday =
+                  date && date.toDateString() === new Date().toDateString();
+
                 return (
                   <div
                     key={index}
                     className={`
                       min-h-[80px] p-2 border border-gray-100 rounded-lg
-                      ${date ? 'bg-white hover:bg-gray-50 cursor-pointer' : 'bg-gray-50'}
-                      ${isToday ? 'border-blue-500 bg-blue-50' : ''}
+                      ${date ? "bg-white hover:bg-gray-50 cursor-pointer" : "bg-gray-50"}
+                      ${isToday ? "border-blue-500 bg-blue-50" : ""}
                       transition-colors
                     `}
                     onClick={() => handleDateClick(date)}
-                    title={date ? `Click to create task for ${date.toDateString()}` : ''}
+                    title={
+                      date
+                        ? `Click to create task for ${date.toDateString()}`
+                        : ""
+                    }
                   >
                     {date && (
                       <>
-                        <div className={`text-sm font-medium mb-1 ${isToday ? 'text-blue-700' : 'text-gray-900'}`}>
+                        <div
+                          className={`text-sm font-medium mb-1 ${isToday ? "text-blue-700" : "text-gray-900"}`}
+                        >
                           {date.getDate()}
                         </div>
                         <div className="space-y-1">
-                          {tasksForDate.map(task => (
+                          {tasksForDate.map((task) => (
                             <div
                               key={task.id}
                               className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-md cursor-pointer hover:bg-green-200 transition-colors"
@@ -246,13 +297,13 @@ export default function Calendar({ onClose }) {
                       </>
                     )}
                   </div>
-                )
+                );
               })}
             </div>
           </div>
         )}
 
-        {viewMode === 'week' && (
+        {viewMode === "week" && (
           <div className="week-view">
             <div className="text-center text-gray-500 mb-4">
               Week view coming soon...
@@ -260,7 +311,7 @@ export default function Calendar({ onClose }) {
           </div>
         )}
 
-        {viewMode === 'day' && (
+        {viewMode === "day" && (
           <div className="day-view">
             <div className="text-center text-gray-500 mb-4">
               Day view coming soon...
@@ -291,10 +342,22 @@ export default function Calendar({ onClose }) {
       {/* Create Task Modal */}
       {showCreateTask && (
         <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
-          <div className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreateTask(false)}></div>
-          <div className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right" style={{width: 'min(90vw, 600px)', boxShadow: '-10px 0 50px rgba(0,0,0,0.2)', borderLeft: '1px solid rgba(255,255,255,0.2)'}}>
+          <div
+            className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowCreateTask(false)}
+          ></div>
+          <div
+            className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right"
+            style={{
+              width: "min(90vw, 900px)",
+              boxShadow: "-10px 0 50px rgba(0,0,0,0.2)",
+              borderLeft: "1px solid rgba(255,255,255,0.2)",
+            }}
+          >
             <div className="drawer-header">
-              <h2 className="text-2xl font-bold text-white">Create Task for {selectedDate}</h2>
+              <h2 className="text-2xl font-bold text-white">
+                Create Task for {selectedDate}
+              </h2>
               <button
                 onClick={() => setShowCreateTask(false)}
                 className="close-btn"
@@ -315,8 +378,8 @@ export default function Calendar({ onClose }) {
               </button>
             </div>
             <div className="drawer-body">
-              <CreateTask 
-                onClose={() => setShowCreateTask(false)} 
+              <CreateTask
+                onClose={() => setShowCreateTask(false)}
                 preFilledDate={selectedDate}
               />
             </div>
@@ -324,5 +387,5 @@ export default function Calendar({ onClose }) {
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -231,7 +231,7 @@ export default function ApprovalTaskCreator({
                 </span>
               </label>
               <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 sm:grid-cols-2 gap-3">
                   {availableApprovers.map((approver) => (
                     <div
                       key={approver.id}

@@ -108,34 +108,36 @@ export default function MilestoneManager() {
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl md:text-l font-semibold text-gray-900 mb-2">
                   {milestone.taskName}
                 </h3>
-                <p className="text-gray-600 mb-4">{milestone.description}</p>
+                <p className="text-gray-600 mb-4 md:text-sm">
+                  {milestone.description}
+                </p>
 
                 <div className="flex items-center space-x-4 flex-wrap">
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(milestone.status)}`}
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(milestone.status)}  mt-1`}
                   >
                     {milestone.status.replace("_", " ").toUpperCase()}
                   </span>
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(milestone.priority)}`}
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(milestone.priority)} mt-1`}
                   >
                     {milestone.priority.toUpperCase()} PRIORITY
                   </span>
 
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 mt-1">
                     {milestone.milestoneType.toUpperCase()}
                   </span>
                   <div className="mt-2 flex flex-col-3 gap-4">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 mt-1">
                       Assigned: {milestone.assignedTo}
                     </span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 mt-1">
                       Due: {new Date(milestone.dueDate).toLocaleDateString()}
                     </span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 mt-1">
                       👁️ {milestone.visibility}
                     </span>
                   </div>
@@ -143,7 +145,7 @@ export default function MilestoneManager() {
               </div>
 
               <div className="text-right">
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-2xl md:text-md font-bold text-gray-900">
                   {milestone.progress}%
                 </div>
                 <div className="text-sm text-gray-500">Complete</div>
@@ -458,7 +460,7 @@ export default function MilestoneManager() {
                       Link to Tasks
                     </label>
                     <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-4">
-                      <div className="grid grid-cols-4 gap-2">
+                      <div className="grid grid-cols-4 md:grid-cols-2 gap-2">
                         <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-200 cursor-pointer group">
                           <input
                             type="checkbox"
@@ -555,7 +557,7 @@ export default function MilestoneManager() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2  gap-4">
                     <div className="form-group">
                       <label
                         htmlFor="visibility"
@@ -640,7 +642,7 @@ export default function MilestoneManager() {
                       Collaborators
                     </label>
                     <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-xl p-4">
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-3 md:grid-cols-1 gap-2">
                         <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50 transition-all duration-200 cursor-pointer group">
                           <input
                             type="checkbox"

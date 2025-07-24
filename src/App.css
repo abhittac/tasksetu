@@ -423,7 +423,7 @@
 
       .drawer-content {
         @apply absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col;
-        width: min(90vw, 600px);
+        width: min(95vw, 900px);
         box-shadow: -10px 0 50px rgba(0,0,0,0.2);
         border-left: 1px solid rgba(255,255,255,0.2);
       }

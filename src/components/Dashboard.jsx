@@ -11,7 +11,8 @@ export default function Dashboard() {
   const [selectedTaskType, setSelectedTaskType] = useState("regular");
   const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
   const [showNotifications, setShowNotifications] = React.useState(false);
-  const [showNotificationCenter, setShowNotificationCenter] = React.useState(false);
+  const [showNotificationCenter, setShowNotificationCenter] =
+    React.useState(false);
   const [notifications, setNotifications] = React.useState([
     {
       id: 1,
@@ -220,7 +221,7 @@ export default function Dashboard() {
 
             {/* Notification Dropdown */}
             {showNotifications && (
-              <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-lg rounded-lg z-50 max-h-96 overflow-y-auto">
+              <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-lg rounded-lg z-[9999] max-h-96 overflow-y-auto">
                 {/* Header */}
                 <div className="p-4 border-b border-gray-200 bg-gray-50">
                   <div className="flex items-center justify-between">
@@ -318,7 +319,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="p-6">
+      <div className="p-6 ">
         {/* Stats Grid */}
         <div className="stats-grid">
           {stats.map((stat, index) => (
@@ -361,7 +362,7 @@ export default function Dashboard() {
         </div>
       </div>
       {/* Main Dashboard Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ">
         {/* Recent Tasks */}
         <div className="lg:col-span-2">
           <div className="card">
@@ -410,7 +411,7 @@ export default function Dashboard() {
       {/* Task Creation Tiles */}
 
       {/* Quick Actions */}
-      <div className="mt-8">
+      <div className="mt-8 ">
         <div className="card">
           <div className="card-header">
             <h3 className="text-lg font-semibold text-gray-900">
@@ -447,7 +448,7 @@ export default function Dashboard() {
 
       {/* Create Task Modal */}
       {showCreateTask && (
-        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
+        <div className="fixed inset-0  overflow-hidden overlay-animate mt-0">
           <div
             className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setShowCreateTask(false)}
@@ -455,7 +456,7 @@ export default function Dashboard() {
           <div
             className="absolute right-0 top-0 h-full bg-white/95 backdrop-blur-sm flex flex-col modal-animate-slide-right"
             style={{
-              width: "min(90vw, 600px)",
+              width: "min(90vw, 900px)",
               boxShadow: "-10px 0 50px rgba(0,0,0,0.2)",
               borderLeft: "1px solid rgba(255,255,255,0.2)",
             }}
@@ -493,7 +494,7 @@ export default function Dashboard() {
 
       {/* Approval Task Modal */}
       {showApprovalTaskModal && (
-        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
+        <div className="fixed inset-0  overflow-hidden overlay-animate mt-0">
           <div
             className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setShowApprovalTaskModal(false)}
@@ -541,7 +542,7 @@ export default function Dashboard() {
 
       {/* Annual Self-Appraisal Form */}
       {showSelfAppraisal && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
+        <div className="fixed inset-0  overflow-hidden">
           <div
             className="absolute inset-0 bg-gray-500 opacity-75"
             onClick={() => setShowSelfAppraisal(false)}
