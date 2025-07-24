@@ -100,7 +100,7 @@ export default function MilestoneManager() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {milestones.map((milestone) => (
           <div
             key={milestone.id}
@@ -703,8 +703,7 @@ export default function MilestoneManager() {
                             <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-bold">
                               MJ
                             </div>
-                            <div>
-                              <span className="text-sm font-medium text-gray-900 group-hover:text-teal-700">
+                            <div><span className="text-sm font-medium text-gray-900 group-hover:text-teal-700">
                                 Mike Johnson
                               </span>
                               <p className="text-xs text-gray-500">
