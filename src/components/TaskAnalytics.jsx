@@ -1,39 +1,85 @@
-
-import React, { useState } from 'react'
+import React, { useState } from "react";
 
 export default function TaskAnalytics() {
-  const [selectedPeriod, setSelectedPeriod] = useState('month')
-  
+  const [selectedPeriod, setSelectedPeriod] = useState("month");
+
   const analyticsData = {
     totalTasks: 156,
     completedTasks: 89,
     inProgressTasks: 45,
     pendingTasks: 22,
-    overdueTasks: 8
-  }
+    overdueTasks: 8,
+  };
 
-  const completionRate = Math.round((analyticsData.completedTasks / analyticsData.totalTasks) * 100)
+  const completionRate = Math.round(
+    (analyticsData.completedTasks / analyticsData.totalTasks) * 100,
+  );
 
   const teamMembers = [
-    { name: 'John Smith', completed: 24, rate: 95, avatar: 'JS', color: 'bg-blue-500' },
-    { name: 'Sarah Wilson', completed: 18, rate: 88, avatar: 'SW', color: 'bg-purple-500' },
-    { name: 'Mike Johnson', completed: 21, rate: 92, avatar: 'MJ', color: 'bg-green-500' },
-    { name: 'Emily Davis', completed: 15, rate: 85, avatar: 'ED', color: 'bg-pink-500' },
-    { name: 'Alex Chen', completed: 11, rate: 78, avatar: 'AC', color: 'bg-indigo-500' }
-  ]
+    {
+      name: "John Smith",
+      completed: 24,
+      rate: 95,
+      avatar: "JS",
+      color: "bg-blue-500",
+    },
+    {
+      name: "Sarah Wilson",
+      completed: 18,
+      rate: 88,
+      avatar: "SW",
+      color: "bg-purple-500",
+    },
+    {
+      name: "Mike Johnson",
+      completed: 21,
+      rate: 92,
+      avatar: "MJ",
+      color: "bg-green-500",
+    },
+    {
+      name: "Emily Davis",
+      completed: 15,
+      rate: 85,
+      avatar: "ED",
+      color: "bg-pink-500",
+    },
+    {
+      name: "Alex Chen",
+      completed: 11,
+      rate: 78,
+      avatar: "AC",
+      color: "bg-indigo-500",
+    },
+  ];
 
   const priorityData = [
-    { priority: 'High Priority', percentage: 35, count: 55, color: 'bg-red-500' },
-    { priority: 'Medium Priority', percentage: 45, count: 70, color: 'bg-yellow-500' },
-    { priority: 'Low Priority', percentage: 20, count: 31, color: 'bg-green-500' }
-  ]
+    {
+      priority: "High Priority",
+      percentage: 35,
+      count: 55,
+      color: "bg-red-500",
+    },
+    {
+      priority: "Medium Priority",
+      percentage: 45,
+      count: 70,
+      color: "bg-yellow-500",
+    },
+    {
+      priority: "Low Priority",
+      percentage: 20,
+      count: 31,
+      color: "bg-green-500",
+    },
+  ];
 
   const timeframes = [
-    { value: 'week', label: 'This Week' },
-    { value: 'month', label: 'This Month' },
-    { value: 'quarter', label: 'This Quarter' },
-    { value: 'year', label: 'This Year' }
-  ]
+    { value: "week", label: "This Week" },
+    { value: "month", label: "This Month" },
+    { value: "quarter", label: "This Quarter" },
+    { value: "year", label: "This Year" },
+  ];
 
   return (
     <div className="analytics-container h-auto overflow-scroll">
@@ -41,22 +87,24 @@ export default function TaskAnalytics() {
       <div className="analytics-header">
         <div className="header-content">
           <div>
-            <h1 className="analytics-title">📊 Task Analytics</h1>
-            <p className="analytics-subtitle">Comprehensive insights and performance metrics</p>
+            <h2 className="analytics-title"> Task Analytics</h2>
+            <p className="analytics-subtitle">
+              Comprehensive insights and performance metrics
+            </p>
           </div>
           <div className="header-controls">
-            <select 
+            <select
               className="period-selector"
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
             >
-              {timeframes.map(tf => (
-                <option key={tf.value} value={tf.value}>{tf.label}</option>
+              {timeframes.map((tf) => (
+                <option key={tf.value} value={tf.value}>
+                  {tf.label}
+                </option>
               ))}
             </select>
-            <button className="export-btn">
-              📤 Export Report
-            </button>
+            <button className="export-btn">📤 Export Report</button>
           </div>
         </div>
       </div>
@@ -83,7 +131,9 @@ export default function TaskAnalytics() {
           <div className="metric-content">
             <h3 className="metric-label">Completed</h3>
             <div className="metric-value">{analyticsData.completedTasks}</div>
-            <div className="metric-sublabel">{completionRate}% completion rate</div>
+            <div className="metric-sublabel">
+              {completionRate}% completion rate
+            </div>
           </div>
         </div>
 
@@ -149,7 +199,13 @@ export default function TaskAnalytics() {
                   className="progress-circle"
                 />
                 <defs>
-                  <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <linearGradient
+                    id="progressGradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="0%"
+                  >
                     <stop offset="0%" stopColor="#10b981" />
                     <stop offset="100%" stopColor="#059669" />
                   </linearGradient>
@@ -186,7 +242,7 @@ export default function TaskAnalytics() {
                   <div className="priority-percentage">{item.percentage}%</div>
                 </div>
                 <div className="priority-bar-container">
-                  <div 
+                  <div
                     className={`priority-bar ${item.color}`}
                     style={{ width: `${item.percentage}%` }}
                   />
@@ -220,7 +276,7 @@ export default function TaskAnalytics() {
                 </div>
                 <div className="member-progress">
                   <div className="progress-bar-bg">
-                    <div 
+                    <div
                       className="progress-bar-fill"
                       style={{ width: `${member.rate}%` }}
                     />
@@ -258,5 +314,5 @@ export default function TaskAnalytics() {
         </div>
       </div>
     </div>
-  )
+  );
 }
