@@ -3730,10 +3730,7 @@ function SubtaskDrawer({ parentTask, currentUser, onSubmit, onClose }) {
       />
 
       {/* Drawer */}
-      <div 
-        className="fixed top-0 right-0 h-full bg-white shadow-2xl z-50 overflow-y-auto drawer-animate"
-        style={{ width: "min(90vw, 600px)" }}
-      >
+      <div className="fixed top-0 right-0 h-full w-1/2 bg-white shadow-2xl z-50 overflow-y-auto drawer-animate">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
