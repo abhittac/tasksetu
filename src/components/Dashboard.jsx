@@ -584,7 +584,7 @@ export default function Dashboard() {
 
       {/* Notification Center Overlay */}
       {showNotificationCenter && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
+        <div className="fixed inset-0 z-[9999] overflow-hidden">
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setShowNotificationCenter(false)}
