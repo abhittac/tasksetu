@@ -117,9 +117,66 @@ export default function TaskAnalytics() {
             <div className="metric-trend positive">+12%</div>
           </div>
           <div className="metric-content">
-            <h3 className="metric-label">Total Tasks</h3>
+            <h3 className="metric-label">Task Stages Distribution</h3>
             <div className="metric-value">{analyticsData.totalTasks}</div>
-            <div className="metric-sublabel">vs last {selectedPeriod}</div>
+            <div className="metric-sublabel">Total Tasks</div>
+            
+            {/* Mini Stage Chart */}
+            <div className="stage-chart-container">
+              <div className="stage-bars">
+                <div className="stage-bar-item">
+                  <div className="stage-bar">
+                    <div 
+                      className="stage-bar-fill completed-bar" 
+                      style={{ width: `${(analyticsData.completedTasks / analyticsData.totalTasks) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="stage-info">
+                    <span className="stage-count">{analyticsData.completedTasks}</span>
+                    <span className="stage-label">Done</span>
+                  </div>
+                </div>
+                
+                <div className="stage-bar-item">
+                  <div className="stage-bar">
+                    <div 
+                      className="stage-bar-fill progress-bar" 
+                      style={{ width: `${(analyticsData.inProgressTasks / analyticsData.totalTasks) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="stage-info">
+                    <span className="stage-count">{analyticsData.inProgressTasks}</span>
+                    <span className="stage-label">In Progress</span>
+                  </div>
+                </div>
+                
+                <div className="stage-bar-item">
+                  <div className="stage-bar">
+                    <div 
+                      className="stage-bar-fill pending-bar" 
+                      style={{ width: `${(analyticsData.pendingTasks / analyticsData.totalTasks) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="stage-info">
+                    <span className="stage-count">{analyticsData.pendingTasks}</span>
+                    <span className="stage-label">Pending</span>
+                  </div>
+                </div>
+                
+                <div className="stage-bar-item">
+                  <div className="stage-bar">
+                    <div 
+                      className="stage-bar-fill overdue-bar" 
+                      style={{ width: `${(analyticsData.overdueTasks / analyticsData.totalTasks) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="stage-info">
+                    <span className="stage-count">{analyticsData.overdueTasks}</span>
+                    <span className="stage-label">Overdue</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

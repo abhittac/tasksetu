@@ -2870,6 +2870,130 @@
       font-size: 0.875rem;
     }
 
+    /* Stage Chart Styles */
+    .stage-chart-container {
+      margin-top: 1rem;
+      padding: 1rem 0;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .stage-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .stage-bar-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .stage-bar {
+      flex: 1;
+      height: 8px;
+      background: #f3f4f6;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stage-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s ease-in-out;
+      position: relative;
+    }
+
+    .stage-bar-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .completed-bar {
+      background: linear-gradient(90deg, #10b981, #059669);
+    }
+
+    .progress-bar {
+      background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+    }
+
+    .pending-bar {
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    .overdue-bar {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    .stage-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      min-width: 60px;
+    }
+
+    .stage-count {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1f2937;
+      line-height: 1;
+    }
+
+    .stage-label {
+      font-size: 0.625rem;
+      color: #6b7280;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Hover effects for stage bars */
+    .stage-bar-item:hover .stage-bar-fill {
+      filter: brightness(1.1);
+      transform: scaleY(1.2);
+    }
+
+    .stage-bar-item:hover .stage-count {
+      color: #3b82f6;
+      transform: scale(1.1);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .stage-chart-container {
+        margin-top: 0.75rem;
+        padding: 0.75rem 0;
+      }
+
+      .stage-bars {
+        gap: 0.5rem;
+      }
+
+      .stage-info {
+        min-width: 50px;
+      }
+
+      .stage-count {
+        font-size: 0.875rem;
+      }
+
+      .stage-label {
+        font-size: 0.5rem;
+      }
+    }
+
     /* Charts Section */
     .charts-section {
       display: grid;
