@@ -401,35 +401,79 @@ export default function StatusManager() {
           </div>
         </div>
 
-        <div className="status-workflow-diagram">
-          <h3>Company Status Workflow</h3>
-          <div className="workflow-visualization">
-            {companyStatuses.filter(s => s.active).sort((a, b) => a.order - b.order).map(status => (
-              <div key={status.id} className="workflow-node">
-                <div 
-                  className="status-node company-status"
-                  style={{ backgroundColor: status.color }}
-                >
-                  <span className="status-label">{status.label}</span>
-                  {status.isDefault && <span className="default-indicator">DEFAULT</span>}
-                  <span className="system-mapping">
-                    → {getSystemStatusLabelMain(status.systemMapping)}
-                  </span>
-                </div>
-                {status.allowedTransitions.length > 0 && (
-                  <div className="transitions">
-                    {status.allowedTransitions.map(transitionCode => {
-                      const targetStatus = companyStatuses.find(s => s.code === transitionCode)
-                      return targetStatus ? (
-                        <div key={transitionCode} className="transition-arrow">
-                          → {targetStatus.label}
-                        </div>
-                      ) : null
-                    })}
-                  </div>
-                )}
-              </div>
-            ))}
+        <div className="status-workflow-diagram mb-8">
+          <div className="section-header">
+            <h3>Company Status Workflow</h3>
+            <p>Visual representation of status transitions and system mappings</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">System Mapping</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Allowed Transitions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {companyStatuses.filter(s => s.active).sort((a, b) => a.order - b.order).map(status => (
+                  <tr key={status.id} className="hover:bg-gray-50 transition-colors duration-200">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm font-medium text-gray-900">{status.order}</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-3">
+                        <span 
+                          className="inline-block w-3 h-3 rounded-full"
+                          style={{ backgroundColor: status.color }}
+                        ></span>
+                        <span className="text-sm font-medium text-gray-900">{status.label}</span>
+                        {status.isDefault && (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            DEFAULT
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm">
+                        <div className="text-gray-900">→ {getSystemStatusLabelMain(status.systemMapping)}</div>
+                        <code className="text-xs text-gray-500">({status.systemMapping})</code>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        status.isFinal ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                      }`}>
+                        {status.isFinal ? 'Final' : 'Active'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap gap-2">
+                        {status.allowedTransitions.length > 0 ? (
+                          status.allowedTransitions.map(transitionCode => {
+                            const targetStatus = companyStatuses.find(s => s.code === transitionCode)
+                            return targetStatus ? (
+                              <span 
+                                key={transitionCode} 
+                                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
+                                style={{ backgroundColor: targetStatus.color }}
+                              >
+                                → {targetStatus.label}
+                              </span>
+                            ) : null
+                          })
+                        ) : (
+                          <span className="text-sm text-gray-400">No transitions</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
