@@ -685,7 +685,7 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
 
         {/* Creation Info - Compact */}
         <div className="info-section bg-gray-50 p-1 rounded">
-          <h4 className="text-xs font-medium mb-0.5">Details</h4>
+          <h4 className="text-xs font-medium mb-0.5" style={{ paddingLeft: '1rem' }}>Details</h4>
           <div className="space-y-0.5 text-xs">
             <div className="info-field flex justify-between">
               <label className="font-medium">Created By:</label>
