@@ -221,7 +221,7 @@ export default function Dashboard() {
 
             {/* Notification Dropdown */}
             {showNotifications && (
-              <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-lg rounded-lg z-[9999] max-h-96 overflow-y-auto">
+              <div className="fixed right-4 top-16 w-96 bg-white shadow-xl rounded-lg z-[99999] max-h-96 overflow-y-auto border border-gray-200">
                 {/* Header */}
                 <div className="p-4 border-b border-gray-200 bg-gray-50">
                   <div className="flex items-center justify-between">
@@ -383,7 +383,7 @@ export default function Dashboard() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">
-                        Task Title {task}
+                        Task TTask Title {task}
                       </p>
                       <p className="text-sm text-gray-500">Due tomorrow</p>
                     </div>
@@ -585,7 +585,7 @@ export default function Dashboard() {
 
       {/* Notification Center Overlay */}
       {showNotificationCenter && (
-        <div className="fixed inset-0 z-[9999] overflow-hidden">
+        <div className="fixed inset-0 z-[99999] overflow-hidden">
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setShowNotificationCenter(false)}
