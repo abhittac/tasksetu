@@ -229,7 +229,7 @@ export default function RecurringTaskManager({ onClose }) {
       )}
 
       {/* Recurring Tasks List */}
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {filteredTasks.map((task) => (
           <div key={task.id} className="card hover:shadow-md transition-shadow">
             <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
