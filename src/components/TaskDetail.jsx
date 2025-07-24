@@ -309,8 +309,6 @@ export default function TaskDetail({ taskId, onClose }) {
           />
 
           <div className="header-controls">
-            
-
             <StatusDropdown
               status={task.status}
               onChange={handleStatusChange}
@@ -338,7 +336,6 @@ export default function TaskDetail({ taskId, onClose }) {
               }
               canEdit={permissions.canEdit}
             />
-           
           </div>
 
           <div className="header-badges">
@@ -597,7 +594,9 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
           {task.reminders.length > 0 && (
             <div className="bg-yellow-100 px-1 py-0.5 rounded text-xs">
               <span className="font-medium">⏰ Reminder:</span>
-              <span className="ml-1">{task.reminders[0].message} ({task.reminders[0].date})</span>
+              <span className="ml-1">
+                {task.reminders[0].message} ({task.reminders[0].date})
+              </span>
             </div>
           )}
           <h3 className="text-xs font-medium">Description</h3>
@@ -612,7 +611,7 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
         {/* Timeline - Compact */}
         <div className="info-section bg-gray-50 p-1 rounded">
           <h4 className="text-xs font-medium mb-0.5">Timeline</h4>
-          <div className="space-y-0.5">
+          <div className="space-y-0.5 p-4">
             <div className="info-field flex justify-between text-xs">
               <label className="font-medium">Start:</label>
               <EditableDateField
@@ -643,13 +642,15 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
         </div>
 
         {/* Relationships - Compact */}
-        <div className="info-section bg-gray-50 p-1 rounded">
-          <h4 className="text-xs font-medium mb-0.5">Relationships</h4>
-          <div className="space-y-0.5 text-xs">
+        <div className="info-section bg-gray-50  rounded">
+          <h4 className="text-xs font-medium mb-0.5 p-4">Relationships</h4>
+          <div className="space-y-0.5 text-xs p-4">
             {task.parentTaskId && (
               <div className="info-field">
                 <label className="font-medium">Parent:</label>
-                <span className="linked-task text-blue-600">#{task.parentTaskId}</span>
+                <span className="linked-task text-blue-600">
+                  #{task.parentTaskId}
+                </span>
               </div>
             )}
             {task.isRecurring && task.recurringFromTaskId && (
@@ -670,7 +671,10 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
               <label className="font-medium block mb-1">Collaborators:</label>
               <div className="collaborators-list flex flex-wrap gap-1">
                 {task.collaborators.map((collab) => (
-                  <span key={collab} className="collaborator-badge bg-blue-100 text-blue-800 px-1 py-0.5 rounded text-xs">
+                  <span
+                    key={collab}
+                    className="collaborator-badge bg-blue-100 text-blue-800 px-1 py-0.5 rounded text-xs"
+                  >
                     {collab}
                   </span>
                 ))}
@@ -698,15 +702,16 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
           </div>
         </div>
 
-        
-
         {/* Milestone Progress - Compact */}
         {task.taskType === "milestone" && task.milestones.length > 0 && (
           <div className="info-section lg:col-span-2 bg-purple-50 p-1 rounded">
             <h4 className="text-xs font-medium mb-0.5">🎯 Milestones</h4>
             <div className="milestone-list space-y-0.5">
               {task.milestones.map((milestone) => (
-                <div key={milestone.id} className="milestone-item flex items-center gap-1 text-xs">
+                <div
+                  key={milestone.id}
+                  className="milestone-item flex items-center gap-1 text-xs"
+                >
                   <span className={`milestone-icon ${milestone.status}`}>
                     {milestone.status === "completed"
                       ? "✅"
@@ -715,8 +720,12 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
                         : "⭐"}
                   </span>
                   <div className="milestone-info flex-1">
-                    <span className="milestone-title font-medium">{milestone.title}</span>
-                    <span className="milestone-date text-gray-500 ml-1">({milestone.date})</span>
+                    <span className="milestone-title font-medium">
+                      {milestone.title}
+                    </span>
+                    <span className="milestone-date text-gray-500 ml-1">
+                      ({milestone.date})
+                    </span>
                   </div>
                 </div>
               ))}
@@ -754,7 +763,8 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
             <h4 className="text-xs font-medium mb-0.5">😴 Snoozed</h4>
             <div className="snooze-details space-y-0.5 text-xs">
               <div className="snooze-field">
-                <strong>Until:</strong> {new Date(task.snoozedUntil).toLocaleString()}
+                <strong>Until:</strong>{" "}
+                {new Date(task.snoozedUntil).toLocaleString()}
               </div>
               {task.snoozeNote && (
                 <div className="snooze-field">
@@ -1485,8 +1495,6 @@ function PriorityDropdown({ priority, onChange, canEdit }) {
   );
 }
 
-
-
 function AssigneeSelector({ assignee, assigneeId, onChange, canEdit }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -1600,7 +1608,11 @@ function EditableTextArea({ value, onSave, canEdit, placeholder }) {
   };
 
   if (!canEdit) {
-    return <p className="readonly-text text-xs text-gray-700">{value || placeholder}</p>;
+    return (
+      <p className="readonly-text text-xs text-gray-700">
+        {value || placeholder}
+      </p>
+    );
   }
 
   if (isEditing) {
@@ -1620,9 +1632,14 @@ function EditableTextArea({ value, onSave, canEdit, placeholder }) {
   }
 
   return (
-    <div className="editable-text-display cursor-pointer text-xs p-1 rounded hover:bg-gray-100 group" onClick={() => setIsEditing(true)}>
+    <div
+      className="editable-text-display cursor-pointer text-xs p-1 rounded hover:bg-gray-100 group"
+      onClick={() => setIsEditing(true)}
+    >
       <p className="text-gray-700">{value || placeholder}</p>
-      <span className="edit-icon opacity-0 group-hover:opacity-100 text-xs">✏️</span>
+      <span className="edit-icon opacity-0 group-hover:opacity-100 text-xs">
+        ✏️
+      </span>
     </div>
   );
 }
@@ -1663,9 +1680,14 @@ function EditableTextField({ value, onSave, canEdit }) {
   }
 
   return (
-    <span className="editable-field cursor-pointer text-xs hover:bg-gray-100 px-1 py-0.5 rounded group" onClick={() => setIsEditing(true)}>
+    <span
+      className="editable-field cursor-pointer text-xs hover:bg-gray-100 px-1 py-0.5 rounded group"
+      onClick={() => setIsEditing(true)}
+    >
       {value}
-      <span className="edit-icon opacity-0 group-hover:opacity-100 ml-1 text-xs">✏️</span>
+      <span className="edit-icon opacity-0 group-hover:opacity-100 ml-1 text-xs">
+        ✏️
+      </span>
     </span>
   );
 }
@@ -1699,9 +1721,14 @@ function EditableDateField({ value, onSave, canEdit }) {
   }
 
   return (
-    <span className="editable-field cursor-pointer text-xs hover:bg-gray-100 px-1 py-0.5 rounded group" onClick={() => setIsEditing(true)}>
+    <span
+      className="editable-field cursor-pointer text-xs hover:bg-gray-100 px-1 py-0.5 rounded group"
+      onClick={() => setIsEditing(true)}
+    >
       {value}
-      <span className="edit-icon opacity-0 group-hover:opacity-100 ml-1 text-xs">✏️</span>
+      <span className="edit-icon opacity-0 group-hover:opacity-100 ml-1 text-xs">
+        ✏️
+      </span>
     </span>
   );
 }
@@ -2405,7 +2432,8 @@ function SubtaskStatusDropdown({ subtask, onUpdate, canEdit }) {
     { value: "blocked", label: "Blocked", color: "#ef4444" },
   ];
 
-  const currentStatus = statuses.find(s => s.value === subtask.status) || statuses[0];
+  const currentStatus =
+    statuses.find((s) => s.value === subtask.status) || statuses[0];
 
   const handleStatusChange = (newStatus) => {
     const updatedSubtask = { ...subtask, status: newStatus.value };
@@ -2416,7 +2444,7 @@ function SubtaskStatusDropdown({ subtask, onUpdate, canEdit }) {
   if (!canEdit) {
     return (
       <div className="subtask-status-display readonly">
-        <span 
+        <span
           className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white"
           style={{ backgroundColor: currentStatus.color }}
         >
@@ -2754,7 +2782,7 @@ function SubtaskSlideUpPanel({
                       <p className="font-semibold text-gray-900">
                         {subtask.assignee}
                       </p>
-                      <p className="text-sm text-gray-500">Task     Assignee</p>
+                      <p className="text-sm text-gray-500">Task Assignee</p>
                     </div>
                   </div>
                 )}
@@ -2783,7 +2811,7 @@ function SubtaskSlideUpPanel({
                     <p className="font-semibold text-gray-900">
                       {subtask.dueDate}
                     </p>
-                    <p className="text-sm text-gray-500">Target     completion</p>
+                    <p className="text-sm text-gray-500">Target completion</p>
                   </div>
                 )}
               </div>
