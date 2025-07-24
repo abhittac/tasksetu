@@ -87,7 +87,7 @@ export default function TaskAnalytics() {
       <div className="analytics-header">
         <div className="header-content">
           <div>
-            <h2 className="analytics-title"> Task Analytics</h2>
+            <h2 className="analytics-title">📊 Task Analytics</h2>
             <p className="analytics-subtitle">
               Comprehensive insights and performance metrics
             </p>
