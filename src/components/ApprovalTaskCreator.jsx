@@ -235,27 +235,28 @@ export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate, 
               </div>
 
               {/* Approval Mode */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Approval Mode *
-                  </label>
-                  <select
-                    name="approvalMode"
-                    value={formData.approvalMode}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  >
-                    <option value="any">Any One</option>
-                    <option value="all">All Must Approve</option>
-                    <option value="sequential">Sequential</option>
-                  </select>
-                  <p className="text-xs text-gray-500">
-                    {getApprovalModeDescription(formData.approvalMode)}
-                  </p>
-                </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Approval Mode *
+                </label>
+                <select
+                  name="approvalMode"
+                  value={formData.approvalMode}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="any">Any One</option>
+                  <option value="all">All Must Approve</option>
+                  <option value="sequential">Sequential</option>
+                </select>
+                <p className="text-xs text-gray-500">
+                  {getApprovalModeDescription(formData.approvalMode)}
+                </p>
+              </div>
 
+              {/* Due Date, Priority, and Visibility in single line */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Due Date */}
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">
@@ -271,10 +272,7 @@ export default function ApprovalTaskCreator({ onClose, onSubmit, preFilledDate, 
                     min={new Date().toISOString().split('T')[0]}
                   />
                 </div>
-              </div>
 
-              {/* Priority and Visibility */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">
                     Priority
