@@ -111,7 +111,7 @@ export default function TaskAnalytics() {
 
       {/* Key Metrics Cards */}
       <div className="metrics-grid">
-        <div className="metric-card featured">
+        <div className="metric-card featured completion-card">
           <div className="metric-header">
             <div className="metric-icon total">📊</div>
             <div className="metric-trend positive">+12%</div>
@@ -139,18 +139,6 @@ export default function TaskAnalytics() {
 
         <div className="metric-card">
           <div className="metric-header">
-            <div className="metric-icon progress">🔄</div>
-            <div className="metric-trend neutral">-2%</div>
-          </div>
-          <div className="metric-content">
-            <h3 className="metric-label">In Progress</h3>
-            <div className="metric-value">{analyticsData.inProgressTasks}</div>
-            <div className="metric-sublabel">28% of total tasks</div>
-          </div>
-        </div>
-
-        <div className="metric-card">
-          <div className="metric-header">
             <div className="metric-icon pending">⏳</div>
             <div className="metric-trend neutral">+5%</div>
           </div>
@@ -160,19 +148,6 @@ export default function TaskAnalytics() {
             <div className="metric-sublabel">14% of total tasks</div>
           </div>
         </div>
-
-        <div className="metric-card alert">
-          <div className="metric-header">
-            <div className="metric-icon overdue">⚠️</div>
-            <div className="metric-trend negative">+3</div>
-          </div>
-          <div className="metric-content">
-            <h3 className="metric-label">Overdue</h3>
-            <div className="metric-value">{analyticsData.overdueTasks}</div>
-            <div className="metric-sublabel">Needs immediate attention</div>
-          </div>
-        </div>
-
         {/* Completion Rate Circle */}
         <div className="metric-card completion-card">
           <div className="completion-circle-container">
@@ -217,6 +192,28 @@ export default function TaskAnalytics() {
               </div>
             </div>
             <div className="completion-message">🎉 Excellent progress!</div>
+          </div>
+        </div>
+        <div className="metric-card alert">
+          <div className="metric-header">
+            <div className="metric-icon overdue">⚠️</div>
+            <div className="metric-trend negative">+3</div>
+          </div>
+          <div className="metric-content">
+            <h3 className="metric-label">Overdue</h3>
+            <div className="metric-value">{analyticsData.overdueTasks}</div>
+            <div className="metric-sublabel">Needs immediate attention</div>
+          </div>
+        </div>
+        <div className="metric-card">
+          <div className="metric-header">
+            <div className="metric-icon progress">🔄</div>
+            <div className="metric-trend neutral">-2%</div>
+          </div>
+          <div className="metric-content">
+            <h3 className="metric-label">In Progress</h3>
+            <div className="metric-value">{analyticsData.inProgressTasks}</div>
+            <div className="metric-sublabel">28% of total tasks</div>
           </div>
         </div>
       </div>
