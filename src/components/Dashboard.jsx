@@ -87,7 +87,7 @@ export default function Dashboard() {
     {
       title: "Completed",
       value: "856",
-      subtitle: "This month",
+      subtitle: "All time",
       percentage: "+8%",
       trend: "up",
       icon: "✅",
@@ -96,7 +96,7 @@ export default function Dashboard() {
     {
       title: "In Progress",
       value: "234",
-      subtitle: "Active tasks",
+      subtitle: "All time",
       percentage: "+3%",
       trend: "up",
       icon: "⏳",
@@ -105,7 +105,7 @@ export default function Dashboard() {
     {
       title: "Overdue",
       value: "12",
-      subtitle: "Need attention",
+      subtitle: "All time",
       percentage: "-5%",
       trend: "down",
       icon: "⚠️",
