@@ -177,7 +177,7 @@ export default function CreateTask({
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2  gap-4">
               {/* Title */}
               <div className="lg:col-span-2">
                 <label className="form-label">Task Title *</label>
@@ -206,7 +206,7 @@ export default function CreateTask({
               </div>
 
               {/* Assignee */}
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Assign to
                 </label>
@@ -226,7 +226,7 @@ export default function CreateTask({
               </div>
 
               {/* Priority */}
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Priority
                 </label>
@@ -246,7 +246,7 @@ export default function CreateTask({
               </div>
 
               {/* Status */}
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-1">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Initial Status
                 </label>
@@ -260,7 +260,26 @@ export default function CreateTask({
                   <option value="review">In Review</option>
                 </select>
               </div>
-
+              {/* Category */}
+              <div className="lg:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category
+                </label>
+                <select
+                  value={formData.category}
+                  onChange={(e) =>
+                    handleInputChange("category", e.target.value)
+                  }
+                  className="form-select"
+                >
+                  <option value="">Select category...</option>
+                  <option value="development">Development</option>
+                  <option value="design">Design</option>
+                  <option value="research">Research</option>
+                  <option value="marketing">Marketing</option>
+                  <option value="support">Support</option>
+                </select>
+              </div>
               {/* Due Date */}
               <div className="lg:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -306,27 +325,6 @@ export default function CreateTask({
                     </button>
                   </div>
                 )}
-              </div>
-
-              {/* Category */}
-              <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category
-                </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) =>
-                    handleInputChange("category", e.target.value)
-                  }
-                  className="form-select"
-                >
-                  <option value="">Select category...</option>
-                  <option value="development">Development</option>
-                  <option value="design">Design</option>
-                  <option value="research">Research</option>
-                  <option value="marketing">Marketing</option>
-                  <option value="support">Support</option>
-                </select>
               </div>
 
               {/* Tags */}
@@ -405,7 +403,7 @@ export default function CreateTask({
           </div>
 
           {/* Form Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+          <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
             <button
               type="button"
               className="btn btn-secondary"
@@ -413,12 +411,14 @@ export default function CreateTask({
             >
               Cancel
             </button>
-            <button type="button" className="btn btn-secondary">
-              Save as Draft
-            </button>
-            <button type="submit" className="btn btn-primary">
-              Create Task
-            </button>
+            <div>
+              <button type="button" className="btn btn-secondary mr-1">
+                Save as Draft
+              </button>
+              <button type="submit" className="btn btn-primary">
+                Create Task
+              </button>{" "}
+            </div>
           </div>
         </form>
       )}
@@ -651,7 +651,7 @@ function MoreOptionsModal({ data, onChange, onClose, onSave }) {
       </div>
 
       {/* Modal Actions */}
-      <div className="p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3 sm:justify-end">
+      <div className="p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3 sm:justify-between">
         <button type="button" onClick={onClose} className="btn btn-secondary">
           Cancel
         </button>
