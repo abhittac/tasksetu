@@ -1,50 +1,49 @@
-
-import React from 'react'
+import React from "react";
 
 export default function Sidebar({ currentView, onViewChange, onCreateTask }) {
   const menuItems = [
     {
-      section: 'Main',
+      section: "Main",
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-        { id: 'all-tasks', label: 'All Tasks', icon: '📋' },
+        { id: "dashboard", label: "Dashboard", icon: "📊" },
+        { id: "all-tasks", label: "All Tasks", icon: "📋" },
         // { id: 'create-task', label: 'Create Task', icon: '➕' },
-        { id: 'deadlines', label: 'Deadlines', icon: '⏰' },
-      ]
+        { id: "deadlines", label: "Deadlines", icon: "⏰" },
+      ],
     },
     {
-      section: 'Management',
+      section: "Management",
       items: [
-        { id: 'recurring-tasks', label: 'Recurring Tasks', icon: '🔄' },
-        { id: 'approvals', label: 'Approvals', icon: '✅' },
-        { id: 'milestones', label: 'Milestones', icon: '🏁' },
-        { id: 'status-manager', label: 'Status Manager', icon: '🏷️' },
-        { id: 'priority-manager', label: 'Priority Manager', icon: '🎯' },
-      ]
+        { id: "recurring-tasks", label: "Recurring Tasks", icon: "🔄" },
+        { id: "approvals", label: "Approvals", icon: "✅" },
+        { id: "milestones", label: "Milestones", icon: "🏁" },
+        { id: "status-manager", label: "Status Manager", icon: "🏷️" },
+        { id: "priority-manager", label: "Priority Manager", icon: "🎯" },
+      ],
     },
     {
-      section: 'Insights',
+      section: "Insights",
       items: [
-        { id: 'analytics', label: 'Analytics', icon: '📈' },
-        { id: 'activity', label: 'Activity Feed', icon: '🔔' },
-        { id: 'notifications', label: 'Notifications', icon: '📢' },
-      ]
-    }
-  ]
+        { id: "analytics", label: "Analytics", icon: "📈" },
+        { id: "activity", label: "Activity Feed", icon: "🔔" },
+        { id: "notifications", label: "Notifications", icon: "📢" },
+      ],
+    },
+  ];
 
   const handleItemClick = (itemId) => {
-    if (itemId === 'create-task') {
-      onCreateTask()
+    if (itemId === "create-task") {
+      onCreateTask();
     } else {
-      onViewChange(itemId)
+      onViewChange(itemId);
     }
-  }
+  };
 
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
         <h1 className="text-xl font-bold text-gray-900">TaskFlow Pro</h1>
-        <p className="text-sm text-gray-500 mt-1">Task Management System</p>
+        <p className="text-sm text-white mt-1">Task Management System</p>
       </div>
 
       <nav className="sidebar-content">
@@ -57,7 +56,9 @@ export default function Sidebar({ currentView, onViewChange, onCreateTask }) {
                   <button
                     onClick={() => handleItemClick(item.id)}
                     className={`nav-item w-full text-left ${
-                      currentView === item.id ? 'active' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                      currentView === item.id
+                        ? "active"
+                        : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
                     }`}
                   >
                     <span className="nav-icon">{item.icon}</span>
@@ -76,11 +77,13 @@ export default function Sidebar({ currentView, onViewChange, onCreateTask }) {
             <span className="text-white text-sm font-medium">U</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">Admin User</p>
+            <p className="text-sm font-medium text-gray-900 truncate">
+              Admin User
+            </p>
             <p className="text-xs text-gray-500 truncate">admin@company.com</p>
           </div>
         </div>
       </div>
     </aside>
-  )
+  );
 }
