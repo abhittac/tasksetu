@@ -608,8 +608,8 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
           />
         </div>
 
-        {/* Timeline - Compact */}
-        <div className="info-section bg-gray-50 p-1 rounded">
+        {/* Timeline - Compact - Reduced Width */}
+        <div className="info-section bg-gray-50 p-1 rounded lg:col-span-1">
           <h4 className="text-xs font-medium mb-0.5" style={{ paddingLeft: '1rem' }}>Timeline</h4>
           <div className="space-y-0.5 p-4">
             <div className="info-field flex justify-between text-xs">
@@ -637,6 +637,25 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
                 }
                 canEdit={permissions.canEdit}
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Creation Info - Compact - Increased Width */}
+        <div className="info-section bg-gray-50 p-1 rounded lg:col-span-2">
+          <h4 className="text-xs font-medium mb-0.5" style={{ paddingLeft: '1rem' }}>Details</h4>
+          <div className="space-y-0.5 text-xs p-4">
+            <div className="info-field flex justify-between">
+              <label className="font-medium">Created By:</label>
+              <span className="truncate">{task.createdBy}</span>
+            </div>
+            <div className="info-field flex justify-between">
+              <label className="font-medium">Created:</label>
+              <span className="truncate">{task.createdAt}</span>
+            </div>
+            <div className="info-field flex justify-between">
+              <label className="font-medium">Updated:</label>
+              <span className="truncate">{task.updatedAt}</span>
             </div>
           </div>
         </div>
@@ -679,25 +698,6 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
                   </span>
                 ))}
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Creation Info - Compact */}
-        <div className="info-section bg-gray-50 p-1 rounded">
-          <h4 className="text-xs font-medium mb-0.5" style={{ paddingLeft: '1rem' }}>Details</h4>
-          <div className="space-y-0.5 text-xs">
-            <div className="info-field flex justify-between">
-              <label className="font-medium">Created By:</label>
-              <span className="truncate">{task.createdBy}</span>
-            </div>
-            <div className="info-field flex justify-between">
-              <label className="font-medium">Created:</label>
-              <span className="truncate">{task.createdAt}</span>
-            </div>
-            <div className="info-field flex justify-between">
-              <label className="font-medium">Updated:</label>
-              <span className="truncate">{task.updatedAt}</span>
             </div>
           </div>
         </div>
