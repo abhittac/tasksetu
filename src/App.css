@@ -249,6 +249,29 @@
         @apply px-8 py-4 text-base;
       }
 
+      /* Quick Actions Responsive Layout */
+      .quick-actions-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .quick-actions-grid .btn {
+        flex: 1 1 auto;
+        min-width: 140px;
+        max-width: 200px;
+        white-space: nowrap;
+      }
+
+      @media (max-width: 768px) {
+        .quick-actions-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        }
+      }
+
       /* Card Components */
       .card {
         @apply bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200/50 p-6 transition-all duration-300;

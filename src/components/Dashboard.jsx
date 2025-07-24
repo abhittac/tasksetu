@@ -417,7 +417,7 @@ export default function Dashboard() {
               Quick Actions
             </h3>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="quick-actions-grid">
             <button className="btn btn-secondary">
               <span className="mr-2">📊</span>
               View Reports
