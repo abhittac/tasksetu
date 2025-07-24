@@ -219,102 +219,7 @@ export default function Dashboard() {
               )}
             </button>
 
-            {/* Notification Dropdown */}
-            {showNotifications && (
-              <div className="fixed right-4 top-16 w-96 bg-white shadow-xl rounded-lg z-[99999] max-h-96 overflow-y-auto border border-gray-200">
-                {/* Header */}
-                <div className="p-4 border-b border-gray-200 bg-gray-50">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Notifications
-                    </h3>
-                    {unreadCount > 0 && (
-                      <button
-                        onClick={markAllAsRead}
-                        className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        Mark all as read
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Notifications List */}
-                <div className="max-h-80 overflow-y-auto">
-                  {notifications.length > 0 ? (
-                    notifications.slice(0, 10).map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${
-                          !notification.read
-                            ? "bg-blue-50 hover:bg-blue-100"
-                            : "hover:bg-gray-50"
-                        }`}
-                        onClick={() => markAsRead(notification.id)}
-                      >
-                        <div className="flex items-start space-x-3">
-                          <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center border">
-                            <span className="text-sm">
-                              {getNotificationIcon(notification.type)}
-                            </span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <h4 className="text-sm font-medium text-gray-900 mb-1">
-                                  {notification.title}
-                                </h4>
-                                <p className="text-sm text-gray-600 mb-2">
-                                  {notification.message}
-                                </p>
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-xs text-gray-500">
-                                    {formatTimestamp(notification.timestamp)}
-                                  </span>
-                                  <span
-                                    className="text-xs font-medium"
-                                    style={{
-                                      color: getPriorityColor(
-                                        notification.priority,
-                                      ),
-                                    }}
-                                  >
-                                    {notification.priority}
-                                  </span>
-                                  {!notification.read && (
-                                    <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-8 text-center">
-                      <div className="text-gray-400 text-4xl mb-2">🔔</div>
-                      <p className="text-gray-500">No notifications</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Footer */}
-                {notifications.length > 0 && (
-                  <div className="p-3 border-t border-gray-200 bg-gray-50">
-                    <button
-                      onClick={() => {
-                        setShowNotifications(false);
-                        setShowNotificationCenter(true);
-                      }}
-                      className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium"
-                    >
-                      View All Notifications
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+            
           </div>
         </div>
       </div>
@@ -616,6 +521,110 @@ export default function Dashboard() {
               <NotificationCenter />
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Notification Dropdown - Rendered at top level */}
+      {showNotifications && (
+        <div 
+          className="fixed w-96 bg-white shadow-xl rounded-lg z-[99999] max-h-96 overflow-y-auto border border-gray-200"
+          style={{
+            top: '70px',
+            right: '20px',
+            position: 'fixed'
+          }}
+        >
+          {/* Header */}
+          <div className="p-4 border-b border-gray-200 bg-gray-50">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Notifications
+              </h3>
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllAsRead}
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Mark all as read
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Notifications List */}
+          <div className="max-h-80 overflow-y-auto">
+            {notifications.length > 0 ? (
+              notifications.slice(0, 10).map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${
+                    !notification.read
+                      ? "bg-blue-50 hover:bg-blue-100"
+                      : "hover:bg-gray-50"
+                  }`}
+                  onClick={() => markAsRead(notification.id)}
+                >
+                  <div className="flex items-start space-x-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-white rounded-full flex items-center justify-center border">
+                      <span className="text-sm">
+                        {getNotificationIcon(notification.type)}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium text-gray-900 mb-1">
+                            {notification.title}
+                          </h4>
+                          <p className="text-sm text-gray-600 mb-2">
+                            {notification.message}
+                          </p>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs text-gray-500">
+                              {formatTimestamp(notification.timestamp)}
+                            </span>
+                            <span
+                              className="text-xs font-medium"
+                              style={{
+                                color: getPriorityColor(
+                                  notification.priority,
+                                ),
+                              }}
+                            >
+                              {notification.priority}
+                            </span>
+                            {!notification.read && (
+                              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-8 text-center">
+                <div className="text-gray-400 text-4xl mb-2">🔔</div>
+                <p className="text-gray-500">No notifications</p>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          {notifications.length > 0 && (
+            <div className="p-3 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={() => {
+                  setShowNotifications(false);
+                  setShowNotificationCenter(true);
+                }}
+                className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium"
+              >
+                View All Notifications
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
