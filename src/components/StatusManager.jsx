@@ -439,34 +439,39 @@ export default function StatusManager() {
               <h3>Company Statuses</h3>
               <p>Custom statuses configured for your organization</p>
             </div>
-            <div className="status-table">
-              <div className="table-header">
-                <div className="th">Order</div>
-                <div className="th">Status</div>
-                <div className="th">Code</div>
-                <div className="th">System Mapping</div>
-                <div className="th">Type</div>
-                <div className="th">Tasks Using</div>
-                <div className="th">Actions</div>
-              </div>
-
-              {activeCompanyStatuses.sort((a, b) => a.order - b.order).map(status => (
-                <CompanyStatusRow
-                  key={status.id}
-                  status={status}
-                  systemStatuses={systemStatuses}
-                  onEdit={() => setEditingStatus(status)}
-                  onDelete={() => setDeleteModal(status)}
-                  onSetDefault={() => handleSetDefault(status.id)}
-                  canEdit={currentUser.role === 'admin'}
-                  onDragStart={handleDragStart}
-                  onDragEnd={handleDragEnd}
-                  onDragOver={handleDragOver}
-                  onDragEnter={handleDragEnter}
-                  onDrop={handleDrop}
-                  isDraggedOver={dragOverItem && dragOverItem.id === status.id}
-                />
-              ))}
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">System Mapping</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tasks Using</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {activeCompanyStatuses.sort((a, b) => a.order - b.order).map(status => (
+                    <CompanyStatusRow
+                      key={status.id}
+                      status={status}
+                      systemStatuses={systemStatuses}
+                      onEdit={() => setEditingStatus(status)}
+                      onDelete={() => setDeleteModal(status)}
+                      onSetDefault={() => handleSetDefault(status.id)}
+                      canEdit={currentUser.role === 'admin'}
+                      onDragStart={handleDragStart}
+                      onDragEnd={handleDragEnd}
+                      onDragOver={handleDragOver}
+                      onDragEnter={handleDragEnter}
+                      onDrop={handleDrop}
+                      isDraggedOver={dragOverItem && dragOverItem.id === status.id}
+                    />
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
@@ -476,22 +481,27 @@ export default function StatusManager() {
                 <h3>System Statuses (Read-Only)</h3>
                 <p>Core statuses used for internal logic and analytics - Required for application consistency</p>
               </div>
-              <div className="status-table">
-                <div className="table-header">
-                  <div className="th">Status</div>
-                  <div className="th">Code</div>
-                  <div className="th">Description</div>
-                  <div className="th">Type</div>
-                  <div className="th">Company Mappings</div>
-                </div>
-
-                {systemStatuses.map(status => (
-                  <SystemStatusRow
-                    key={status.id}
-                    status={status}
-                    companyStatuses={activeCompanyStatuses}
-                  />
-                ))}
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company Mappings</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {systemStatuses.map(status => (
+                      <SystemStatusRow
+                        key={status.id}
+                        status={status}
+                        companyStatuses={activeCompanyStatuses}
+                      />
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
@@ -547,8 +557,8 @@ function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefau
   const taskCount = getTaskCount(status.code)
 
   return (
-    <div 
-      className={`table-row ${isDraggedOver ? 'drag-over' : ''}`}
+    <tr 
+      className={`${isDraggedOver ? 'bg-blue-50' : 'hover:bg-gray-50'} transition-colors duration-200`}
       draggable={canEdit}
       onDragStart={(e) => onDragStart(e, status)}
       onDragEnd={onDragEnd}
@@ -556,58 +566,72 @@ function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefau
       onDragEnter={(e) => onDragEnter(e, status)}
       onDrop={(e) => onDrop(e, status)}
     >
-      <div className="td">
-        <div className={`drag-handle ${canEdit ? 'draggable' : ''}`}>⋮⋮</div>
-        <span className="order-number">{status.order}</span>
-      </div>
-      <div className="td">
-        <div className="status-display">
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center space-x-2">
+          <div className={`text-gray-400 ${canEdit ? 'cursor-move' : ''}`}>⋮⋮</div>
+          <span className="text-sm font-medium text-gray-900">{status.order}</span>
+        </div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center space-x-3">
           <span 
-            className="status-color-indicator"
+            className="inline-block w-3 h-3 rounded-full"
             style={{ backgroundColor: status.color }}
           ></span>
-          <span className="status-name">{status.label}</span>
+          <span className="text-sm font-medium text-gray-900">{status.label}</span>
           {status.isDefault && (
-            <span className="badge badge-primary">DEFAULT</span>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              DEFAULT
+            </span>
           )}
         </div>
-      </div>
-      <div className="td">
-        <code className="status-code">{status.code}</code>
-      </div>
-      <div className="td">
-        <div className="system-mapping-display">
-          <span className="system-status-label">
-            {getSystemStatusLabel(status.systemMapping, systemStatuses)}
-          </span>
-          <code className="system-status-code">({status.systemMapping})</code>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <code className="text-sm bg-gray-100 px-2 py-1 rounded">{status.code}</code>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="text-sm">
+          <div className="text-gray-900">{getSystemStatusLabel(status.systemMapping, systemStatuses)}</div>
+          <code className="text-xs text-gray-500">({status.systemMapping})</code>
         </div>
-      </div>
-      <div className="td">
-        <span className={`status-type ${status.isFinal ? 'final' : 'active'}`}>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          status.isFinal ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+        }`}>
           {status.isFinal ? 'Final' : 'Active'}
         </span>
-      </div>
-      <div className="td">
-        <div className="task-count-display">
-          <span className="task-count-number">{taskCount}</span>
-          <span className="task-count-label">tasks</span>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="text-sm">
+          <div className="text-gray-900 font-medium">{taskCount}</div>
+          <div className="text-gray-500">tasks</div>
         </div>
-      </div>
-      <div className="td">
-        <div className="action-buttons">
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <div className="flex space-x-2">
           {canEdit && (
             <>
-              <button className="btn-action" onClick={onEdit}>
+              <button 
+                className="text-indigo-600 hover:text-indigo-900 transition-colors duration-200"
+                onClick={onEdit}
+              >
                 Edit
               </button>
               {!status.isDefault && (
-                <button className="btn-action" onClick={onSetDefault}>
+                <button 
+                  className="text-blue-600 hover:text-blue-900 transition-colors duration-200"
+                  onClick={onSetDefault}
+                >
                   Set Default
                 </button>
               )}
               <button 
-                className="btn-action danger" 
+                className={`transition-colors duration-200 ${
+                  taskCount > 0 
+                    ? 'text-gray-400 cursor-not-allowed' 
+                    : 'text-red-600 hover:text-red-900'
+                }`}
                 onClick={onDelete}
                 disabled={taskCount > 0}
                 title={taskCount > 0 ? `Cannot delete: ${taskCount} tasks using this status` : 'Delete status'}
@@ -617,8 +641,8 @@ function CompanyStatusRow({ status, systemStatuses, onEdit, onDelete, onSetDefau
             </>
           )}
         </div>
-      </div>
-    </div>
+      </td>
+    </tr>
   )
 }
 
@@ -626,44 +650,50 @@ function SystemStatusRow({ status, companyStatuses }) {
   const mappedCompanyStatuses = companyStatuses.filter(cs => cs.systemMapping === status.code)
 
   return (
-    <div className="table-row system-row">
-      <div className="td">
-        <div className="status-display">
+    <tr className="hover:bg-gray-50 transition-colors duration-200">
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center space-x-3">
           <span 
-            className="status-color-indicator"
+            className="inline-block w-3 h-3 rounded-full"
             style={{ backgroundColor: status.color }}
           ></span>
-          <span className="status-name">{status.label}</span>
-          <span className="badge badge-secondary">SYSTEM</span>
+          <span className="text-sm font-medium text-gray-900">{status.label}</span>
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            SYSTEM
+          </span>
         </div>
-      </div>
-      <div className="td">
-        <code className="status-code">{status.code}</code>
-      </div>
-      <div className="td">
-        <span className="status-description">{status.description}</span>
-      </div>
-      <div className="td">
-        <span className={`status-type ${status.isFinal ? 'final' : 'active'}`}>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <code className="text-sm bg-gray-100 px-2 py-1 rounded">{status.code}</code>
+      </td>
+      <td className="px-6 py-4">
+        <span className="text-sm text-gray-900">{status.description}</span>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          status.isFinal ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+        }`}>
           {status.isFinal ? 'Final' : 'Active'}
         </span>
-      </div>
-      <div className="td">
-        <div className="company-mappings">
+      </td>
+      <td className="px-6 py-4">
+        <div className="flex flex-wrap gap-2">
           {mappedCompanyStatuses.length > 0 ? (
-            <div className="mapping-list">
-              {mappedCompanyStatuses.map(cs => (
-                <span key={cs.id} className="mapping-badge" style={{ backgroundColor: cs.color }}>
-                  {cs.label}
-                </span>
-              ))}
-            </div>
+            mappedCompanyStatuses.map(cs => (
+              <span 
+                key={cs.id} 
+                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
+                style={{ backgroundColor: cs.color }}
+              >
+                {cs.label}
+              </span>
+            ))
           ) : (
-            <span className="text-gray-400">No mappings</span>
+            <span className="text-sm text-gray-400">No mappings</span>
           )}
         </div>
-      </div>
-    </div>
+      </td>
+    </tr>
   )
 }
 
