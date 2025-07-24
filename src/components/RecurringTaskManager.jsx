@@ -563,59 +563,60 @@ function RecurringTaskForm({ onClose }) {
               rows={3}
             />
           </div>
+          <div className="grid grid-cols-3 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Assign to
+              </label>
+              <select
+                name="assignee"
+                value={formData.assignee}
+                onChange={handleChange}
+                className="form-select"
+              >
+                <option value="">Select assignee...</option>
+                <option value="john">John Doe</option>
+                <option value="jane">Jane Smith</option>
+                <option value="mike">Mike Johnson</option>
+                <option value="sarah">Sarah Wilson</option>
+              </select>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Assign to
-            </label>
-            <select
-              name="assignee"
-              value={formData.assignee}
-              onChange={handleChange}
-              className="form-select"
-            >
-              <option value="">Select assignee...</option>
-              <option value="john">John Doe</option>
-              <option value="jane">Jane Smith</option>
-              <option value="mike">Mike Johnson</option>
-              <option value="sarah">Sarah Wilson</option>
-            </select>
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Priority
+              </label>
+              <select
+                name="priority"
+                value={formData.priority}
+                onChange={handleChange}
+                className="form-select"
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="urgent">Urgent</option>
+              </select>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Priority
-            </label>
-            <select
-              name="priority"
-              value={formData.priority}
-              onChange={handleChange}
-              className="form-select"
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-              <option value="urgent">Urgent</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category
-            </label>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="form-select"
-            >
-              <option value="">Select category...</option>
-              <option value="development">Development</option>
-              <option value="design">Design</option>
-              <option value="research">Research</option>
-              <option value="marketing">Marketing</option>
-              <option value="support">Support</option>
-            </select>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="form-select"
+              >
+                <option value="">Select category...</option>
+                <option value="development">Development</option>
+                <option value="design">Design</option>
+                <option value="research">Research</option>
+                <option value="marketing">Marketing</option>
+                <option value="support">Support</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -626,7 +627,7 @@ function RecurringTaskForm({ onClose }) {
           Recurrence Pattern
         </h3>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Frequency *
@@ -672,6 +673,19 @@ function RecurringTaskForm({ onClose }) {
               className="form-input"
             />
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Start Date *
+            </label>
+            <input
+              type="date"
+              name="startDate"
+              value={formData.startDate}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
         </div>
 
         {formData.frequency === "weekly" && (
@@ -697,20 +711,6 @@ function RecurringTaskForm({ onClose }) {
             </div>
           </div>
         )}
-
-        <div className="mt-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Start Date *
-          </label>
-          <input
-            type="date"
-            name="startDate"
-            value={formData.startDate}
-            onChange={handleChange}
-            className="form-input"
-            required
-          />
-        </div>
       </div>
 
       {/* End Condition */}
@@ -719,7 +719,7 @@ function RecurringTaskForm({ onClose }) {
           End Condition
         </h3>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-3">
           <div className="flex items-center space-x-3">
             <input
               type="radio"
@@ -731,7 +731,7 @@ function RecurringTaskForm({ onClose }) {
               className="form-radio"
             />
             <label htmlFor="never" className="text-sm text-gray-700">
-              Never end
+              Never End
             </label>
           </div>
 
@@ -746,7 +746,7 @@ function RecurringTaskForm({ onClose }) {
               className="form-radio"
             />
             <label htmlFor="after" className="text-sm text-gray-700">
-              End after
+              End After
             </label>
             {formData.endConditionType === "after" && (
               <input
@@ -775,7 +775,7 @@ function RecurringTaskForm({ onClose }) {
               className="form-radio"
             />
             <label htmlFor="on" className="text-sm text-gray-700">
-              End on
+              End On
             </label>
             {formData.endConditionType === "on" && (
               <input
@@ -791,7 +791,7 @@ function RecurringTaskForm({ onClose }) {
       </div>
 
       {/* Form Actions */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+      <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
         <button type="button" className="btn btn-secondary" onClick={onClose}>
           Cancel
         </button>
@@ -894,7 +894,7 @@ function EditRecurrenceModal({ task, onClose, onSave }) {
               Frequency Settings
             </h4>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
               <div>
                 <label
                   htmlFor="frequency"
@@ -1156,7 +1156,7 @@ function EditRecurrenceModal({ task, onClose, onSave }) {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:justify-end pt-4 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row gap-3 sm:justify-between pt-4 border-t border-gray-200">
             <button
               type="button"
               className="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center"

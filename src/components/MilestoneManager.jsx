@@ -124,18 +124,21 @@ export default function MilestoneManager() {
                   >
                     {milestone.priority.toUpperCase()} PRIORITY
                   </span>
+
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                     {milestone.milestoneType.toUpperCase()}
                   </span>
-                  <span className="text-sm text-gray-500">
-                    Assigned: {milestone.assignedTo}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    Due: {new Date(milestone.dueDate).toLocaleDateString()}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    👁️ {milestone.visibility}
-                  </span>
+                  <div className="mt-2 flex flex-col-3 gap-4">
+                    <span className="text-sm text-gray-500">
+                      Assigned: {milestone.assignedTo}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      Due: {new Date(milestone.dueDate).toLocaleDateString()}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      👁️ {milestone.visibility}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -205,9 +208,9 @@ export default function MilestoneManager() {
               </div>
             </div>
 
-            <div className="flex items-center justify-end space-x-3 mt-4 pt-4 border-t border-gray-200">
-              <button className="btn btn-secondary btn-sm">Edit</button>
-              <button className="btn btn-primary btn-sm">View Details</button>
+            <div className="flex items-center justify-between space-x-3 mt-4 pt-4 border-t border-gray-200">
+              <button className="btn btn-secondary btn-md">Edit</button>
+              <button className="btn btn-primary btn-md">View Details</button>
             </div>
           </div>
         ))}
@@ -349,85 +352,86 @@ export default function MilestoneManager() {
                       </label>
                     </div>
                   </div>
-
-                  <div className="form-group">
-                    <label
-                      htmlFor="milestoneType"
-                      className="form-label flex items-center gap-2"
-                    >
-                      <svg
-                        className="w-4 h-4 text-purple-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                  <div className="grid grid-cols-3 gap-6">
+                    <div className="form-group">
+                      <label
+                        htmlFor="milestoneType"
+                        className="form-label flex items-center gap-2"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                        />
-                      </svg>
-                      Milestone Type
-                    </label>
-                    <select id="milestoneType" className="form-select">
-                      <option value="standalone">
-                        🎯 Standalone Milestone
-                      </option>
-                      <option value="linked">🔗 Linked to Tasks</option>
-                    </select>
-                  </div>
+                        <svg
+                          className="w-4 h-4 text-purple-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                          />
+                        </svg>
+                        Milestone Type
+                      </label>
+                      <select id="milestoneType" className="form-select">
+                        <option value="standalone">
+                          🎯 Standalone Milestone
+                        </option>
+                        <option value="linked">🔗 Linked to Tasks</option>
+                      </select>
+                    </div>
 
-                  <div className="form-group">
-                    <label
-                      htmlFor="dueDate"
-                      className="form-label flex items-center gap-2"
-                    >
-                      <svg
-                        className="w-4 h-4 text-red-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    <div className="form-group">
+                      <label
+                        htmlFor="dueDate"
+                        className="form-label flex items-center gap-2"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      Due Date*
-                    </label>
-                    <input type="date" id="dueDate" className="form-input" />
-                  </div>
+                        <svg
+                          className="w-4 h-4 text-red-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                        Due Date*
+                      </label>
+                      <input type="date" id="dueDate" className="form-input" />
+                    </div>
 
-                  <div className="form-group">
-                    <label
-                      htmlFor="assignedTo"
-                      className="form-label flex items-center gap-2"
-                    >
-                      <svg
-                        className="w-4 h-4 text-green-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    <div className="form-group">
+                      <label
+                        htmlFor="assignedTo"
+                        className="form-label flex items-center gap-2"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        />
-                      </svg>
-                      Assigned To
-                    </label>
-                    <select id="assignedTo" className="form-select">
-                      <option value="Current User">👤 Current User</option>
-                      <option value="John Smith">👨‍💼 John Smith</option>
-                      <option value="Sarah Wilson">👩‍💼 Sarah Wilson</option>
-                      <option value="Mike Johnson">👨‍💻 Mike Johnson</option>
-                      <option value="Emily Davis">👩‍💻 Emily Davis</option>
-                    </select>
+                        <svg
+                          className="w-4 h-4 text-green-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
+                        Assigned To
+                      </label>
+                      <select id="assignedTo" className="form-select">
+                        <option value="Current User">👤 Current User</option>
+                        <option value="John Smith">👨‍💼 John Smith</option>
+                        <option value="Sarah Wilson">👩‍💼 Sarah Wilson</option>
+                        <option value="Mike Johnson">👨‍💻 Mike Johnson</option>
+                        <option value="Emily Davis">👩‍💻 Emily Davis</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 
@@ -454,7 +458,7 @@ export default function MilestoneManager() {
                       Link to Tasks
                     </label>
                     <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-4">
-                      <div className="space-y-3">
+                      <div className="grid grid-cols-4 gap-2">
                         <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-200 cursor-pointer group">
                           <input
                             type="checkbox"
@@ -636,7 +640,7 @@ export default function MilestoneManager() {
                       Collaborators
                     </label>
                     <div className="bg-gradient-to-br from-teal-50 to-cyan-50 border border-teal-200 rounded-xl p-4">
-                      <div className="space-y-3">
+                      <div className="grid grid-cols-3 gap-2">
                         <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-teal-300 hover:bg-teal-50 transition-all duration-200 cursor-pointer group">
                           <input
                             type="checkbox"
@@ -755,7 +759,7 @@ export default function MilestoneManager() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-4 mt-10 pt-8 border-t-2 border-gray-100">
+              <div className="flex items-center justify-between gap-4 mt-10 pt-8 border-t-2 border-gray-100">
                 <button
                   type="button"
                   className="btn btn-secondary px-8 py-3 text-sm font-semibold"
