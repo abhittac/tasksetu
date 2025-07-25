@@ -404,8 +404,8 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
         {/* Compact Content */}
         <div className="lg:col-span-3">
           <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-              {/* Delivery Preferences */}
-              {activeSection === "delivery" && (
+            {/* Delivery Preferences */}
+            {activeSection === "delivery" && (
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-lg">📨</span>
@@ -455,7 +455,7 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
               )}
 
               {/* Due Date Reminders */}
-              {activeSection === "reminders" && (
+            {activeSection === "reminders" && (
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-lg">⏰</span>
@@ -550,7 +550,7 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
               )}
 
               {/* Advanced Settings */}
-              {activeSection === "advanced" && (
+            {activeSection === "advanced" && (
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-lg">⚙️</span>
@@ -620,7 +620,6 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                   </div>
                 </div>
               )}
-            </div>
           </div>
         </div>
       </div>
