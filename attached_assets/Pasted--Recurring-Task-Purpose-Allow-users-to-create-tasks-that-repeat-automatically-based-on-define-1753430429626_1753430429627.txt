@@ -1,0 +1,94 @@
+
+Recurring Task
+🔹 Purpose:
+Allow users to create tasks that repeat automatically based on defined recurrence rules — reducing manual effort for repetitive workflows like daily check-ins, weekly reports, monthly reviews, etc.
+
+🧩 Where Recurring Logic Appears
+📍 Task Creation Modal
+•	Section: “Make this a recurring task”
+o	Checkbox: “Repeat this task”
+	When checked, recurrence options appear
+
+📋 Recurrence Options (Modal or Inline Expandable Section)
+Field	Type	Behavior/Options
+Frequency	Dropdown	Daily, Weekly, Monthly, Custom
+Repeat Every	Input	Numeric (e.g. every 2 days, every 3 weeks)
+Repeat On (for weekly)	Checkboxes	Mon, Tue, Wed...
+Start Date	Date	Defaults to today
+End Condition	Radio	• Never Ends
+• Ends after N occurrences
+• Ends by specific date
+Time of Creation	Optional	If defined, system will use this to auto-create task on that time (else default)
+
+🤖 System Behaviour
+🔄 How It Works
+•	System generates a new task based on the recurrence pattern.
+•	Each recurrence is treated as a new standalone task.
+•	The new task copies fields like: name, description, assignee, priority, tags, etc.
+•	It auto-updates the due date based on pattern.
+
+🔐 Permissions & Editing
+User Type	Rights
+Task Creator	Can create, edit, or stop recurrence
+Assignee	Cannot change recurrence, but can edit individual task instance
+Admin	Can view all recurrences across company (if needed for reports or corrections)
+
+🧠 System Data Model (Backend)
+RecurringTaskMaster Table
+Field Name	Description
+id	Unique ID
+creator_user_id	Who created this pattern
+base_task_id	The task from which recurrence started
+frequency	Daily / Weekly / Monthly / Custom
+repeat_every	Interval number
+repeat_on_days	If weekly, which days (comma list)
+start_date	From when recurrence begins
+end_condition_type	Never / AfterN / EndDate
+end_value	e.g. 5 (occurrences) or 2025-12-31
+active	Boolean
+
+🔔 Notifications
+•	When a new instance is created via recurrence logic:
+o	The assignee receives a normal task creation notification.
+o	If collaborators were defined in base task, they're notified too.
+
+🖼️ UX Considerations
+Area	Behavior
+Calendar View	Only upcoming instance(s) visible, not all future repeats
+Task List	Shows each instance as a separate task with recurrence icon (🔁)
+Task Detail View	Shows “Recurring from Task #1234” if it’s part of a recurring pattern
+Manage Recurring Tasks	New tab under "My Tasks" or "Company Tasks" to list and manage patterns
+Editing a Recurring Task	Only the master pattern can be edited for future instances
+Stopping Recurrence	Button: "Stop recurrence" – removes only future generation, not past
+
+⚠️ Edge Cases & Fail Safes
+Case	Handling
+User deletes master task	Prompt: “This will stop recurrence. Are you sure?”
+Company disables recurrence	Existing ones remain, but no new ones can be created
+Assignee changed mid-recurring	Only affects future instances post-change
+Weekend creation logic (optional)	Provide toggle: “Skip weekends” or “Adjust to next business day”
+
+✅ Example Use Cases
+Use Case	How It Works
+Weekly Team Sync Task	Repeats every Monday at 10:00 AM with same assignees & forms
+Monthly Vendor Invoice Audit	Repeats on 1st of every month, ends after 12 cycles
+Daily Stand-up	Task created every weekday, due same day, auto-closed if not updated
+Annual Self-Appraisal Form	Recurs every year with a form attached, sent to employee email
+
+🎯 If Task Type is selected as “Recurring”
+•	Due Date should become blank and un-editable.
+•	Somewhere near task type, a pop-up/ modal/card should open.
+•	Showing Calendar – multi select dates.
+•	Drop Down showing Dates “Every – DDL” of month.
+•	Drop Down showing days “Every – DDL” of week.
+•	Only one of the above three should be selectable. 
+•	System captures this information which will be used further in the system.
+
+Priority	Default Days to Due Date (T+x)
+Low	T + 30 days
+Medium	T + 14 days
+High	T + 7 days
+Critical	T + 2 days
+•	T = Today's date (date of task creation)
+•	If the user selects a Due Date manually, it overrides the default logic.
+
