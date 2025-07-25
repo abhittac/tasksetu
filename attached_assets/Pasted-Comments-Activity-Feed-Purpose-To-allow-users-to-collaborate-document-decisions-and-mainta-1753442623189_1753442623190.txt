@@ -1,0 +1,88 @@
+Comments & Activity Feed
+🎯 Purpose:
+To allow users to collaborate, document decisions, and maintain a transparent history of actions on every task. The comments and activity feed should be available for all the tasks, sub-tasks. 
+
+🔄 Where Accessible:
+•	Task View Modal
+Always visible in a right-hand collapsible section (like Slack or Notion).
+Tabs:
+o	🗨️ Comments
+o	🕓 Activity Feed
+
+🗨️ Comments
+Aspect	Description
+Input Box	Always shown at bottom of Comments tab. Placeholder: “Leave a comment…”
+Mentions	Use @ to mention any user in the workspace. Autocomplete supports names. Names should come from the user master for that company.
+Formatting	Rich text support (Bold, Italic, Bullets, Code block, Line breaks)
+Attachments	Drag & drop or click to attach (images, docs, etc.) within a comment
+Emojis	Emoji picker and reaction support
+Edit/Delete	Only allowed for own comments. Deleted comments show: “This comment was deleted.”
+Notification	Mentioned users and assignee get notified via app and/or email
+Timestamp	Each comment shows user name and time (hover to see exact datetime)
+
+🕓 Activity Feed
+Action Type	Tracked
+Task Created	“John created this task”
+Field Updated	“Due Date changed from X to Y”
+Subtask Added	“Subtask ‘X’ added by Jane”
+Status/Priority Change	“Status updated to ‘In Progress’”
+Assignment Change	“Task assigned to Sarah by Admin”
+Comment Added/Edited	“Jane commented...” (links to comment)
+File Attached/Removed	“Report.docx added by Anil”
+Recurrence Updated	“Recurring pattern updated”
+Form Attached/Submitted	“Form ‘Vendor Review’ submitted”
+Task Completed/Reopened	“Task marked Complete by Ajay” / “Reopened by Neha”
+All activities are read-only and timestamped, with the username highlighted.
+📎 Attachments & Links
+📍 Location:
+•	In the Task Detail (center or top section), there’s a tab or attachment area where all files and links are managed.
+•	Attachments added via:
+o	Dedicated "Attach Files" button.
+o	Drag & drop into task body or comment.
+o	Date Time & User captured for identification.
+
+
+📂 Attachment Features
+Feature	Behavior
+File Types Allowed	Images (JPG, PNG), Docs (PDF, DOCX), Sheets, Presentations, ZIPs, etc. – File type configurable at org level by the Admin
+Upload Limits	Up to 02 MB per file (configurable at org level by The Admin)
+Drag & Drop Support	Across all supported screens
+Inline Preview	Images and PDFs open inside a lightbox. Others download by default.
+Delete Option	Only by uploader or task owner/admin
+Versioning (Future)	To track changes to same-named files
+
+🔗 Links
+Feature	Behavior
+Add Link	Click “+ Add Link” → Paste URL & optional title
+Preview	Smart previews for known domains (YouTube, Google Docs, Figma, etc.)
+Deletion	Only link adder or task owner can remove
+Uses	External docs, dashboards, related tasks, vendor portals, etc.
+
+🔐 Permissions
+Role	Comments	Activity Feed	Attachments & Links
+Assignee	View/Add/Edit Own	View All	Add/Remove Own
+Collaborator	View/Add	View All	Add (not remove)
+Viewer	View Only	View Only	View Only
+Admin	Full Rights	Full Rights	Full Rights
+
+⚠️ Edge Cases / Fail Safes
+Case	Handling
+Link contains malware	Virus scan integration (future enhancement)
+User deletes file in comment	File stays if referenced in other places, else removed
+Mentioned user removed from task	They’ll still see the comment but won't get further updates
+________________________________________
+🧠 UX Enhancements (Modern Experience)
+•	Collapsible Side Panel: To focus on task vs discussion.
+•	Infinite Scroll with Lazy Load: For long comment/activity threads.
+•	Live Updates: Comment added by other users appear instantly (socket-based).
+•	Comment Bookmarking (Future): For key decisions.
+•	Filters in Activity Feed: View only status updates, comments, etc.
+
+✅ Sample Scenario
+Imagine a user adds a comment:
+@Ritu please attach the final pricing sheet. See draft below.
+(attaches file)
+Then the assignee changes the due date.
+In activity feed:
+•	“Ritu was mentioned in a comment”
+•	“Due date updated from Apr 30 to May 2”

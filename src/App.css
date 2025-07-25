@@ -1333,7 +1333,7 @@
 
       .modal-actions {
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         gap: 0.75rem;
         margin-top: 1.5rem;
         padding-top: 1rem;

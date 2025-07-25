@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import useTasksStore from "../stores/tasksStore";
 
 export default function NotificationCenter() {
-  const { 
-    notifications, 
+  const {
+    notifications,
     notificationSettings,
     markNotificationRead,
     markAllNotificationsRead,
     deleteNotification,
     updateNotificationSettings,
-    checkReminders 
+    checkReminders,
   } = useTasksStore();
 
   const [staticNotifications] = useState([
@@ -562,7 +562,8 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                               <span>⏱️</span>
                               Remind me:
                             </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+                            <div className="grid grid-cols-3 md:grid-cols-3 gap-3">
                               {[
                                 {
                                   days: 7,
@@ -579,17 +580,28 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                                   label: "1 day before",
                                   desc: "Last minute",
                                 },
-                              ].map(({ days, label, desc }) => (
-                                <label key={days} className="relative">
-                                  <input
-                                    type="checkbox"
-                                    checked={(settings.dueDateReminders?.daysBeforeDue || []).includes(
-                                      days,
-                                    )}
-                                    onChange={(e) => {
-                                      if (e.target.checked) {
-                                        const currentDays = settings.dueDateReminders?.daysBeforeDue || [];
-                                        const newDays = [...currentDays, days].sort((a, b) => b - a);
+                              ].map(({ days, label, desc }) => {
+                                const isSelected =
+                                  settings.dueDateReminders?.daysBeforeDue?.includes(
+                                    days,
+                                  );
+                                return (
+                                  <label key={days} className="relative block">
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={(e) => {
+                                        const currentDays =
+                                          settings.dueDateReminders
+                                            ?.daysBeforeDue || [];
+                                        const newDays = e.target.checked
+                                          ? [...currentDays, days].sort(
+                                              (a, b) => b - a,
+                                            )
+                                          : currentDays.filter(
+                                              (d) => d !== days,
+                                            );
+
                                         onSettingsChange({
                                           ...settings,
                                           dueDateReminders: {
@@ -597,51 +609,52 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                                             daysBeforeDue: newDays,
                                           },
                                         });
-                                      } else {
-                                        const currentDays = settings.dueDateReminders?.daysBeforeDue || [];
-                                        const newDays = currentDays.filter((d) => d !== days);
-                                        onSettingsChange({
-                                          ...settings,
-                                          dueDateReminders: {
-                                            ...settings.dueDateReminders,
-                                            daysBeforeDue: newDays,
-                                          },
-                                        });
-                                      }
-                                    }}
-                                    className="sr-only peer"
-                                  />
-                                  <div className="bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 peer-checked:border-orange-500 peer-checked:bg-orange-50 hover:border-orange-300">
-                                    <div className="flex items-center justify-between">
-                                      <div>
-                                        <div className="font-medium text-gray-900">
-                                          {label}
+                                      }}
+                                      className="sr-only"
+                                    />
+
+                                    <div
+                                      className={`border-2 bg-white rounded-xl p-4 transition-all cursor-pointer ${
+                                        isSelected
+                                          ? "border-orange-500 "
+                                          : "border-gray-200 hover:border-orange-300"
+                                      }`}
+                                    >
+                                      <div className="flex items-center justify-between">
+                                        <div>
+                                          <div className="font-medium text-gray-900">
+                                            {label}
+                                          </div>
+                                          <div className="text-sm text-gray-600">
+                                            {desc}
+                                          </div>
                                         </div>
-                                        <div className="text-sm text-gray-600">
-                                          {desc}
+                                        <div
+                                          className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
+                                            isSelected
+                                              ? "border-orange-500 bg-orange-500"
+                                              : "border-gray-300"
+                                          }`}
+                                        >
+                                          {isSelected && (
+                                            <svg
+                                              className="w-3 h-3 text-white"
+                                              fill="currentColor"
+                                              viewBox="0 0 20 20"
+                                            >
+                                              <path
+                                                fillRule="evenodd"
+                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                clipRule="evenodd"
+                                              />
+                                            </svg>
+                                          )}
                                         </div>
-                                      </div>
-                                      <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:border-orange-500 peer-checked:bg-orange-500 flex items-center justify-center">
-                                        {(settings.dueDateReminders?.daysBeforeDue || []).includes(
-                                          days,
-                                        ) && (
-                                          <svg
-                                            className="w-3 h-3 text-white"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                          >
-                                            <path
-                                              fillRule="evenodd"
-                                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                              clipRule="evenodd"
-                                            />
-                                          </svg>
-                                        )}
                                       </div>
                                     </div>
-                                  </div>
-                                </label>
-                              ))}
+                                  </label>
+                                );
+                              })}
                             </div>
                           </div>
 
@@ -700,7 +713,7 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                       <p className="text-gray-600 mb-4">
                         Set times when you don't want to receive notifications
                       </p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Start time
@@ -732,7 +745,7 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                       <p className="text-gray-600 mb-4">
                         Receive summary notifications instead of individual ones
                       </p>
-                      <div className="space-y-3">
+                      <div className="space-y-3 flex justify-between items-center">
                         <label className="flex items-center gap-3 cursor-pointer">
                           <input
                             type="radio"
@@ -774,7 +787,7 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                       <p className="text-gray-600 mb-4">
                         Only receive notifications for specific priority levels
                       </p>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="flex justify-between">
                         {[
                           { level: "low", color: "green", label: "Low" },
                           { level: "medium", color: "yellow", label: "Medium" },
