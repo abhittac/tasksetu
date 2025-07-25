@@ -823,8 +823,9 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
                           : "bg-green-100 text-green-800"
                   }`}
                 >
-                  {task.priority?.charAt(0).toUpperCase() +
-                    task.priority?.slice(1)}
+                  {task.priority ? 
+                    task.priority.charAt(0).toUpperCase() + task.priority.slice(1) 
+                    : "Medium"}
                 </span>
               </div>
             </div>
