@@ -2232,11 +2232,22 @@ function SubtasksPanel({ subtasks, onCreateSubtask, parentTask, currentUser }) {
                     </span>
 
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate">
+                      <div className={`text-sm font-medium truncate ${
+                        subtask.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'
+                      }`}>
                         {subtask.title}
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <span>Due: {subtask.dueDate}</span>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className={`${
+                          new Date(subtask.dueDate) < new Date() && subtask.status !== 'completed'
+                            ? 'text-red-600 font-medium'
+                            : 'text-gray-500'
+                        }`}>
+                          Due: {subtask.dueDate}
+                          {new Date(subtask.dueDate) < new Date() && subtask.status !== 'completed' && (
+                            <span className="ml-1">⚠️ Overdue</span>
+                          )}
+                        </span>
                         <SubtaskStatusDropdown
                           subtask={subtask}
                           onUpdate={handleUpdateSubtask}
@@ -2438,10 +2449,15 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value={currentUser.name}>Myself</option>
-              <option value="John Smith">John Smith</option>
-              <option value="Sarah Wilson">Sarah Wilson</option>
-              <option value="Mike Johnson">Mike Johnson</option>
-              <option value="Emily Davis">Emily Davis</option>
+              {/* Only show team members if user has permission to assign to others */}
+              {(currentUser.role === "admin" || currentUser.role === "team") && (
+                <>
+                  <option value="John Smith">John Smith</option>
+                  <option value="Sarah Wilson">Sarah Wilson</option>
+                  <option value="Mike Johnson">Mike Johnson</option>
+                  <option value="Emily Davis">Emily Davis</option>
+                </>
+              )}
             </select>
 
             <select
@@ -2457,7 +2473,7 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             <input
               type="date"
               name="dueDate"
@@ -2478,22 +2494,86 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
               <option value="blocked">Blocked</option>
               <option value="completed">Completed</option>
             </select>
+
+            <select
+              name="visibility"
+              value={formData.visibility}
+              onChange={handleChange}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              disabled={currentUser.role === "individual"}
+            >
+              <option value="private">Private</option>
+              <option value="team">Team</option>
+              {currentUser.role === "admin" && <option value="company">Company</option>}
+            </select>
           </div>
 
-          {/* Notes */}
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Optional notes..."
-            rows="2"
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none"
-          />
+          {/* Notes/Description */}
+          <div>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Add notes or description... (supports rich text)"
+              rows="3"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              onKeyDown={(e) => {
+                if (e.key === 'Tab') {
+                  e.preventDefault();
+                  // Move focus to next field or submit
+                  const form = e.target.form;
+                  const elements = Array.from(form.elements);
+                  const currentIndex = elements.indexOf(e.target);
+                  const nextElement = elements[currentIndex + 1];
+                  if (nextElement && nextElement.type !== 'submit') {
+                    nextElement.focus();
+                  }
+                }
+              }}
+            />
+            <div className="text-xs text-gray-500 mt-1">
+              Use Tab to navigate fields, Enter to submit form
+            </div>
+          </div>
 
-          {/* Compact Inheritance Info */}
-          <div className="bg-blue-50 p-2 rounded-md">
-            <div className="text-xs text-blue-700">
-              Inherits: {parentTask.visibility || "Private"} • Parent Due: {parentTask.dueDate}
+          {/* Attachments Section */}
+          <div className="bg-gray-50 p-3 rounded-md border border-dashed border-gray-300">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm font-medium text-gray-700">📎 Attachments</span>
+              <span className="text-xs text-gray-500">(Optional)</span>
+            </div>
+            <div className="text-xs text-gray-500">
+              Drag & drop files here or{" "}
+              <button 
+                type="button" 
+                className="text-blue-600 hover:text-blue-800 underline"
+                onClick={() => alert("File upload functionality would be implemented here")}
+              >
+                browse files
+              </button>
+            </div>
+          </div>
+
+          {/* Enhanced Inheritance Info */}
+          <div className="bg-blue-50 border border-blue-200 p-3 rounded-md">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-blue-600 text-sm">🔗</span>
+              <span className="text-xs font-medium text-blue-800">Inheritance Rules</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs text-blue-700">
+              <div>
+                <span className="font-medium">Visibility:</span> Inherits "{parentTask.visibility || "Private"}"
+                {currentUser.role !== "individual" && " (can override)"}
+              </div>
+              <div>
+                <span className="font-medium">Suggested Due:</span> {parentTask.dueDate}
+              </div>
+              <div>
+                <span className="font-medium">Priority Impact:</span> Changes due date automatically
+              </div>
+              <div>
+                <span className="font-medium">Max Length:</span> Title 60 chars
+              </div>
             </div>
           </div>
         </div>
