@@ -513,7 +513,7 @@ function RecurringTaskForm({ onClose }) {
       ? currentDays.filter((d) => d !== day)
       : [...currentDays, day];
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       repeatOnDays: updatedDays,
     }));
@@ -700,8 +700,8 @@ function RecurringTaskForm({ onClose }) {
                   type="button"
                   className={`px-3 py-1 text-sm rounded-md border transition-colors ${
                     formData.repeatOnDays.includes(day)
-                      ? "bg-primary-600 text-white border-primary-600"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
                   }`}
                   onClick={() => handleDayToggle(day)}
                 >
@@ -827,7 +827,7 @@ function EditRecurrenceModal({ task, onClose, onSave }) {
       ? currentDays.filter((d) => d !== day)
       : [...currentDays, day];
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       repeatOnDays: updatedDays,
     }));
