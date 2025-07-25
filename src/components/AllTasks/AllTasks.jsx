@@ -931,7 +931,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                         Standard one-time task
                       </div>
                     </div>
-                  </button                  <button
+                  </button>
+                  <button
                     className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
                     onClick={() => handleTaskTypeSelect("recurring")}
                   >
