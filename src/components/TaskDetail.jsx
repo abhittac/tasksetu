@@ -823,8 +823,9 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
                           : "bg-green-100 text-green-800"
                   }`}
                 >
-                  {task.priority ? 
-                    task.priority.charAt(0).toUpperCase() + task.priority.slice(1) 
+                  {task.priority
+                    ? task.priority.charAt(0).toUpperCase() +
+                      task.priority.slice(1)
                     : "Medium"}
                 </span>
               </div>
@@ -2920,9 +2921,7 @@ function SubtaskSlideUpPanel({
           <div className="relative flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
-                <span className="text-sm">
-                  {getStatusIcon(subtask.status)}
-                </span>
+                <span className="text-sm">{getStatusIcon(subtask.status)}</span>
               </div>
               <div>
                 <h3 className="text-sm font-bold text-gray-900">
@@ -3018,9 +3017,7 @@ function SubtaskSlideUpPanel({
                   <div className="w-5 h-5 bg-emerald-100 rounded flex items-center justify-center">
                     <span className="text-emerald-600 text-xs">🎯</span>
                   </div>
-                  <h4 className="text-sm font-medium text-gray-900">
-                    Status
-                  </h4>
+                  <h4 className="text-sm font-medium text-gray-900">Status</h4>
                 </div>
                 {isEditing ? (
                   <select
@@ -3073,7 +3070,9 @@ function SubtaskSlideUpPanel({
                   <div
                     className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-xs font-medium ${getPriorityColor(subtask.priority)}`}
                   >
-                    <span className="capitalize">{subtask.priority}</span>
+                    <span className="capitalize">
+                      {subtask.priority || "Low"}{" "}
+                    </span>
                   </div>
                 )}
               </div>
