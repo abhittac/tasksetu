@@ -3385,32 +3385,27 @@ function SubtaskDetailPanel({
                 </p>
               )}
             </div>
-
-            {/* Status */}
+            {/* Due Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
+                Due Date
               </label>
               {isEditing ? (
-                <select
-                  value={formData.status}
+                <input
+                  type="date"
+                  value={formData.dueDate}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, status: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      dueDate: e.target.value,
+                    }))
                   }
-                  className="form-select w-full"
-                >
-                  <option value="OPEN">Open</option>
-                  <option value="INPROGRESS">In Progress</option>
-                  <option value="DONE">Done</option>
-                  <option value="ONHOLD">On Hold</option>
-                  <option value="CANCELLED">Cancelled</option>
-                </select>
+                  className="form-input w-full"
+                />
               ) : (
-                <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(subtask.status)}`}
-                >
-                  {subtask.status}
-                </span>
+                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
+                  {subtask.dueDate}
+                </p>
               )}
             </div>
           </div>
@@ -3445,28 +3440,31 @@ function SubtaskDetailPanel({
                 </span>
               )}
             </div>
-
-            {/* Due Date */}
+            {/* Status */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Due Date
+                Status
               </label>
               {isEditing ? (
-                <input
-                  type="date"
-                  value={formData.dueDate}
+                <select
+                  value={formData.status}
                   onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      dueDate: e.target.value,
-                    }))
+                    setFormData((prev) => ({ ...prev, status: e.target.value }))
                   }
-                  className="form-input w-full"
-                />
+                  className="form-select w-full"
+                >
+                  <option value="OPEN">Open</option>
+                  <option value="INPROGRESS">In Progress</option>
+                  <option value="DONE">Done</option>
+                  <option value="ONHOLD">On Hold</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
               ) : (
-                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">
-                  {subtask.dueDate}
-                </p>
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(subtask.status)}`}
+                >
+                  {subtask.status}
+                </span>
               )}
             </div>
           </div>
