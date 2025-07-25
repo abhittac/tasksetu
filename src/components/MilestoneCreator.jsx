@@ -81,6 +81,10 @@ export default function MilestoneCreator({
       newErrors.dueDate = "Due date is required";
     }
 
+    if (formData.milestoneType === "linked" && formData.linkedTasks.length === 0) {
+      newErrors.linkedTasks = "Please select at least one task to link to this milestone";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -361,7 +365,7 @@ export default function MilestoneCreator({
           </div>
         </div>
 
-        {/* Linked Tasks Section */}
+        {/* Linked Tasks Section - Only show when milestone type is "linked" */}
         {formData.milestoneType === "linked" && (
           <div className="form-group">
             <label className="form-label flex items-center gap-2">
@@ -378,7 +382,7 @@ export default function MilestoneCreator({
                   d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
                 />
               </svg>
-              Link to Tasks
+              Link to Tasks *
             </label>
             <div className="bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 rounded-xl p-4">
               <div className="space-y-3">
@@ -402,7 +406,16 @@ export default function MilestoneCreator({
                   </label>
                 ))}
               </div>
+              <p className="text-xs text-indigo-600 mt-3 flex items-center gap-1 bg-white/50 p-2 rounded-lg">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Select tasks/subtasks that must be completed before this milestone can be achieved
+              </p>
             </div>
+            {errors.linkedTasks && (
+              <span className="text-red-500 text-sm">{errors.linkedTasks}</span>
+            )}
           </div>
         )}
 

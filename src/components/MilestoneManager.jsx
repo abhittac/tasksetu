@@ -7,6 +7,7 @@ const getStatusColor = (status) => {
     in_progress: "bg-blue-100 text-blue-800",
     completed: "bg-green-100 text-green-800",
     overdue: "bg-red-100 text-red-800",
+    dependencies_complete: "bg-yellow-100 text-yellow-800 animate-pulse",
   };
   return colors[status] || "bg-gray-100 text-gray-800";
 };
@@ -68,6 +69,56 @@ export default function MilestoneManager() {
 
   const [showAddForm, setShowAddForm] = useState(false);
 
+  // Handle marking milestone as achieved
+  const handleMarkAchieved = (milestoneId) => {
+    setMilestones(prevMilestones =>
+      prevMilestones.map(milestone =>
+        milestone.id === milestoneId
+          ? { ...milestone, status: "completed", progress: 100 }
+          : milestone
+      )
+    );
+  };
+
+  // Calculate milestone progress based on linked tasks
+  const calculateMilestoneProgress = (milestone) => {
+    if (milestone.milestoneType === "standalone") {
+      return milestone.progress;
+    }
+    
+    if (milestone.tasks && milestone.tasks.length > 0) {
+      const completedTasks = milestone.tasks.filter(task => task.completed).length;
+      return Math.round((completedTasks / milestone.tasks.length) * 100);
+    }
+    
+    return 0;
+  };
+
+  // Update milestone progress automatically
+  React.useEffect(() => {
+    setMilestones(prevMilestones =>
+      prevMilestones.map(milestone => {
+        const newProgress = calculateMilestoneProgress(milestone);
+        let newStatus = milestone.status;
+        
+        // Auto-update status based on progress for linked milestones
+        if (milestone.milestoneType === "linked") {
+          if (newProgress === 100 && milestone.status !== "completed") {
+            newStatus = "dependencies_complete"; // Visual cue that dependencies are done
+          } else if (newProgress > 0 && newProgress < 100) {
+            newStatus = "in_progress";
+          }
+        }
+        
+        return {
+          ...milestone,
+          progress: newProgress,
+          status: newStatus
+        };
+      })
+    );
+  }, [milestones]);
+
   return (
     <div className="space-y-6 p-5 h-auto overflow-scroll">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -119,7 +170,15 @@ export default function MilestoneManager() {
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(milestone.status)}  mt-1`}
                   >
-                    {milestone.status.replace("_", " ").toUpperCase()}
+                    {milestone.status === "dependencies_complete" ? (
+                      <>
+                        <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-yellow-400 opacity-75 mr-1"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500 mr-1"></span>
+                        READY FOR ACHIEVEMENT
+                      </>
+                    ) : (
+                      milestone.status.replace("_", " ").toUpperCase()
+                    )}
                   </span>
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(milestone.priority)} mt-1`}
@@ -212,6 +271,17 @@ export default function MilestoneManager() {
 
             <div className="flex items-center justify-between space-x-3 mt-4 pt-4 border-t border-gray-200">
               <button className="btn btn-secondary btn-md">Edit</button>
+              {milestone.milestoneType === "linked" && milestone.progress === 100 && milestone.status !== "completed" && (
+                <button 
+                  className="btn btn-success btn-md flex items-center gap-2"
+                  onClick={() => handleMarkAchieved(milestone.id)}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Mark Achieved
+                </button>
+              )}
               <button className="btn btn-primary btn-md">View Details</button>
             </div>
           </div>

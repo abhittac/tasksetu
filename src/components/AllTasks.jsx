@@ -1044,7 +1044,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       title: milestoneData.title,
       assignee: milestoneData.assignee || "Current User",
       assigneeId: milestoneData.assigneeId || 1,
-      status: "OPEN",
+      status: milestoneData.milestoneType === "linked" ? "not_started" : "OPEN",
       priority: milestoneData.priority || "Medium",
       dueDate: milestoneData.dueDate || selectedDateForTask,
       category: "Milestone",
@@ -1060,6 +1060,22 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       milestoneType: milestoneData.milestoneType || "standalone",
       linkedTasks: milestoneData.linkedTasks || [],
       visibility: milestoneData.visibility || "private",
+      // For linked milestones, create mock task dependencies
+      tasks: milestoneData.milestoneType === "linked" && milestoneData.linkedTasks.length > 0 
+        ? milestoneData.linkedTasks.map(taskId => {
+            const taskNames = {
+              1: "UI Design Complete",
+              2: "Backend API Development", 
+              3: "Testing Phase",
+              4: "Deployment"
+            };
+            return {
+              id: taskId,
+              title: taskNames[taskId] || `Task ${taskId}`,
+              completed: false
+            };
+          })
+        : []
     };
 
     setTasks((prevTasks) => [...prevTasks, newTask]);
