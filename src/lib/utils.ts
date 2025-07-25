@@ -1,60 +1,51 @@
 
-export const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
+export const formatDate = (date: Date): string => {
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(date);
+};
+
+export const formatDateTime = (date: Date): string => {
+  return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  });
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date);
 };
 
-export const formatRelativeTime = (dateString: string): string => {
-  const date = new Date(dateString);
+export const formatDistanceToNow = (date: Date): string => {
   const now = new Date();
   const diffInMs = now.getTime() - date.getTime();
-  const diffInHours = diffInMs / (1000 * 60 * 60);
-  const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+  const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
-  if (diffInHours < 1) {
-    return 'Just now';
-  } else if (diffInHours < 24) {
-    return `${Math.floor(diffInHours)} hours ago`;
-  } else if (diffInDays < 7) {
-    return `${Math.floor(diffInDays)} days ago`;
-  } else {
-    return formatDate(dateString);
-  }
-};
-
-export const getInitials = (name: string): string => {
-  return name
-    .split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase();
-};
-
-export const generateId = (): number => {
-  return Date.now() + Math.floor(Math.random() * 1000);
-};
-
-export const truncateText = (text: string, maxLength: number): string => {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength) + '...';
+  if (diffInMinutes < 1) return 'just now';
+  if (diffInMinutes < 60) return `${diffInMinutes}m`;
+  if (diffInHours < 24) return `${diffInHours}h`;
+  if (diffInDays < 7) return `${diffInDays}d`;
+  return formatDate(date);
 };
 
 export const cn = (...classes: (string | undefined | null | false)[]): string => {
   return classes.filter(Boolean).join(' ');
 };
 
+export const generateId = (): string => {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+};
+
 export const debounce = <T extends (...args: any[]) => any>(
   func: T,
-  wait: number
+  delay: number
 ): ((...args: Parameters<T>) => void) => {
-  let timeout: NodeJS.Timeout;
-  
+  let timeoutId: NodeJS.Timeout;
   return (...args: Parameters<T>) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(null, args), wait);
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
   };
 };

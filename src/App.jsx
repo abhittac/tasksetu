@@ -1,22 +1,23 @@
-import React from "react";
-import { BrowserRouter } from 'react-router-dom';
+
+import React from 'react';
 import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 import { store } from './store';
 import AppRoutes from './routes/AppRoutes';
-import CreateTaskDrawer from './features/tasks/components/CreateTaskDrawer';
 import ToastNotification from './components/UI/ToastNotification';
-import "./App.css";
+import './App.css';
 
-export default function App() {
+function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
-        <div className="app">
+        <div className="App">
           <AppRoutes />
-          <CreateTaskDrawer />
           <ToastNotification />
         </div>
       </BrowserRouter>
     </Provider>
   );
 }
+
+export default App;

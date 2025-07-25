@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { useAppSelector, useAppDispatch } from '../store';
-import { setCurrentView, setShowCreateTaskDrawer } from '../features/ui/uiSlice';
+import { setShowCreateTaskDrawer } from '../features/ui/uiSlice';
 import Sidebar from '../components/Sidebar';
+import CreateTaskDrawer from '../features/tasks/components/CreateTaskDrawer';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -10,11 +11,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const dispatch = useAppDispatch();
-  const { currentView, showCreateTaskDrawer } = useAppSelector(state => state.ui);
-
-  const handleViewChange = (view: string) => {
-    dispatch(setCurrentView(view));
-  };
+  const { showCreateTaskDrawer } = useAppSelector(state => state.ui);
 
   const handleCreateTask = () => {
     dispatch(setShowCreateTaskDrawer(true));
@@ -22,14 +19,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <div className="app-layout">
-      <Sidebar
-        currentView={currentView}
-        onViewChange={handleViewChange}
-        onCreateTask={handleCreateTask}
-      />
+      <Sidebar onCreateTask={handleCreateTask} />
       <main className="main-content">
         {children}
       </main>
+      {showCreateTaskDrawer && <CreateTaskDrawer />}
     </div>
   );
 };
