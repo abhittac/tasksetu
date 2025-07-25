@@ -826,7 +826,6 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   });
 
   const [viewMode, setViewMode] = useState("grid");
-  const [sortBy, setSortBy] = useState("dueDate");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPriority, setFilterPriority] = useState("all");
 
