@@ -1,0 +1,46 @@
+
+📋 Fields in Sub-task Creation (from Modal or Inline Add)
+Field Name	Mandatory (M/O)	Default	Behavior
+Sub-task Name	M	New Sub-Task	Short name, max 60 chars. Appears inline, editable on click.
+Assigned To	M	Self	Searchable dropdown (single select). Self-assigned by default.
+Due Date	M	Based on priority	Pre-filled to parent due date unless priority overrides.
+Priority	O	Low	Low, Medium, High, Critical. Changes due date if not set manually.
+Status	M	To Do	To Do, In Progress, Blocked, Completed. Visual cue in list.
+Visibility	M	Inherit from Parent	Can override if company user.
+Notes/Description	O	–	Rich text editor for internal use.
+Attachments	O	–	Upload files or drag/drop.
+
+✏️ Sub-task Creation UX – Flow
+Step 1: User opens a Task (Task View screen)
+•	Sees Sub-tasks section
+•	Clicks on + Add Sub-task
+Step 2: Sub-task Input Modal or Inline Add opens
+•	User enters Sub-task Name
+•	Assigns user (search dropdown)
+•	Selects priority (optional)
+•	Due date auto-suggested based on priority and today's date (from backend config)
+•	Clicks Create
+Step 3: Sub-task appears under parent
+•	Collapsed by default (expandable)
+•	Assigned person gets notified
+•	If a collaborator was added in the parent, they also get update (if notification rules apply)
+
+🔁 Inheritance Logic
+Field	Inherits from Parent	Can Override?
+Visibility	Yes	Yes (for company users)
+Priority	No	Yes
+Due Date	Suggested from Parent	Yes
+Assignee	No	Yes
+
+🔐 Permissions
+Action	Self (Individual)	Company User	Company Admin
+Create Sub-task	✅	✅	✅
+Assign to others	❌	✅ (team only)	✅
+View sub-tasks	✅	✅	✅
+Edit Sub-task	✅ (if assigned)	✅ (if assigned/collaborator)	✅ (always)
+Delete Sub-task	✅ (if created)	✅ (if created)	✅
+🧠 User Friendliness Considerations
+•	Inline Quick Add: Mirrors Asana / Notion style – task appears instantly as you type.
+•	Click-to-edit fields: Task name, due date, and priority can be edited inline on hover.
+•	Visual Indicators: Overdue sub-tasks show in red, completed are struck-through.
+•	Keyboard Shortcuts: Allow Enter to add sub-task, Tab to move to next field.
