@@ -930,7 +930,7 @@ function EditRecurrenceModal({ task, onClose, onSave }) {
                   value={formData.repeatEvery}
                   onChange={handleChange}
                   min="1"
-                  max="365"```text
+                  max="365"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
                 />
               </div>
