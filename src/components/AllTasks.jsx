@@ -1675,59 +1675,15 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-nowrap">
-                        <div className="flex items-center space-x-3">
-                          <button
-                            className="text-gray-400 cursor-pointer hover:text-blue-600 transition-colors p-1"
-                            onClick={() => handleViewTask(task.id)}
-                            title="View task details"
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                              />
-                            </svg>
-                          </button>
-
-                          <button
-                            className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
-                            onClick={() => handleDeleteTask(task.id)}
-                            title="Delete Task"
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              />
-                            </svg>
-                          </button>
-
+                        <div className="flex items-center justify-center">
                           <TaskActionsDropdown
                             task={task}
+                            onView={() => handleViewTask(task.id)}
                             onCreateSubtask={() => handleAddSubtask(task.id)}
                             onSnooze={() => handleSnoozeTask(task.id)}
                             onMarkAsRisk={() => handleMarkAsRisk(task.id)}
                             onMarkAsDone={() => handleStatusChange(task.id, "DONE", true)}
+                            onDelete={() => handleDeleteTask(task.id)}
                           />
                         </div>
                       </td>
@@ -3973,7 +3929,7 @@ function TasksCalendarView({ tasks, onTaskClick, onClose }) {
 }
 
 // Task Actions Dropdown Component
-function TaskActionsDropdown({ task, onCreateSubtask, onSnooze, onMarkAsRisk, onMarkAsDone }) {
+function TaskActionsDropdown({ task, onCreateSubtask, onSnooze, onMarkAsRisk, onMarkAsDone, onView, onDelete }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -3998,11 +3954,55 @@ function TaskActionsDropdown({ task, onCreateSubtask, onSnooze, onMarkAsRisk, on
             <button
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
               onClick={() => {
+                onView();
+                setIsOpen(false);
+              }}
+            >
+              <svg
+                className="w-4 h-4 text-blue-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+              </svg>
+              <div>
+                <div className="font-medium">View</div>
+                <div className="text-xs text-gray-500">View will be same</div>
+              </div>
+            </button>
+
+            <button
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+              onClick={() => {
                 onCreateSubtask();
                 setIsOpen(false);
               }}
             >
-              <span className="text-green-500">🟢</span>
+              <svg
+                className="w-4 h-4 text-green-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
               <div>
                 <div className="font-medium">Create Sub-task</div>
                 <div className="text-xs text-gray-500">Task ke andar ek sub-task banata hai</div>
@@ -4016,7 +4016,19 @@ function TaskActionsDropdown({ task, onCreateSubtask, onSnooze, onMarkAsRisk, on
                 setIsOpen(false);
               }}
             >
-              <span className="text-yellow-500">⏸️</span>
+              <svg
+                className="w-4 h-4 text-yellow-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
               <div>
                 <div className="font-medium">Snooze</div>
                 <div className="text-xs text-gray-500">Task ko temporary rokh deta hai</div>
@@ -4030,7 +4042,19 @@ function TaskActionsDropdown({ task, onCreateSubtask, onSnooze, onMarkAsRisk, on
                 setIsOpen(false);
               }}
             >
-              <span className="text-orange-500">🧠</span>
+              <svg
+                className="w-4 h-4 text-orange-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
+              </svg>
               <div>
                 <div className="font-medium">Mark as Risk</div>
                 <div className="text-xs text-gray-500">Batata hai ki task mein koi risk hai</div>
@@ -4044,10 +4068,50 @@ function TaskActionsDropdown({ task, onCreateSubtask, onSnooze, onMarkAsRisk, on
                 setIsOpen(false);
               }}
             >
-              <span className="text-green-500">✅</span>
+              <svg
+                className="w-4 h-4 text-green-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
               <div>
                 <div className="font-medium">Mark as Done</div>
                 <div className="text-xs text-gray-500">Task complete ho gaya, status update hota hai</div>
+              </div>
+            </button>
+
+            <div className="border-t border-gray-200 my-1"></div>
+            
+            <button
+              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors"
+              onClick={() => {
+                onDelete();
+                setIsOpen(false);
+              }}
+            >
+              <svg
+                className="w-4 h-4 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+              <div>
+                <div className="font-medium">Delete</div>
+                <div className="text-xs text-gray-500">Delete same</div>
               </div>
             </button>
           </div>
