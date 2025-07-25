@@ -44,6 +44,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     type: "success",
     isVisible: false,
   });
+  const [snoozedTasks, setSnoozedTasks] = useState(new Set());
+  const [riskyTasks, setRiskyTasks] = useState(new Set());
   const [tasks, setTasks] = useState([
     {
       id: 1,
@@ -1066,6 +1068,36 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     console.log("Milestone created:", newTask);
   };
 
+  // Handle task snooze
+  const handleSnoozeTask = (taskId) => {
+    setSnoozedTasks((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+        showToast("Task un-snoozed successfully", "success");
+      } else {
+        newSet.add(taskId);
+        showToast("Task snoozed successfully", "success");
+      }
+      return newSet;
+    });
+  };
+
+  // Handle mark as risk
+  const handleMarkAsRisk = (taskId) => {
+    setRiskyTasks((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+        showToast("Task risk status removed", "success");
+      } else {
+        newSet.add(taskId);
+        showToast("Task marked as risky", "warning");
+      }
+      return newSet;
+    });
+  };
+
   return (
     <div className="space-y-6 px-4 py-6 h-auto overflow-scroll">
       {/* Header */}
@@ -1564,6 +1596,12 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                                     title="Click to edit"
                                   >
                                     {task.title}
+                                    {riskyTasks.has(task.id) && (
+                                      <span className="ml-2 text-orange-500" title="Risky Task">⚠️</span>
+                                    )}
+                                    {snoozedTasks.has(task.id) && (
+                                      <span className="ml-2 text-yellow-500" title="Snoozed Task">⏸️</span>
+                                    )}
                                   </span>
 
                                   {task.recurringFromTaskId && (
@@ -1683,6 +1721,14 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                               />
                             </svg>
                           </button>
+
+                          <TaskActionsDropdown
+                            task={task}
+                            onCreateSubtask={() => handleAddSubtask(task.id)}
+                            onSnooze={() => handleSnoozeTask(task.id)}
+                            onMarkAsRisk={() => handleMarkAsRisk(task.id)}
+                            onMarkAsDone={() => handleStatusChange(task.id, "DONE", true)}
+                          />
                         </div>
                       </td>
                     </tr>
@@ -3922,6 +3968,91 @@ function TasksCalendarView({ tasks, onTaskClick, onClose }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Task Actions Dropdown Component
+function TaskActionsDropdown({ task, onCreateSubtask, onSnooze, onMarkAsRisk, onMarkAsDone }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        className="text-gray-400 cursor-pointer hover:text-gray-600 transition-colors p-1"
+        onClick={() => setIsOpen(!isOpen)}
+        title="More actions"
+      >
+        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute right-0 top-8 z-20 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2">
+            <button
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+              onClick={() => {
+                onCreateSubtask();
+                setIsOpen(false);
+              }}
+            >
+              <span className="text-green-500">🟢</span>
+              <div>
+                <div className="font-medium">Create Sub-task</div>
+                <div className="text-xs text-gray-500">Task ke andar ek sub-task banata hai</div>
+              </div>
+            </button>
+
+            <button
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+              onClick={() => {
+                onSnooze();
+                setIsOpen(false);
+              }}
+            >
+              <span className="text-yellow-500">⏸️</span>
+              <div>
+                <div className="font-medium">Snooze</div>
+                <div className="text-xs text-gray-500">Task ko temporary rokh deta hai</div>
+              </div>
+            </button>
+
+            <button
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+              onClick={() => {
+                onMarkAsRisk();
+                setIsOpen(false);
+              }}
+            >
+              <span className="text-orange-500">🧠</span>
+              <div>
+                <div className="font-medium">Mark as Risk</div>
+                <div className="text-xs text-gray-500">Batata hai ki task mein koi risk hai</div>
+              </div>
+            </button>
+
+            <button
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+              onClick={() => {
+                onMarkAsDone();
+                setIsOpen(false);
+              }}
+            >
+              <span className="text-green-500">✅</span>
+              <div>
+                <div className="font-medium">Mark as Done</div>
+                <div className="text-xs text-gray-500">Task complete ho gaya, status update hota hai</div>
+              </div>
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
