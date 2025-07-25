@@ -2351,8 +2351,6 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
     attachments: [],
   });
 
-  const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
-  const fieldRefs = useRef([]);
   const priorityDueDays = { low: 30, medium: 14, high: 7, critical: 2 };
 
   const calculateDueDate = (priority) => {
@@ -2372,11 +2370,10 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
         dueDate: calculateDueDate(value),
       });
     } else if (name === "assignee") {
-      // In a real app, you'd lookup assignee ID from name
       setFormData({
         ...formData,
         [name]: value,
-        assigneeId: value === currentUser.name ? currentUser.id : 2, // Mock ID
+        assigneeId: value === currentUser.name ? currentUser.id : 2,
       });
     } else {
       setFormData({
@@ -2394,92 +2391,51 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && e.target.name === "title" && formData.title.trim()) {
       e.preventDefault();
-      if (e.target.name === "title" && formData.title.trim()) {
-        handleSubmit(e);
-      } else {
-        // Move to next field
-        const nextIndex = currentFieldIndex + 1;
-        if (nextIndex < fieldRefs.current.length) {
-          setCurrentFieldIndex(nextIndex);
-          fieldRefs.current[nextIndex]?.focus();
-        }
-      }
-    } else if (e.key === "Tab") {
-      // Handle tab navigation
-      const isShift = e.shiftKey;
-      const nextIndex = isShift ? currentFieldIndex - 1 : currentFieldIndex + 1;
-
-      if (nextIndex >= 0 && nextIndex < fieldRefs.current.length) {
-        e.preventDefault();
-        setCurrentFieldIndex(nextIndex);
-        fieldRefs.current[nextIndex]?.focus();
-      }
+      handleSubmit(e);
     } else if (e.key === "Escape") {
       onCancel();
     }
   };
 
-  const handleFieldFocus = (index) => {
-    setCurrentFieldIndex(index);
-  };
-
   return (
-    <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 p-6 modal-animate-slide-up">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
-              <span className="text-white text-lg">📝</span>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900">New Sub-task</h3>
-              <p className="text-sm text-gray-600">Add a sub-task to the current task</p>
-            </div>
+    <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
+      <form onSubmit={handleSubmit} className="p-3">
+        {/* Compact Header */}
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-6 h-6 bg-blue-500 rounded-md flex items-center justify-center">
+            <span className="text-white text-xs">+</span>
           </div>
+          <h4 className="text-sm font-medium text-gray-900">Add Sub-task</h4>
         </div>
 
-        {/* Task Title */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Sub-task Title *
-          </label>
-          <div className="relative">
+        {/* Compact Form Fields */}
+        <div className="space-y-2">
+          {/* Title */}
+          <div>
             <input
               type="text"
               name="title"
               value={formData.title}
               onChange={handleChange}
-              placeholder="Enter sub-task name (max 60 characters)"
+              placeholder="Sub-task title (required)"
               maxLength={60}
               required
               autoFocus
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 pr-16"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               onKeyDown={handleKeyPress}
             />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-400">
-              {formData.title.length}/60
-            </div>
           </div>
-        </div>
 
-        {/* Form Fields Grid */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Assigned To *
-            </label>
+          {/* Two Column Grid */}
+          <div className="grid grid-cols-2 gap-2">
             <select
-              ref={(el) => (fieldRefs.current[0] = el)}
               name="assignee"
               value={formData.assignee}
               onChange={handleChange}
-              onKeyDown={handleKeyPress}
-              onFocus={() => handleFieldFocus(0)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value={currentUser.name}>Myself</option>
               <option value="John Smith">John Smith</option>
@@ -2487,57 +2443,35 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
               <option value="Mike Johnson">Mike Johnson</option>
               <option value="Emily Davis">Emily Davis</option>
             </select>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Priority
-            </label>
             <select
-              ref={(el) => (fieldRefs.current[1] = el)}
               name="priority"
               value={formData.priority}
               onChange={handleChange}
-              onKeyDown={handleKeyPress}
-              onFocus={() => handleFieldFocus(1)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              <option value="low">Low Priority</option>
+              <option value="medium">Medium Priority</option>
+              <option value="high">High Priority</option>
               <option value="critical">Critical</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Due Date *
-            </label>
+          <div className="grid grid-cols-2 gap-2">
             <input
-              ref={(el) => (fieldRefs.current[2] = el)}
               type="date"
               name="dueDate"
               value={formData.dueDate}
               onChange={handleChange}
-              onKeyDown={handleKeyPress}
-              onFocus={() => handleFieldFocus(2)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Status
-            </label>
             <select
-              ref={(el) => (fieldRefs.current[3] = el)}
               name="status"
               value={formData.status}
               onChange={handleChange}
-              onKeyDown={handleKeyPress}
-              onFocus={() => handleFieldFocus(3)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="to-do">To Do</option>
               <option value="in-progress">In Progress</option>
@@ -2545,50 +2479,37 @@ function InlineSubtaskAdd({ parentTask, currentUser, onSubmit, onCancel }) {
               <option value="completed">Completed</option>
             </select>
           </div>
-        </div>
 
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Notes/Description
-          </label>
+          {/* Notes */}
           <textarea
-            ref={(el) => (fieldRefs.current[4] = el)}
             name="description"
             value={formData.description}
             onChange={handleChange}
-            onKeyDown={handleKeyPress}
-            onFocus={() => handleFieldFocus(4)}
-            placeholder="Add details or context for this sub-task..."
-            rows="3"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+            placeholder="Optional notes..."
+            rows="2"
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 resize-none"
           />
-        </div>
 
-        {/* Inheritance Info */}
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <h4 className="text-sm font-medium text-blue-800 mb-2">
-            Inherited from Parent Task
-          </h4>
-          <div className="text-xs text-blue-700 space-y-1">
-            <div>• Visibility: {parentTask.visibility || "Private"}</div>
-            <div>• Parent Due Date: {parentTask.dueDate}</div>
-            <div>• Category: {parentTask.category || "None"}</div>
+          {/* Compact Inheritance Info */}
+          <div className="bg-blue-50 p-2 rounded-md">
+            <div className="text-xs text-blue-700">
+              Inherits: {parentTask.visibility || "Private"} • Parent Due: {parentTask.dueDate}
+            </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+        {/* Action Buttons with justify-between */}
+        <div className="flex justify-between gap-2 pt-3 mt-3 border-t border-gray-200">
           <button
             type="button"
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-medium"
+            className="px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
             onClick={onCancel}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-300 font-medium"
+            className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             disabled={!formData.title.trim()}
           >
             Create Sub-task
