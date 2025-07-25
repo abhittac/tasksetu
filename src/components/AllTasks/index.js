@@ -1,2 +1,2 @@
 
-export { default } from './AllTasks';
+export { default } from './AllTasks.jsx';
