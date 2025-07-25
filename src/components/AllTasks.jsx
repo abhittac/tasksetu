@@ -1280,13 +1280,10 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
           </div>
 
           {selectedTasks.length > 0 && (
-            <div className="bulk-selection-active flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-blue-800">
-                  {selectedTasks.length} task{selectedTasks.length > 1 ? 's' : ''} selected
-                </span>
-              </div>
+            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+              <span className="text-sm font-medium text-blue-800">
+                {selectedTasks.length} selected
+              </span>
               <select
                 className="form-select text-sm"
                 onChange={(e) => {
@@ -1467,7 +1464,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                   <React.Fragment key={task.id}>
                     <tr
                       className={`hover:bg-gray-50 transition-colors ${
-                        selectedTasks.includes(task.id) ? "selected-task bg-blue-50" : ""
+                        selectedTasks.includes(task.id) ? "bg-blue-50" : ""
                       }`}
                     >
                       <td className="px-6 py-4 text-nowrap">
