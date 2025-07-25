@@ -508,15 +508,15 @@ function RecurringTaskForm({ onClose }) {
   };
 
   const handleDayToggle = (day) => {
-    const days = formData.repeatOnDays;
-    const updatedDays = days.includes(day)
-      ? days.filter((d) => d !== day)
-      : [...days, day];
+    const currentDays = formData.repeatOnDays || [];
+    const updatedDays = currentDays.includes(day)
+      ? currentDays.filter((d) => d !== day)
+      : [...currentDays, day];
 
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       repeatOnDays: updatedDays,
-    });
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -822,15 +822,15 @@ function EditRecurrenceModal({ task, onClose, onSave }) {
   };
 
   const handleDayToggle = (day) => {
-    const days = formData.repeatOnDays;
-    const updatedDays = days.includes(day)
-      ? days.filter((d) => d !== day)
-      : [...days, day];
+    const currentDays = formData.repeatOnDays || [];
+    const updatedDays = currentDays.includes(day)
+      ? currentDays.filter((d) => d !== day)
+      : [...currentDays, day];
 
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       repeatOnDays: updatedDays,
-    });
+    }));
   };
 
   const handleSubmit = (e) => {
