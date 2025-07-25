@@ -1,10 +1,9 @@
 
 import React from 'react';
-import { useAppSelector } from '../store';
-import Dashboard from '../components/Dashboard';
+import DashboardComponent from '../components/Dashboard/Dashboard';
 
-const DashboardPage: React.FC = () => {
-  return <Dashboard />;
+const Dashboard: React.FC = () => {
+  return <DashboardComponent />;
 };
 
-export default DashboardPage;
+export default Dashboard;

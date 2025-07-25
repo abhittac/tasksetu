@@ -1,29 +1,9 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../store';
-import { setShowCreateTaskDrawer, setSelectedTaskId } from '../features/ui/uiSlice';
-import AllTasks from '../components/AllTasks';
+import AllTasksComponent from '../components/AllTasks/AllTasks';
 
-const AllTasksPage: React.FC = () => {
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-
-  const handleCreateTask = () => {
-    dispatch(setShowCreateTaskDrawer(true));
-  };
-
-  const handleNavigateToTask = (taskId: number) => {
-    dispatch(setSelectedTaskId(taskId));
-    navigate(`/task/${taskId}`);
-  };
-
-  return (
-    <AllTasks
-      onCreateTask={handleCreateTask}
-      onNavigateToTask={handleNavigateToTask}
-    />
-  );
+const AllTasks: React.FC = () => {
+  return <AllTasksComponent />;
 };
 
-export default AllTasksPage;
+export default AllTasks;

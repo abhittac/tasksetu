@@ -1,9 +1,9 @@
 
 import React from 'react';
-import MilestoneManager from '../components/MilestoneManager';
+import MilestoneManagerComponent from '../components/MilestoneManager/MilestoneManager';
 
-const MilestoneManagerPage: React.FC = () => {
-  return <MilestoneManager />;
+const MilestoneManager: React.FC = () => {
+  return <MilestoneManagerComponent />;
 };
 
-export default MilestoneManagerPage;
+export default MilestoneManager;

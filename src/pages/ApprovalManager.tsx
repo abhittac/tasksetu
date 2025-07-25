@@ -1,9 +1,9 @@
 
 import React from 'react';
-import ApprovalManager from '../components/ApprovalManager';
+import ApprovalManagerComponent from '../components/ApprovalManager/ApprovalManager';
 
-const ApprovalManagerPage: React.FC = () => {
-  return <ApprovalManager />;
+const ApprovalManager: React.FC = () => {
+  return <ApprovalManagerComponent />;
 };
 
-export default ApprovalManagerPage;
+export default ApprovalManager;
