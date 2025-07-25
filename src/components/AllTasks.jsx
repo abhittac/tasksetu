@@ -3302,12 +3302,12 @@ function SubtaskDetailPanel({
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <button
+              {/* <button
                 onClick={() => setIsEditing(!isEditing)}
                 className="btn btn-secondary btn-sm"
               >
                 {isEditing ? "Cancel" : "Edit"}
-              </button>
+              </button> */}
               <button
                 onClick={onClose}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -3511,27 +3511,24 @@ function SubtaskDetailPanel({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
+          <div className="flex justify-between gap-3 pt-4 border-t border-gray-200">
             {isEditing ? (
               <>
-                <button
-                  onClick={handleCancel}
-                  className="btn btn-secondary flex-1"
-                >
+                <button onClick={handleCancel} className="btn btn-secondary ">
                   Cancel
                 </button>
-                <button onClick={handleSave} className="btn btn-primary flex-1">
+                <button onClick={handleSave} className="btn btn-primary ">
                   Save Changes
                 </button>
               </>
             ) : (
               <>
-                <button onClick={onDelete} className="btn btn-danger">
+                <button onClick={onDelete} className="btn btn-danger ">
                   Delete Sub-task
                 </button>
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="btn btn-primary flex-1"
+                  className="btn btn-primary "
                 >
                   Edit Sub-task
                 </button>

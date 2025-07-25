@@ -609,8 +609,16 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
         </div>
 
         {/* Timeline - Compact - Reduced Width */}
-        <div className="info-section bg-gray-50 p-1 rounded lg:col-span-1" style={{ paddingTop: '2rem' }}>
-          <h4 className="text-xs font-medium mb-0.5" style={{ paddingLeft: '1rem' }}>Timeline</h4>
+        <div
+          className="info-section bg-gray-50 p-1 rounded lg:col-span-1"
+          style={{ paddingTop: "2rem" }}
+        >
+          <h4
+            className="text-xs font-medium mb-0.5"
+            style={{ paddingLeft: "1rem" }}
+          >
+            Timeline
+          </h4>
           <div className="space-y-0.5 p-4">
             <div className="info-field flex justify-between text-xs">
               <label className="font-medium">Start:</label>
@@ -642,8 +650,16 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
         </div>
 
         {/* Creation Info - Compact - Increased Width */}
-        <div className="info-section bg-gray-50 p-1 rounded lg:col-span-2" style={{ paddingTop: '2rem' }}>
-          <h4 className="text-xs font-medium mb-0.5" style={{ paddingLeft: '1rem' }}>Details</h4>
+        <div
+          className="info-section bg-gray-50 p-1 rounded lg:col-span-2"
+          style={{ paddingTop: "2rem" }}
+        >
+          <h4
+            className="text-xs font-medium mb-0.5"
+            style={{ paddingLeft: "1rem" }}
+          >
+            Details
+          </h4>
           <div className="space-y-0.5 text-xs p-4">
             <div className="info-field flex justify-between">
               <label className="font-medium">Created By:</label>
@@ -661,8 +677,16 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
         </div>
 
         {/* Relationships - Compact */}
-        <div className="info-section bg-gray-50  rounded" style={{ paddingTop: '2rem' }}>
-          <h4 className="text-xs font-medium mb-0.5 p-4" style={{ paddingLeft: '1rem' }}>Relationships</h4>
+        <div
+          className="info-section bg-gray-50  rounded"
+          style={{ paddingTop: "2rem" }}
+        >
+          <h4
+            className="text-xs font-medium mb-0.5 p-4"
+            style={{ paddingLeft: "1rem" }}
+          >
+            Relationships
+          </h4>
           <div className="space-y-0.5 text-xs p-4">
             {task.parentTaskId && (
               <div className="info-field">
@@ -861,7 +885,7 @@ function FormsPanel({ forms, taskId }) {
 
       {/* Forms Grid */}
       {filteredForms.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredForms.map((form) => (
             <div
               key={form.id}
@@ -876,7 +900,7 @@ function FormsPanel({ forms, taskId }) {
                     <h4 className="font-semibold text-gray-900 mb-2 truncate group-hover:text-emerald-600 transition-colors">
                       {form.title}
                     </h4>
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col-2 gap-1">
                       <span
                         className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-fit ${getFormTypeColor(form.type)}`}
                       >
@@ -4295,42 +4319,43 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                     rows={4}
                   />
                 </div>
-
-                {/* Task Type */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Task Type
-                  </label>
-                  <select
-                    value={formData.taskType}
-                    onChange={(e) => handleChange("taskType", e.target.value)}
-                    className="form-select w-full"
-                    disabled={!permissions.canEdit}
-                  >
-                    <option value="normal">Normal Task</option>
-                    <option value="milestone">Milestone</option>
-                    <option value="approval">Approval Task</option>
-                  </select>
-                </div>
-
-                {/* Category */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => handleChange("category", e.target.value)}
-                    className="form-select w-full"
-                  >
-                    <option value="">Select category...</option>
-                    <option value="Backend">Backend</option>
-                    <option value="Frontend">Frontend</option>
-                    <option value="Design">Design</option>
-                    <option value="Research">Research</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Support">Support</option>
-                  </select>
+                <div className="flex flex-cols-2 gap-2">
+                  {" "}
+                  {/* Task Type */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Task Type
+                    </label>
+                    <select
+                      value={formData.taskType}
+                      onChange={(e) => handleChange("taskType", e.target.value)}
+                      className="form-select w-full"
+                      disabled={!permissions.canEdit}
+                    >
+                      <option value="normal">Normal Task</option>
+                      <option value="milestone">Milestone</option>
+                      <option value="approval">Approval Task</option>
+                    </select>
+                  </div>
+                  {/* Category */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Category
+                    </label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => handleChange("category", e.target.value)}
+                      className="form-select w-full"
+                    >
+                      <option value="">Select category...</option>
+                      <option value="Backend">Backend</option>
+                      <option value="Frontend">Frontend</option>
+                      <option value="Design">Design</option>
+                      <option value="Research">Research</option>
+                      <option value="Marketing">Marketing</option>
+                      <option value="Support">Support</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
@@ -4341,7 +4366,7 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                 Assignment & Priority
               </h3>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-3 lg:grid-cols-3 gap-6">
                 {/* Assignee */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -4405,7 +4430,7 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
                 Timeline
               </h3>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-3 lg:grid-cols-3 gap-6">
                 {/* Start Date */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -4517,7 +4542,7 @@ function TaskEditModal({ task, onSave, onClose, permissions }) {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 mt-6">
+          <div className="flex justify-between gap-3 pt-6 border-t border-gray-200 mt-6">
             <button
               type="button"
               onClick={onClose}
