@@ -1,4 +1,3 @@
-
 export interface User {
   id: number;
   name: string;
@@ -102,12 +101,29 @@ export interface RecurringTask {
 }
 
 export interface Notification {
-  id: number;
-  type: string;
+  id: string;
   title: string;
   message: string;
-  read: boolean;
-  createdAt: string;
-  taskId?: number;
-  userId: number;
+  type: 'info' | 'success' | 'warning' | 'error';
+  timestamp: string;
+  read?: boolean;
+}
+
+export interface TaskFormData {
+  title: string;
+  description: string;
+  assignee: string;
+  priority: string;
+  status: string;
+  dueDate: string;
+  category: string;
+  tags: string;
+  attachments: any[];
+}
+
+export interface MoreOptionsData {
+  referenceProcess: string;
+  customForm: string;
+  dependencies: string[];
+  taskTypeAdvanced: string;
 }
