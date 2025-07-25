@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import CreateTask from "../CreateTask";
 import ApprovalTaskCreator from "../ApprovalTaskCreator";
@@ -79,237 +78,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     getFilteredTasks
   } = useTasksStore();
 
-  // Remove static tasks data - now using store
-  const staticTasks = [
-    {
-      id: 1,
-      title: "Update user authentication system",
-      assignee: "John Doe",
-      assigneeId: 2,
-      status: "INPROGRESS",
-      priority: "High",
-      dueDate: "2024-01-25",
-      category: "Development",
-      progress: 60,
-      subtaskCount: 3,
-      collaborators: [1, 3],
-      createdBy: "Current User",
-      creatorId: 1,
-      isRecurring: false,
-      subtasks: [
-        {
-          id: 101,
-          title: "Setup OAuth providers",
-          assignee: "John Doe",
-          assigneeId: 2,
-          status: "DONE",
-          priority: "High",
-          dueDate: "2024-01-22",
-          progress: 100,
-          parentTaskId: 1,
-          createdBy: "Current User",
-          createdAt: "2024-01-15T09:00:00Z",
-        },
-        {
-          id: 102,
-          title: "Implement session management",
-          assignee: "Jane Smith",
-          assigneeId: 3,
-          status: "INPROGRESS",
-          priority: "High",
-          dueDate: "2024-01-24",
-          progress: 75,
-          parentTaskId: 1,
-          createdBy: "Current User",
-          createdAt: "2024-01-16T10:00:00Z",
-        },
-        {
-          id: 103,
-          title: "Add password reset flow",
-          assignee: "Mike Johnson",
-          assigneeId: 4,
-          status: "OPEN",
-          priority: "Medium",
-          dueDate: "2024-01-26",
-          progress: 0,
-          parentTaskId: 1,
-          createdBy: "Current User",
-          createdAt: "2024-01-17T11:00:00Z",
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: "Design new landing page",
-      assignee: "Jane Smith",
-      assigneeId: 3,
-      status: "OPEN",
-      priority: "Medium",
-      dueDate: "2024-01-30",
-      category: "Design",
-      progress: 0,
-      subtaskCount: 0,
-      collaborators: [],
-      createdBy: "Current User",
-      creatorId: 1,
-      subtasks: [],
-    },
-    {
-      id: 3,
-      title: "Fix mobile responsiveness issues",
-      assignee: "Mike Johnson",
-      assigneeId: 4,
-      status: "DONE",
-      priority: "Low",
-      dueDate: "2024-01-20",
-      category: "Development",
-      progress: 100,
-      subtaskCount: 2,
-      collaborators: [1],
-      createdBy: "Jane Smith",
-      creatorId: 3,
-      subtasks: [
-        { id: 201, status: "completed" },
-        { id: 202, status: "completed" },
-      ],
-    },
-    {
-      id: 4,
-      title: "Conduct user research interviews",
-      assignee: "Sarah Wilson",
-      assigneeId: 5,
-      status: "INPROGRESS",
-      priority: "High",
-      dueDate: "2024-01-28",
-      category: "Research",
-      progress: 80,
-      subtaskCount: 3,
-      collaborators: [1, 2],
-      createdBy: "Current User",
-      creatorId: 1,
-      subtasks: [
-        {
-          id: 301,
-          title: "Prepare interview questions",
-          assignee: "Sarah Wilson",
-          assigneeId: 5,
-          status: "DONE",
-          priority: "High",
-          dueDate: "2024-01-25",
-          progress: 100,
-          parentTaskId: 4,
-          createdBy: "Current User",
-          createdAt: "2024-01-20T09:00:00Z",
-        },
-        {
-          id: 302,
-          title: "Schedule participant sessions",
-          assignee: "Emily Davis",
-          assigneeId: 6,
-          status: "INPROGRESS",
-          priority: "Medium",
-          dueDate: "2024-01-27",
-          progress: 60,
-          parentTaskId: 4,
-          createdBy: "Sarah Wilson",
-          createdAt: "2024-01-21T10:00:00Z",
-        },
-        {
-          id: 303,
-          title: "Analyze interview data",
-          assignee: "Sarah Wilson",
-          assigneeId: 5,
-          status: "OPEN",
-          priority: "High",
-          dueDate: "2024-01-30",
-          progress: 0,
-          parentTaskId: 4,
-          createdBy: "Current User",
-          createdAt: "2024-01-22T11:00:00Z",
-        },
-      ],
-    },
-    {
-      id: 5,
-      title: "Weekly Team Standup",
-      assignee: "Current User",
-      assigneeId: 1,
-      status: "OPEN",
-      priority: "Medium",
-      dueDate: "2024-01-29",
-      category: "Meeting",
-      progress: 0,
-      subtaskCount: 0,
-      collaborators: [],
-      createdBy: "System",
-      creatorId: 0,
-      isRecurring: true,
-      recurringFromTaskId: 1001,
-      subtasks: [],
-    },
-    {
-      id: 6,
-      title: "Daily Code Backup",
-      assignee: "DevOps Team",
-      assigneeId: 6,
-      status: "OPEN",
-      priority: "Low",
-      dueDate: "2024-01-29",
-      category: "DevOps",
-      progress: 0,
-      subtaskCount: 0,
-      collaborators: [],
-      createdBy: "System",
-      creatorId: 0,
-      isRecurring: true,
-      recurringFromTaskId: 1002,
-      subtasks: [],
-    },
-    {
-      id: 7,
-      title: "Project Alpha Launch",
-      assignee: "Project Manager",
-      assigneeId: 7,
-      status: "OPEN",
-      priority: "High",
-      dueDate: "2024-02-15",
-      category: "Milestone",
-      progress: 0,
-      subtaskCount: 0,
-      collaborators: [1, 2, 3],
-      createdBy: "Current User",
-      creatorId: 1,
-      type: "milestone",
-      subtasks: [],
-    },
-    {
-      id: 8,
-      title: "Budget Approval for Q2",
-      assignee: "Finance Team",
-      assigneeId: 8,
-      status: "OPEN",
-      priority: "High",
-      dueDate: "2024-01-31",
-      category: "Approval",
-      progress: 0,
-      subtaskCount: 0,
-      collaborators: [],
-      createdBy: "Current User",
-      creatorId: 1,
-      isApprovalTask: true,
-      approvers: [
-        { id: 1, name: "Current User", role: "Admin", status: "pending" },
-        {
-          id: 9,
-          name: "Finance Director",
-          role: "Director",
-          status: "pending",
-        },
-      ],
-      approvalMode: "all",
-      subtasks: [],
-    },
-  ];
+  // Get tasks from Zustand store
+  const { tasks: storeTasks } = useTasksStore();
 
   // Company-defined statuses with comprehensive management
   const [companyStatuses] = useState([
@@ -1017,6 +787,45 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     }
   };
 
+  // Apply filters to tasks
+  const filteredTasks = storeTasks.filter((task) => {
+    // Apply search filter
+    const matchesSearch =
+      task.title
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      task.assignee
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+
+    // Apply status filter
+    const matchesStatus =
+      statusFilter === "all" ||
+      (statusFilter === "todo" && task.status === "OPEN") ||
+      (statusFilter === "progress" &&
+        task.status === "INPROGRESS") ||
+      (statusFilter === "review" && task.status === "ONHOLD") ||
+      (statusFilter === "completed" && task.status === "DONE");
+
+    // Apply priority filter
+    const matchesPriority =
+      priorityFilter === "all" ||
+      task.priority.toLowerCase() ===
+        priorityFilter.toLowerCase();
+
+    // Apply task type filter
+    const taskType = getTaskType(task);
+    const matchesTaskType =
+      taskTypeFilter === "all" || taskType === taskTypeFilter;
+
+    return (
+      matchesSearch &&
+      matchesStatus &&
+      matchesPriority &&
+      matchesTaskType
+    );
+  });
+
   return (
     <div className="space-y-6 px-4 py-6 h-auto overflow-scroll">
       {/* Header */}
@@ -1122,8 +931,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
                         Standard one-time task
                       </div>
                     </div>
-                  </button>
-                  <button
+                  </button                  <button
                     className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
                     onClick={() => handleTaskTypeSelect("recurring")}
                   >
@@ -1341,44 +1149,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {tasks
-                .filter((task) => {
-                  // Apply search filter
-                  const matchesSearch =
-                    task.title
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase()) ||
-                    task.assignee
-                      .toLowerCase()
-                      .includes(searchTerm.toLowerCase());
-
-                  // Apply status filter
-                  const matchesStatus =
-                    statusFilter === "all" ||
-                    (statusFilter === "todo" && task.status === "OPEN") ||
-                    (statusFilter === "progress" &&
-                      task.status === "INPROGRESS") ||
-                    (statusFilter === "review" && task.status === "ONHOLD") ||
-                    (statusFilter === "completed" && task.status === "DONE");
-
-                  // Apply priority filter
-                  const matchesPriority =
-                    priorityFilter === "all" ||
-                    task.priority.toLowerCase() ===
-                      priorityFilter.toLowerCase();
-
-                  // Apply task type filter
-                  const taskType = getTaskType(task);
-                  const matchesTaskType =
-                    taskTypeFilter === "all" || taskType === taskTypeFilter;
-
-                  return (
-                    matchesSearch &&
-                    matchesStatus &&
-                    matchesPriority &&
-                    matchesTaskType
-                  );
-                })
+              {filteredTasks
                 .map((task) => (
                   <React.Fragment key={task.id}>
                     <tr

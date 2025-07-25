@@ -57,6 +57,20 @@ export default function CreateTask({
 
     addTask(newTask);
     console.log("Task created successfully:", newTask);
+    alert("Task created successfully!");
+    
+    // Reset form
+    setFormData({
+      title: "",
+      description: "",
+      assignee: "",
+      priority: "medium",
+      status: "OPEN",
+      dueDate: preFilledDate || "",
+      category: "",
+      tags: "",
+      attachments: [],
+    });
     
     if (onClose) onClose();
   };
