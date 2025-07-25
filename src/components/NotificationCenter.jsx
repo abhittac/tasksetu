@@ -583,16 +583,13 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                                 <label key={days} className="relative">
                                   <input
                                     type="checkbox"
-                                    checked={settings.dueDateReminders.daysBeforeDue.includes(
+                                    checked={(settings.dueDateReminders?.daysBeforeDue || []).includes(
                                       days,
                                     )}
                                     onChange={(e) => {
                                       if (e.target.checked) {
-                                        const newDays = [
-                                          ...settings.dueDateReminders
-                                            .daysBeforeDue,
-                                          days,
-                                        ].sort((a, b) => b - a);
+                                        const currentDays = settings.dueDateReminders?.daysBeforeDue || [];
+                                        const newDays = [...currentDays, days].sort((a, b) => b - a);
                                         onSettingsChange({
                                           ...settings,
                                           dueDateReminders: {
@@ -601,10 +598,8 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                                           },
                                         });
                                       } else {
-                                        const newDays =
-                                          settings.dueDateReminders.daysBeforeDue.filter(
-                                            (d) => d !== days,
-                                          );
+                                        const currentDays = settings.dueDateReminders?.daysBeforeDue || [];
+                                        const newDays = currentDays.filter((d) => d !== days);
                                         onSettingsChange({
                                           ...settings,
                                           dueDateReminders: {
@@ -627,7 +622,7 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                                         </div>
                                       </div>
                                       <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:border-orange-500 peer-checked:bg-orange-500 flex items-center justify-center">
-                                        {settings.dueDateReminders.daysBeforeDue.includes(
+                                        {(settings.dueDateReminders?.daysBeforeDue || []).includes(
                                           days,
                                         ) && (
                                           <svg
