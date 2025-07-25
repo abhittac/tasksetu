@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import { calculateDueDateFromPriority } from "./PriorityManager";
 import RecurringTaskManager from "./RecurringTaskManager";
 import MilestoneManager from "./MilestoneManager";
+import useTasksStore from "../stores/tasksStore";
 
 export default function CreateTask({
   onClose,
   initialTaskType = "regular",
   preFilledDate = null,
 }) {
+  const { addTask } = useTasksStore();
+  
   const [taskType, setTaskType] = useState(initialTaskType);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [formData, setFormData] = useState({
@@ -15,7 +18,7 @@ export default function CreateTask({
     description: "",
     assignee: "",
     priority: "medium",
-    status: "todo",
+    status: "OPEN",
     dueDate: preFilledDate || "",
     category: "",
     tags: "",
@@ -31,8 +34,30 @@ export default function CreateTask({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Creating task:", formData);
-    // Handle task creation
+    
+    if (!formData.title.trim()) {
+      alert("Please enter a task title");
+      return;
+    }
+
+    // Create task using store
+    const newTask = {
+      title: formData.title.trim(),
+      description: formData.description,
+      assignee: formData.assignee || "Current User",
+      assigneeId: formData.assignee ? 2 : 1, // Mock assignee ID
+      priority: formData.priority.charAt(0).toUpperCase() + formData.priority.slice(1),
+      status: formData.status,
+      dueDate: formData.dueDate,
+      category: formData.category,
+      tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
+      attachments: formData.attachments,
+      ...moreOptionsData
+    };
+
+    addTask(newTask);
+    console.log("Task created successfully:", newTask);
+    
     if (onClose) onClose();
   };
 
@@ -255,9 +280,9 @@ export default function CreateTask({
                   onChange={(e) => handleInputChange("status", e.target.value)}
                   className="form-select"
                 >
-                  <option value="todo">To Do</option>
-                  <option value="progress">In Progress</option>
-                  <option value="review">In Review</option>
+                  <option value="OPEN">Open</option>
+                  <option value="INPROGRESS">In Progress</option>
+                  <option value="ONHOLD">On Hold</option>
                 </select>
               </div>
               {/* Category */}

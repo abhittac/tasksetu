@@ -15,6 +15,7 @@ import TaskDeleteConfirmationModal from "./TaskDeleteConfirmationModal";
 import StatusConfirmationModal from "./StatusConfirmationModal";
 import SubtaskDeleteConfirmationModal from "./SubtaskDeleteConfirmationModal";
 import ApprovalTaskDetailModal from "./ApprovalTaskDetailModal";
+import useTasksStore from "../../stores/tasksStore";
 
 export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,7 +30,6 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [editingTitle, setEditingTitle] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  const [selectedTasks, setSelectedTasks] = useState([]);
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [currentUser] = useState({
     id: 1,
@@ -43,7 +43,6 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const [showTaskTypeDropdown, setShowTaskTypeDropdown] = useState(false);
   const [selectedTaskType, setSelectedTaskType] = useState("regular");
   const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
-  const [expandedTasks, setExpandedTasks] = useState(new Set());
   const [showSubtaskCreator, setShowSubtaskCreator] = useState(null);
   const [selectedSubtask, setSelectedSubtask] = useState(null);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
@@ -56,9 +55,32 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     type: "success",
     isVisible: false,
   });
-  const [snoozedTasks, setSnoozedTasks] = useState(new Set());
-  const [riskyTasks, setRiskyTasks] = useState(new Set());
-  const [tasks, setTasks] = useState([
+  // Zustand store
+  const {
+    tasks,
+    selectedTasks,
+    snoozedTasks,
+    riskyTasks,
+    expandedTasks,
+    addTask,
+    updateTask,
+    deleteTask,
+    addSubtask,
+    updateSubtask,
+    deleteSubtask,
+    setSelectedTasks,
+    toggleTaskSelection,
+    bulkUpdateStatus,
+    bulkDeleteTasks,
+    toggleTaskExpansion,
+    toggleSnoozeTask,
+    toggleRiskyTask,
+    updateTaskStatus,
+    getFilteredTasks
+  } = useTasksStore();
+
+  // Remove static tasks data - now using store
+  const staticTasks = [
     {
       id: 1,
       title: "Update user authentication system",
@@ -287,7 +309,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       approvalMode: "all",
       subtasks: [],
     },
-  ]);
+  ];
 
   // Company-defined statuses with comprehensive management
   const [companyStatuses] = useState([
@@ -569,20 +591,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     const task = tasks.find((t) => t.id === taskId);
     const oldStatusCode = task.status;
 
-    // Update task status with autosave
-    setTasks((prevTasks) =>
-      prevTasks.map((t) =>
-        t.id === taskId
-          ? {
-              ...t,
-              status: newStatusCode,
-              progress: newStatusCode === "DONE" ? 100 : t.progress,
-              lastModified: new Date().toISOString(),
-              lastModifiedBy: currentUser.name,
-            }
-          : t,
-      ),
-    );
+    // Update task status using store
+    updateTaskStatus(taskId, newStatusCode);
 
     // Log the status change for audit trail
     logStatusChange(
@@ -641,8 +651,8 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const executeTaskDeletion = (taskId, options) => {
     const task = tasks.find((t) => t.id === taskId);
 
-    // Remove task from list
-    setTasks((prevTasks) => prevTasks.filter((t) => t.id !== taskId));
+    // Remove task from list using store
+    deleteTask(taskId);
 
     // Handle subtasks deletion
     if (options.deleteSubtasks && task.subtasks && task.subtasks.length > 0) {
@@ -701,10 +711,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
         `Are you sure you want to delete ${selectedTasks.length} selected tasks? This action cannot be undone.`,
       )
     ) {
-      setTasks((prevTasks) =>
-        prevTasks.filter((task) => !selectedTasks.includes(task.id)),
-      );
-      setSelectedTasks([]);
+      bulkDeleteTasks(selectedTasks);
       setShowBulkActions(false);
       showToast(
         `${selectedTaskObjects.length} tasks deleted successfully`,
@@ -750,21 +757,10 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       return;
     }
 
-    // Update all selected tasks
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        selectedTasks.includes(task.id)
-          ? {
-              ...task,
-              status: newStatusCode,
-              progress: newStatusCode === "DONE" ? 100 : task.progress,
-            }
-          : task,
-      ),
-    );
+    // Update all selected tasks using store
+    bulkUpdateStatus(selectedTasks, newStatusCode);
 
     // Clear selection
-    setSelectedTasks([]);
     setShowBulkActions(false);
 
     const newStatus = companyStatuses.find((s) => s.code === newStatusCode);
@@ -775,11 +771,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
   // Handle task selection
   const handleTaskSelection = (taskId, isSelected) => {
-    if (isSelected) {
-      setSelectedTasks((prev) => [...prev, taskId]);
-    } else {
-      setSelectedTasks((prev) => prev.filter((id) => id !== taskId));
-    }
+    toggleTaskSelection(taskId);
   };
 
   // Handle select all
@@ -811,11 +803,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       editingTitle.trim() &&
       editingTitle !== tasks.find((t) => t.id === taskId)?.title
     ) {
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === taskId ? { ...task, title: editingTitle.trim() } : task,
-        ),
-      );
+      updateTask(taskId, { title: editingTitle.trim() });
     }
     setEditingTaskId(null);
     setEditingTitle("");
@@ -842,11 +830,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   };
 
   const handleSaveEditedTask = (updatedTask) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === updatedTask.id ? updatedTask : task,
-      ),
-    );
+    updateTask(updatedTask.id, updatedTask);
     setShowEditModal(false);
     setEditingTask(null);
   };
@@ -869,66 +853,31 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
   // Toggle task expansion
   const handleToggleTaskExpansion = (taskId) => {
-    setExpandedTasks((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(taskId)) {
-        newSet.delete(taskId);
-      } else {
-        newSet.add(taskId);
-      }
-      return newSet;
-    });
+    toggleTaskExpansion(taskId);
   };
 
   // Create new subtask
   const handleCreateSubtask = (parentTaskId, subtaskData) => {
-    const newSubtask = {
-      id: Date.now(),
+    const subtaskToAdd = {
       title: subtaskData.title,
       assignee: subtaskData.assignee || currentUser.name,
       assigneeId: subtaskData.assigneeId || currentUser.id,
       status: subtaskData.status || "OPEN",
       priority: subtaskData.priority || "Medium",
       dueDate: subtaskData.dueDate,
-      progress: 0,
-      parentTaskId: parentTaskId,
-      createdBy: currentUser.name,
-      createdAt: new Date().toISOString(),
       description: subtaskData.description || "",
     };
 
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === parentTaskId
-          ? {
-              ...task,
-              subtasks: [...(task.subtasks || []), newSubtask],
-              subtaskCount: (task.subtaskCount || 0) + 1,
-            }
-          : task,
-      ),
-    );
-
+    addSubtask(parentTaskId, subtaskToAdd);
     setShowSubtaskCreator(null);
 
     // Auto-expand parent task to show new subtask
-    setExpandedTasks((prev) => new Set([...prev, parentTaskId]));
+    toggleTaskExpansion(parentTaskId);
   };
 
   // Update subtask
   const handleUpdateSubtask = (parentTaskId, updatedSubtask) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === parentTaskId
-          ? {
-              ...task,
-              subtasks: task.subtasks.map((subtask) =>
-                subtask.id === updatedSubtask.id ? updatedSubtask : subtask,
-              ),
-            }
-          : task,
-      ),
-    );
+    updateSubtask(parentTaskId, updatedSubtask.id, updatedSubtask);
     setSelectedSubtask(null);
   };
 
@@ -937,19 +886,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     const parentTask = tasks.find((t) => t.id === parentTaskId);
     const subtask = parentTask?.subtasks.find((s) => s.id === subtaskId);
 
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === parentTaskId
-          ? {
-              ...task,
-              subtasks: task.subtasks.filter(
-                (subtask) => subtask.id !== subtaskId,
-              ),
-              subtaskCount: Math.max(0, (task.subtaskCount || 0) - 1),
-            }
-          : task,
-      ),
-    );
+    deleteSubtask(parentTaskId, subtaskId);
 
     // Show success toast notification
     if (subtask) {
@@ -962,24 +899,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
   // Handle subtask status change
   const handleSubtaskStatusChange = (parentTaskId, subtaskId, newStatus) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === parentTaskId
-          ? {
-              ...task,
-              subtasks: task.subtasks.map((subtask) =>
-                subtask.id === subtaskId
-                  ? {
-                      ...subtask,
-                      status: newStatus,
-                      progress: newStatus === "DONE" ? 100 : subtask.progress,
-                    }
-                  : subtask,
-              ),
-            }
-          : task,
-      ),
-    );
+    updateSubtask(parentTaskId, subtaskId, { status: newStatus });
   };
 
   const handleAddSubtask = (taskId) => {
@@ -1017,7 +937,6 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const handleCreateApprovalTask = (approvalTaskData) => {
     // Add the approval task to the tasks list
     const newTask = {
-      id: Date.now(),
       title: approvalTaskData.title,
       assignee: "Current User",
       assigneeId: 1,
@@ -1025,19 +944,13 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       priority: approvalTaskData.priority || "Medium",
       dueDate: approvalTaskData.dueDate,
       category: "Approval",
-      progress: 0,
-      subtaskCount: 0,
-      collaborators: [],
-      createdBy: "Current User",
-      creatorId: 1,
       isApprovalTask: true,
       approvers: approvalTaskData.approvers || [],
       approvalMode: approvalTaskData.approvalMode || "any",
       description: approvalTaskData.description || "",
-      subtasks: [],
     };
 
-    setTasks((prevTasks) => [...prevTasks, newTask]);
+    addTask(newTask);
     setShowApprovalTaskModal(false);
     setSelectedDateForTask(null);
     console.log("Approval task created:", newTask);
@@ -1046,7 +959,6 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const handleCreateMilestone = (milestoneData) => {
     // Add the milestone to the tasks list
     const newTask = {
-      id: Date.now(),
       title: milestoneData.title,
       assignee: milestoneData.assignee || "Current User",
       assigneeId: milestoneData.assigneeId || 1,
@@ -1054,14 +966,9 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       priority: milestoneData.priority || "Medium",
       dueDate: milestoneData.dueDate || selectedDateForTask,
       category: "Milestone",
-      progress: 0,
-      subtaskCount: 0,
       collaborators: milestoneData.collaborators || [],
-      createdBy: "Current User",
-      creatorId: 1,
       type: "milestone",
       description: milestoneData.description || "",
-      subtasks: [],
       isMilestone: true,
       milestoneType: milestoneData.milestoneType || "standalone",
       linkedTasks: milestoneData.linkedTasks || [],
@@ -1084,7 +991,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
         : []
     };
 
-    setTasks((prevTasks) => [...prevTasks, newTask]);
+    addTask(newTask);
     setShowMilestoneModal(false);
     setSelectedDateForTask(null);
     console.log("Milestone created:", newTask);
@@ -1092,32 +999,22 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
 
   // Handle task snooze
   const handleSnoozeTask = (taskId) => {
-    setSnoozedTasks((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(taskId)) {
-        newSet.delete(taskId);
-        showToast("Task un-snoozed successfully", "success");
-      } else {
-        newSet.add(taskId);
-        showToast("Task snoozed successfully", "success");
-      }
-      return newSet;
-    });
+    toggleSnoozeTask(taskId);
+    if (snoozedTasks.has(taskId)) {
+      showToast("Task un-snoozed successfully", "success");
+    } else {
+      showToast("Task snoozed successfully", "success"); 
+    }
   };
 
   // Handle mark as risk
   const handleMarkAsRisk = (taskId) => {
-    setRiskyTasks((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(taskId)) {
-        newSet.delete(taskId);
-        showToast("Task risk status removed", "success");
-      } else {
-        newSet.add(taskId);
-        showToast("Task marked as risky", "warning");
-      }
-      return newSet;
-    });
+    toggleRiskyTask(taskId);
+    if (riskyTasks.has(taskId)) {
+      showToast("Task risk status removed", "success");
+    } else {
+      showToast("Task marked as risky", "warning");
+    }
   };
 
   return (

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 export default function SubtaskCreator({ parentTask, onClose, onSubmit, currentUser }) {
   const [formData, setFormData] = useState({
     title: '',
-    assignee: currentUser?.name || '',
+    assignee: currentUser?.name || 'Current User',
     assigneeId: currentUser?.id || 1,
     priority: 'Medium',
     dueDate: '',
