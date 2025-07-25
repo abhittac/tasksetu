@@ -1031,7 +1031,7 @@ function EditRecurrenceModal({ task, onClose, onSave }) {
             </h4>
 
             <div className="space-y-3">
-              <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white transition-colors">
+              <div className="flex items-center space-x-3  rounded-lg hover:bg-white transition-colors">
                 <input
                   type="radio"
                   id="never"
@@ -1062,7 +1062,7 @@ function EditRecurrenceModal({ task, onClose, onSave }) {
                 </label>
               </div>
 
-              <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white transition-colors">
+              <div className="flex items-center space-x-3  rounded-lg hover:bg-white transition-colors">
                 <input
                   type="radio"
                   id="after"
@@ -1093,7 +1093,7 @@ function EditRecurrenceModal({ task, onClose, onSave }) {
                 </label>
               </div>
 
-              <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-white transition-colors">
+              <div className="flex items-center space-x-3  rounded-lg hover:bg-white transition-colors">
                 <input
                   type="radio"
                   id="on"

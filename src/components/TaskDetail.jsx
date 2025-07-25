@@ -3511,7 +3511,7 @@ function LinkedItemsPanel({ linkedItems }) {
                     className="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-lg flex items-center justify-center text-red-600 transition-colors"
                     title="Unlink"
                   >
-                    <span className="text-sm">🔗⛔</span>
+                    <span className="text-sm">⛔</span>
                   </button>
                 </div>
               </div>
