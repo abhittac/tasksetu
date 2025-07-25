@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Calendar from "./Calendar";
 
@@ -392,45 +393,9 @@ export default function RecurringTaskManager({ onClose }) {
         />
       )}
 
-      {/* Calendar View Section */}
-      <div className="card">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Calendar & Upcoming Instances
-          </h2>
-          <div className="flex gap-2">
-            <button className="btn btn-secondary btn-sm">Previous</button>
-            <button className="btn btn-secondary btn-sm">Next</button>
-          </div>
-        </div>
-
-        <div className="bg-gray-50 rounded-lg p-6 text-center">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400 mb-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Calendar View
-          </h3>
-          <p className="text-gray-600">
-            View upcoming recurring task instances in calendar format
-          </p>
-          <button className="btn btn-primary mt-4">Open Calendar</button>
-        </div>
-      </div>
-
       {/* Slide-in Drawer for Creating Recurring Task */}
       {showCreateRecurringDrawer && (
-        <div className="fixed inset-0 z-50 overflow-hidden  overlay-animate mt-0">
+        <div className="fixed inset-0 z-50 overflow-hidden overlay-animate mt-0">
           <div
             className="drawer-overlay absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setShowCreateRecurringDrawer(false)}
@@ -479,28 +444,26 @@ export default function RecurringTaskManager({ onClose }) {
 }
 
 function RecurringTaskForm({ onClose }) {
+  const [isRecurring, setIsRecurring] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    frequency: "weekly",
-    repeatEvery: 1,
-    repeatOnDays: [],
-    startDate: "",
-    endConditionType: "never",
-    endValue: "",
-    time: "09:00",
     assignee: "",
     priority: "medium",
     category: "",
+    tags: "",
+    // Recurring fields
+    frequency: "daily",
+    repeatEvery: 1,
+    repeatOnDays: [],
+    startDate: new Date().toISOString().split('T')[0],
+    endConditionType: "never",
+    endValue: "",
+    timeOfCreation: "09:00",
   });
-
-  const [isManualDueDate, setIsManualDueDate] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (name === "dueDate") {
-      setIsManualDueDate(true);
-    }
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
@@ -521,8 +484,10 @@ function RecurringTaskForm({ onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Creating recurring task:", formData);
-    // Handle recurring task creation
+    console.log("Creating task:", { ...formData, isRecurring });
+    // Here you would handle the actual task creation
+    // If isRecurring is true, create a recurring task master record
+    // Otherwise, create a regular task
     onClose();
   };
 
@@ -534,8 +499,8 @@ function RecurringTaskForm({ onClose }) {
           Task Details
         </h3>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="lg:col-span-2">
+        <div className="space-y-4">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Task Title *
             </label>
@@ -545,12 +510,12 @@ function RecurringTaskForm({ onClose }) {
               value={formData.title}
               onChange={handleChange}
               className="form-input"
-              placeholder="Enter recurring task title..."
+              placeholder="Enter task title..."
               required
             />
           </div>
 
-          <div className="lg:col-span-2">
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Description
             </label>
@@ -559,11 +524,12 @@ function RecurringTaskForm({ onClose }) {
               value={formData.description}
               onChange={handleChange}
               className="form-textarea"
-              placeholder="Describe the recurring task..."
+              placeholder="Describe the task..."
               rows={3}
             />
           </div>
-          <div className="grid grid-cols-3 md:grid-cols-3 gap-6">
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Assign to
@@ -595,7 +561,7 @@ function RecurringTaskForm({ onClose }) {
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
-                <option value="urgent">Urgent</option>
+                <option value="critical">Critical</option>
               </select>
             </div>
 
@@ -618,176 +584,221 @@ function RecurringTaskForm({ onClose }) {
               </select>
             </div>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tags
+            </label>
+            <input
+              type="text"
+              name="tags"
+              value={formData.tags}
+              onChange={handleChange}
+              className="form-input"
+              placeholder="Enter tags separated by commas..."
+            />
+          </div>
         </div>
       </div>
 
-      {/* Recurrence Pattern */}
+      {/* Make this a recurring task */}
       <div className="card">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">
-          Recurrence Pattern
-        </h3>
-
-        <div className="grid grid-cols-2 lg:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Frequency *
-            </label>
-            <select
-              name="frequency"
-              value={formData.frequency}
-              onChange={handleChange}
-              className="form-select"
-              required
-            >
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="custom">Custom</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Repeat Every
-            </label>
-            <input
-              type="number"
-              name="repeatEvery"
-              value={formData.repeatEvery}
-              onChange={handleChange}
-              className="form-input"
-              min="1"
-              max="365"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Time
-            </label>
-            <input
-              type="time"
-              name="time"
-              value={formData.time}
-              onChange={handleChange}
-              className="form-input"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Start Date *
-            </label>
-            <input
-              type="date"
-              name="startDate"
-              value={formData.startDate}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
+        <div className="flex items-center space-x-3 mb-6">
+          <input
+            type="checkbox"
+            id="repeatTask"
+            checked={isRecurring}
+            onChange={(e) => setIsRecurring(e.target.checked)}
+            className="form-checkbox h-5 w-5 text-blue-600"
+          />
+          <label htmlFor="repeatTask" className="text-lg font-semibold text-gray-900">
+            Repeat this task
+          </label>
         </div>
 
-        {formData.frequency === "weekly" && (
-          <div className="mt-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Repeat On Days
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                <button
-                  key={day}
-                  type="button"
-                  className={`px-3 py-1 text-sm rounded-md border transition-colors ${
-                    formData.repeatOnDays.includes(day)
-                      ? "bg-primary-600 text-white border-primary-600"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                  }`}
-                  onClick={() => handleDayToggle(day)}
+        {isRecurring && (
+          <div className="space-y-6 pl-8 border-l-4 border-blue-200">
+            {/* Recurrence Options */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Frequency *
+                </label>
+                <select
+                  name="frequency"
+                  value={formData.frequency}
+                  onChange={handleChange}
+                  className="form-select"
+                  required
                 >
-                  {day}
-                </button>
-              ))}
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Repeat Every
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    name="repeatEvery"
+                    value={formData.repeatEvery}
+                    onChange={handleChange}
+                    className="form-input"
+                    min="1"
+                    max="365"
+                  />
+                  <span className="text-sm text-gray-500">
+                    {formData.frequency === "daily" && "day(s)"}
+                    {formData.frequency === "weekly" && "week(s)"}
+                    {formData.frequency === "monthly" && "month(s)"}
+                    {formData.frequency === "custom" && "interval(s)"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Repeat On Days (for weekly) */}
+            {formData.frequency === "weekly" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Repeat On Days *
+                </label>
+                <div className="grid grid-cols-7 gap-2">
+                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                    <button
+                      key={day}
+                      type="button"
+                      className={`px-3 py-2 text-sm rounded-md border transition-colors ${
+                        formData.repeatOnDays.includes(day)
+                          ? "bg-blue-600 text-white border-blue-600"
+                          : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                      }`}
+                      onClick={() => handleDayToggle(day)}
+                    >
+                      {day}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Start Date *
+                </label>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={formData.startDate}
+                  onChange={handleChange}
+                  className="form-input"
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Defaults to today
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Time of Creation (Optional)
+                </label>
+                <input
+                  type="time"
+                  name="timeOfCreation"
+                  value={formData.timeOfCreation}
+                  onChange={handleChange}
+                  className="form-input"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  System will auto-create task at this time
+                </p>
+              </div>
+            </div>
+
+            {/* End Condition */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                End Condition *
+              </label>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="radio"
+                    id="never"
+                    name="endConditionType"
+                    value="never"
+                    checked={formData.endConditionType === "never"}
+                    onChange={handleChange}
+                    className="form-radio"
+                  />
+                  <label htmlFor="never" className="text-sm text-gray-700">
+                    Never Ends
+                  </label>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="radio"
+                    id="after"
+                    name="endConditionType"
+                    value="after"
+                    checked={formData.endConditionType === "after"}
+                    onChange={handleChange}
+                    className="form-radio"
+                  />
+                  <label htmlFor="after" className="text-sm text-gray-700">
+                    Ends after
+                  </label>
+                  {formData.endConditionType === "after" && (
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="number"
+                        name="endValue"
+                        value={formData.endValue}
+                        onChange={handleChange}
+                        className="form-input w-20"
+                        placeholder="10"
+                        min="1"
+                      />
+                      <span className="text-sm text-gray-500">occurrences</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="radio"
+                    id="endDate"
+                    name="endConditionType"
+                    value="endDate"
+                    checked={formData.endConditionType === "endDate"}
+                    onChange={handleChange}
+                    className="form-radio"
+                  />
+                  <label htmlFor="endDate" className="text-sm text-gray-700">
+                    Ends by specific date
+                  </label>
+                  {formData.endConditionType === "endDate" && (
+                    <input
+                      type="date"
+                      name="endValue"
+                      value={formData.endValue}
+                      onChange={handleChange}
+                      className="form-input"
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
-      </div>
-
-      {/* End Condition */}
-      <div className="card">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">
-          End Condition
-        </h3>
-
-        <div className="grid grid-cols-3">
-          <div className="flex items-center space-x-3">
-            <input
-              type="radio"
-              id="never"
-              name="endConditionType"
-              value="never"
-              checked={formData.endConditionType === "never"}
-              onChange={handleChange}
-              className="form-radio"
-            />
-            <label htmlFor="never" className="text-sm text-gray-700">
-              Never End
-            </label>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <input
-              type="radio"
-              id="after"
-              name="endConditionType"
-              value="after"
-              checked={formData.endConditionType === "after"}
-              onChange={handleChange}
-              className="form-radio"
-            />
-            <label htmlFor="after" className="text-sm text-gray-700">
-              End After
-            </label>
-            {formData.endConditionType === "after" && (
-              <input
-                type="number"
-                name="endValue"
-                value={formData.endValue}
-                onChange={handleChange}
-                className="form-input w-20"
-                placeholder="10"
-                min="1"
-              />
-            )}
-            {formData.endConditionType === "after" && (
-              <span className="text-sm text-gray-700">occurrences</span>
-            )}
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <input
-              type="radio"
-              id="on"
-              name="endConditionType"
-              value="on"
-              checked={formData.endConditionType === "on"}
-              onChange={handleChange}
-              className="form-radio"
-            />
-            <label htmlFor="on" className="text-sm text-gray-700">
-              End On
-            </label>
-            {formData.endConditionType === "on" && (
-              <input
-                type="date"
-                name="endValue"
-                value={formData.endValue}
-                onChange={handleChange}
-                className="form-input"
-              />
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Form Actions */}
@@ -796,7 +807,7 @@ function RecurringTaskForm({ onClose }) {
           Cancel
         </button>
         <button type="submit" className="btn btn-primary">
-          Create Recurring Task
+          {isRecurring ? "Create Recurring Task" : "Create Task"}
         </button>
       </div>
     </form>
