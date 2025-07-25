@@ -75,7 +75,10 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     toggleSnoozeTask,
     toggleRiskyTask,
     updateTaskStatus,
-    getFilteredTasks
+    getFilteredTasks,
+    getTaskStatus,
+    addCustomReminder,
+    snoozeTask,
   } = useTasksStore();
 
   // Get tasks from Zustand store
@@ -744,21 +747,23 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       linkedTasks: milestoneData.linkedTasks || [],
       visibility: milestoneData.visibility || "private",
       // For linked milestones, create mock task dependencies
-      tasks: milestoneData.milestoneType === "linked" && milestoneData.linkedTasks.length > 0 
-        ? milestoneData.linkedTasks.map(taskId => {
-            const taskNames = {
-              1: "UI Design Complete",
-              2: "Backend API Development", 
-              3: "Testing Phase",
-              4: "Deployment"
-            };
-            return {
-              id: taskId,
-              title: taskNames[taskId] || `Task ${taskId}`,
-              completed: false
-            };
-          })
-        : []
+      tasks:
+        milestoneData.milestoneType === "linked" &&
+        milestoneData.linkedTasks.length > 0
+          ? milestoneData.linkedTasks.map((taskId) => {
+              const taskNames = {
+                1: "UI Design Complete",
+                2: "Backend API Development",
+                3: "Testing Phase",
+                4: "Deployment",
+              };
+              return {
+                id: taskId,
+                title: taskNames[taskId] || `Task ${taskId}`,
+                completed: false,
+              };
+            })
+          : [],
     };
 
     addTask(newTask);
@@ -773,7 +778,7 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
     if (snoozedTasks.has(taskId)) {
       showToast("Task un-snoozed successfully", "success");
     } else {
-      showToast("Task snoozed successfully", "success"); 
+      showToast("Task snoozed successfully", "success");
     }
   };
 
@@ -791,27 +796,21 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
   const filteredTasks = storeTasks.filter((task) => {
     // Apply search filter
     const matchesSearch =
-      task.title
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      task.assignee
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+      task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.assignee.toLowerCase().includes(searchTerm.toLowerCase());
 
     // Apply status filter
     const matchesStatus =
       statusFilter === "all" ||
       (statusFilter === "todo" && task.status === "OPEN") ||
-      (statusFilter === "progress" &&
-        task.status === "INPROGRESS") ||
+      (statusFilter === "progress" && task.status === "INPROGRESS") ||
       (statusFilter === "review" && task.status === "ONHOLD") ||
       (statusFilter === "completed" && task.status === "DONE");
 
     // Apply priority filter
     const matchesPriority =
       priorityFilter === "all" ||
-      task.priority.toLowerCase() ===
-        priorityFilter.toLowerCase();
+      task.priority.toLowerCase() === priorityFilter.toLowerCase();
 
     // Apply task type filter
     const taskType = getTaskType(task);
@@ -825,6 +824,43 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
       matchesTaskType
     );
   });
+
+  const [viewMode, setViewMode] = useState("grid");
+  const [sortBy, setSortBy] = useState("dueDate");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterPriority, setFilterPriority] = useState("all");
+
+  // Helper function to get task visual indicators
+  const getTaskIndicators = (task) => {
+    const status = getTaskStatus(task.id);
+    const indicators = [];
+
+    if (status?.isOverdue) {
+      indicators.push({
+        icon: "🔴",
+        text: "Overdue",
+        className: "bg-red-100 text-red-800 border-red-200",
+      });
+    }
+
+    if (status?.isSnoozed) {
+      indicators.push({
+        icon: "🔕",
+        text: "Snoozed",
+        className: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      });
+    }
+
+    if (status?.hasReminders) {
+      indicators.push({
+        icon: "⏰",
+        text: "Has Reminders",
+        className: "bg-blue-100 text-blue-800 border-blue-200",
+      });
+    }
+
+    return indicators;
+  };
 
   return (
     <div className="space-y-6 px-4 py-6 h-auto overflow-scroll">
@@ -857,7 +893,9 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
             {showSnooze ? "Hide" : "Show"} Snoozed Tasks
           </button>
           <button
-            className={`btn ${showCalendarView ? "btn-primary" : "btn-secondary"}`}
+            className={`btn ${
+              showCalendarView ? "btn-primary" : "btn-secondary"
+            }`}
             onClick={() => setShowCalendarView(!showCalendarView)}
           >
             <svg
@@ -1150,377 +1188,382 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredTasks
-                .map((task) => (
-                  <React.Fragment key={task.id}>
-                    <tr
-                      className={`hover:bg-gray-50 transition-colors ${
-                        selectedTasks.includes(task.id) ? "bg-blue-50" : ""
-                      }`}
-                    >
-                      <td className="px-6 py-4 text-nowrap">
-                        <input
-                          type="checkbox"
-                          checked={selectedTasks.includes(task.id)}
-                          onChange={(e) =>
-                            handleTaskSelection(task.id, e.target.checked)
-                          }
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                      </td>
-                      <td className="px-6 py-4 text-nowrap">
-                        <div>
-                          <div className="font-medium text-gray-900">
-                            <div className="flex items-center gap-2">
-                              {/* Expansion control for tasks with subtasks */}
-                              {task.subtasks && task.subtasks.length > 0 && (
-                                <button
-                                  onClick={() =>
-                                    handleToggleTaskExpansion(task.id)
-                                  }
-                                  className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200 transition-colors hover:text-gray-600 transition-colors"
-                                  title={
-                                    expandedTasks.has(task.id)
-                                      ? "Collapse subtasks"
-                                      : "Expand subtasks"
-                                  }
-                                >
-                                  <svg
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <circle
-                                      cx="5"
-                                      cy="5"
-                                      r="2"
-                                      fill="currentColor"
-                                    />
-                                    <circle
-                                      cx="5"
-                                      cy="12"
-                                      r="2"
-                                      fill="currentColor"
-                                    />
-                                    <circle
-                                      cx="5"
-                                      cy="19"
-                                      r="2"
-                                      fill="currentColor"
-                                    />
-
-                                    <path
-                                      d="M5 7V10"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                    />
-                                    <path
-                                      d="M5 14V17"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                    />
-
-                                    <path
-                                      d="M7 12H14"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                    />
-                                    <path
-                                      d="M7 19H14"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                    />
-                                  </svg>
-
-                                  {task.subtasks.length}
-                                </button>
-                              )}
-
-                              {editingTaskId === task.id ? (
-                                <input
-                                  type="text"
-                                  value={editingTitle}
-                                  onChange={(e) =>
-                                    setEditingTitle(e.target.value)
-                                  }
-                                  onBlur={() => handleTitleSave(task.id)}
-                                  onKeyDown={(e) =>
-                                    handleTitleKeyDown(e, task.id)
-                                  }
-                                  className="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all duration-200"
-                                  autoFocus
-                                  maxLength={100}
-                                />
-                              ) : (
-                                <>
-                                  {task.isRecurring && (
-                                    <span
-                                      className="text-green-600 cursor-help"
-                                      title="Recurring Task – generated from a pattern"
-                                    >
-                                      🔁
-                                    </span>
-                                  )}
-                                  {task.isApprovalTask && (
-                                    <span
-                                      className="text-orange-600 cursor-help"
-                                      title="Approval Task – requires approval workflow"
-                                    >
-                                      ✅
-                                    </span>
-                                  )}
-                                  {(task.category === "Milestone" ||
-                                    task.type === "milestone") && (
-                                    <span
-                                      className="text-purple-600 cursor-help"
-                                      title="Milestone – project checkpoint"
-                                    >
-                                      🎯
-                                    </span>
-                                  )}
-                                  <span
-                                    className="cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-all duration-200 inline-block flex-1 editable-task-title"
-                                    onClick={() => handleTaskTitleClick(task)}
-                                    title="Click to edit"
-                                  >
-                                    {task.title}
-                                    {riskyTasks.has(task.id) && (
-                                      <span className="ml-2 text-orange-500" title="Risky Task">⚠️</span>
-                                    )}
-                                    {snoozedTasks.has(task.id) && (
-                                      <span className="ml-2 text-yellow-500" title="Snoozed Task">⏸️</span>
-                                    )}
-                                  </span>
-
-                                  {task.recurringFromTaskId && (
-                                    <span
-                                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 cursor-pointer hover:bg-green-200 transition-colors"
-                                      title={`Recurring from Task #${task.recurringFromTaskId}`}
-                                      onClick={() =>
-                                        console.log(
-                                          `View master task ${task.recurringFromTaskId}`,
-                                        )
-                                      }
-                                    >
-                                      📋 #{task.recurringFromTaskId}
-                                    </span>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {task.category}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mr-3">
-                            <span className="text-xs font-medium text-gray-600">
-                              {task.assignee
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </span>
-                          </div>
-                          <span className="text-sm text-gray-900">
-                            {task.assignee}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-nowrap text-left">
-                        <TaskStatusDropdown
-                          task={task}
-                          currentStatus={task.status}
-                          statuses={companyStatuses}
-                          onStatusChange={(newStatus) =>
-                            handleStatusChange(task.id, newStatus, true)
-                          }
-                          canEdit={canEditTaskStatus(task)}
-                          canMarkCompleted={canMarkAsCompleted(task)}
-                        />
-                      </td>
-                      <td className="px-6 py-4 text-nowrap">
-                        <span className={getPriorityBadge(task.priority)}>
-                          {task.priority}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900 text-nowrap">
-                        {task.dueDate}
-                      </td>
-                      <td className="px-6 py-4 text-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
-                            <div
-                              className="bg-primary-600 h-2 rounded-full"
-                              style={{ width: `${task.progress}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-xs text-gray-600 min-w-[3rem]">
-                            {task.progress}%
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-nowrap">
-                        <div className="flex items-center justify-center">
-                          <TaskActionsDropdown
-                            task={task}
-                            onView={() => handleViewTask(task.id)}
-                            onCreateSubtask={() => handleAddSubtask(task.id)}
-                            onSnooze={() => handleSnoozeTask(task.id)}
-                            onMarkAsRisk={() => handleMarkAsRisk(task.id)}
-                            onMarkAsDone={() => handleStatusChange(task.id, "DONE", true)}
-                            onDelete={() => handleDeleteTask(task.id)}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-
-                    {/* Subtask Rows */}
-                    {expandedTasks.has(task.id) &&
-                      task.subtasks &&
-                      task.subtasks.map((subtask) => (
-                        <tr
-                          key={`subtask-${subtask.id}`}
-                          className="bg-gray-50 hover:bg-gray-100 transition-colors border-l-4 border-l-blue-300"
-                        >
-                          <td className="px-6 py-3"></td>
-                          <td className="px-6 py-3">
-                            <div className="pl-8">
-                              <div className="flex items-center gap-2">
-                                <span className="text-blue-500">↳</span>
-                                <span
-                                  className="font-medium text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
-                                  onClick={() =>
-                                    setSelectedSubtask({
-                                      ...subtask,
-                                      parentTaskId: task.id,
-                                    })
-                                  }
-                                  title="Click to view/edit subtask"
-                                >
-                                  {subtask.title}
-                                </span>
-                              </div>
-                              <div className="text-xs text-gray-500 pl-7">
-                                Sub-task of "{task.title}"
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-3">
-                            <div className="flex items-center">
-                              <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center mr-2">
-                                <span className="text-xs font-medium text-gray-600">
-                                  {subtask.assignee
-                                    .split(" ")
-                                    .map((n) => n[0])
-                                    .join("")}
-                                </span>
-                              </div>
-                              <span className="text-sm text-gray-700">
-                                {subtask.assignee}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-3 text-left">
-                            <TaskStatusDropdown
-                              task={subtask}
-                              currentStatus={subtask.status}
-                              statuses={companyStatuses}
-                              onStatusChange={(newStatus) =>
-                                handleSubtaskStatusChange(
-                                  task.id,
-                                  subtask.id,
-                                  newStatus,
-                                )
-                              }
-                              canEdit={canEditTaskStatus(subtask)}
-                              canMarkCompleted={true}
-                            />
-                          </td>
-                          <td className="px-6 py-3">
-                            <span
-                              className={getPriorityBadge(subtask.priority)}
-                            >
-                              {subtask.priority}
-                            </span>
-                          </td>
-                          <td className="px-6 py-3 text-sm text-gray-700">
-                            {subtask.dueDate}
-                          </td>
-                          <td className="px-6 py-3">
-                            <div className="flex items-center">
-                              <div className="w-full bg-gray-200 rounded-full h-1.5 mr-2">
-                                <div
-                                  className="bg-primary-600 h-1.5 rounded-full"
-                                  style={{ width: `${subtask.progress}%` }}
-                                ></div>
-                              </div>
-                              <span className="text-xs text-gray-600 min-w-[3rem]">
-                                {subtask.progress}%
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-6 py-3">
-                            <div className="flex items-center space-x-2">
+              {filteredTasks.map((task) => (
+                <React.Fragment key={task.id}>
+                  <tr
+                    className={`hover:bg-gray-50 transition-colors ${
+                      selectedTasks.includes(task.id) ? "bg-blue-50" : ""
+                    }`}
+                  >
+                    <td className="px-6 py-4 text-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={selectedTasks.includes(task.id)}
+                        onChange={(e) =>
+                          handleTaskSelection(task.id, e.target.checked)
+                        }
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </td>
+                    <td className="px-6 py-4 text-nowrap">
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          <div className="flex items-center gap-2">
+                            {/* Expansion control for tasks with subtasks */}
+                            {task.subtasks && task.subtasks.length > 0 && (
                               <button
-                                className="text-gray-400 cursor-pointer hover:text-blue-600 transition-colors p-1"
+                                onClick={() =>
+                                  handleToggleTaskExpansion(task.id)
+                                }
+                                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200 transition-colors hover:text-gray-600 transition-colors"
+                                title={
+                                  expandedTasks.has(task.id)
+                                    ? "Collapse subtasks"
+                                    : "Expand subtasks"
+                                }
+                              >
+                                <svg
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <circle
+                                    cx="5"
+                                    cy="5"
+                                    r="2"
+                                    fill="currentColor"
+                                  />
+                                  <circle
+                                    cx="5"
+                                    cy="12"
+                                    r="2"
+                                    fill="currentColor"
+                                  />
+                                  <circle
+                                    cx="5"
+                                    cy="19"
+                                    r="2"
+                                    fill="currentColor"
+                                  />
+
+                                  <path
+                                    d="M5 7V10"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                  />
+                                  <path
+                                    d="M5 14V17"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                  />
+
+                                  <path
+                                    d="M7 12H14"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                  />
+                                  <path
+                                    d="M7 19H14"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                  />
+                                </svg>
+
+                                {task.subtasks.length}
+                              </button>
+                            )}
+
+                            {editingTaskId === task.id ? (
+                              <input
+                                type="text"
+                                value={editingTitle}
+                                onChange={(e) => setEditingTitle(e.target.value)}
+                                onBlur={() => handleTitleSave(task.id)}
+                                onKeyDown={(e) => handleTitleKeyDown(e, task.id)}
+                                className="w-full px-2 py-1 border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all duration-200"
+                                autoFocus
+                                maxLength={100}
+                              />
+                            ) : (
+                              <>
+                                {task.isRecurring && (
+                                  <span
+                                    className="text-green-600 cursor-help"
+                                    title="Recurring Task – generated from a pattern"
+                                  >
+                                    🔁
+                                  </span>
+                                )}
+                                {task.isApprovalTask && (
+                                  <span
+                                    className="text-orange-600 cursor-help"
+                                    title="Approval Task – requires approval workflow"
+                                  >
+                                    ✅
+                                  </span>
+                                )}
+                                {(task.category === "Milestone" ||
+                                  task.type === "milestone") && (
+                                  <span
+                                    className="text-purple-600 cursor-help"
+                                    title="Milestone – project checkpoint"
+                                  >
+                                    🎯
+                                  </span>
+                                )}
+                                <span
+                                  className="cursor-pointer hover:bg-gray-50 px-2 py-1 rounded transition-all duration-200 inline-block flex-1 editable-task-title"
+                                  onClick={() => handleTaskTitleClick(task)}
+                                  title="Click to edit"
+                                >
+                                  {task.title}
+                                  {riskyTasks.has(task.id) && (
+                                    <span
+                                      className="ml-2 text-orange-500"
+                                      title="Risky Task"
+                                    >
+                                      ⚠️
+                                    </span>
+                                  )}
+                                  {snoozedTasks.has(task.id) && (
+                                    <span
+                                      className="ml-2 text-yellow-500"
+                                      title="Snoozed Task"
+                                    >
+                                      ⏸️
+                                    </span>
+                                  )}
+                                </span>
+
+                                {task.recurringFromTaskId && (
+                                  <span
+                                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 cursor-pointer hover:bg-green-200 transition-colors"
+                                    title={`Recurring from Task #${task.recurringFromTaskId}`}
+                                    onClick={() =>
+                                      console.log(
+                                        `View master task ${task.recurringFromTaskId}`,
+                                      )
+                                    }
+                                  >
+                                    📋 #{task.recurringFromTaskId}
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {task.category}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-nowrap">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mr-3">
+                          <span className="text-xs font-medium text-gray-600">
+                            {task.assignee
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </span>
+                        </div>
+                        <span className="text-sm text-gray-900">
+                          {task.assignee}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-nowrap text-left">
+                      <TaskStatusDropdown
+                        task={task}
+                        currentStatus={task.status}
+                        statuses={companyStatuses}
+                        onStatusChange={(newStatus) =>
+                          handleStatusChange(task.id, newStatus, true)
+                        }
+                        canEdit={canEditTaskStatus(task)}
+                        canMarkCompleted={canMarkAsCompleted(task)}
+                      />
+                    </td>
+                    <td className="px-6 py-4 text-nowrap">
+                      <span className={getPriorityBadge(task.priority)}>
+                        {task.priority}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900 text-nowrap">
+                      {task.dueDate}
+                    </td>
+                    <td className="px-6 py-4 text-nowrap">
+                      <div className="flex items-center">
+                        <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                          <div
+                            className="bg-primary-600 h-2 rounded-full"
+                            style={{ width: `${task.progress}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-xs text-gray-600 min-w-[3rem]">
+                          {task.progress}%
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-nowrap">
+                      <div className="flex items-center justify-center">
+                        <TaskActionsDropdown
+                          task={task}
+                          onView={() => handleViewTask(task.id)}
+                          onCreateSubtask={() => handleAddSubtask(task.id)}
+                          onSnooze={() => handleSnoozeTask(task.id)}
+                          onMarkAsRisk={() => handleMarkAsRisk(task.id)}
+                          onMarkAsDone={() =>
+                            handleStatusChange(task.id, "DONE", true)
+                          }
+                          onDelete={() => handleDeleteTask(task.id)}
+                        />
+                      </div>
+                    </td>
+                  </tr>
+
+                  {/* Subtask Rows */}
+                  {expandedTasks.has(task.id) &&
+                    task.subtasks &&
+                    task.subtasks.map((subtask) => (
+                      <tr
+                        key={`subtask-${subtask.id}`}
+                        className="bg-gray-50 hover:bg-gray-100 transition-colors border-l-4 border-l-blue-300"
+                      >
+                        <td className="px-6 py-3"></td>
+                        <td className="px-6 py-3">
+                          <div className="pl-8">
+                            <div className="flex items-center gap-2">
+                              <span className="text-blue-500">↳</span>
+                              <span
+                                className="font-medium text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
                                 onClick={() =>
                                   setSelectedSubtask({
                                     ...subtask,
                                     parentTaskId: task.id,
                                   })
                                 }
-                                title="View/Edit subtask"
+                                title="Click to view/edit subtask"
                               >
-                                <svg
-                                  className="w-3 h-3"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                                  />
-                                </svg>
-                              </button>
-                              <button
-                                className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
-                                onClick={() =>
-                                  setShowDeleteSubtaskConfirmation({
-                                    taskId: task.id,
-                                    subtaskId: subtask.id,
-                                    subtaskTitle: subtask.title,
-                                  })
-                                }
-                                title="Delete Sub-task"
-                              >
-                                <svg
-                                  className="w-3 h-3"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                  />
-                                </svg>
-                              </button>
+                                {subtask.title}
+                              </span>
                             </div>
-                          </td>
-                        </tr>
-                      ))}
-                  </React.Fragment>
-                ))}
+                            <div className="text-xs text-gray-500 pl-7">
+                              Sub-task of "{task.title}"
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-3">
+                          <div className="flex items-center">
+                            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center mr-2">
+                              <span className="text-xs font-medium text-gray-600">
+                                {subtask.assignee
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </span>
+                            </div>
+                            <span className="text-sm text-gray-700">
+                              {subtask.assignee}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-3 text-left">
+                          <TaskStatusDropdown
+                            task={subtask}
+                            currentStatus={subtask.status}
+                            statuses={companyStatuses}
+                            onStatusChange={(newStatus) =>
+                              handleSubtaskStatusChange(
+                                task.id,
+                                subtask.id,
+                                newStatus,
+                              )
+                            }
+                            canEdit={canEditTaskStatus(subtask)}
+                            canMarkCompleted={true}
+                          />
+                        </td>
+                        <td className="px-6 py-3">
+                          <span className={getPriorityBadge(subtask.priority)}>
+                            {subtask.priority}
+                          </span>
+                        </td>
+                        <td className="px-6 py-3 text-sm text-gray-700">
+                          {subtask.dueDate}
+                        </td>
+                        <td className="px-6 py-3">
+                          <div className="flex items-center">
+                            <div className="w-full bg-gray-200 rounded-full h-1.5 mr-2">
+                              <div
+                                className="bg-primary-600 h-1.5 rounded-full"
+                                style={{ width: `${subtask.progress}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-xs text-gray-600 min-w-[3rem]">
+                              {subtask.progress}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-3">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              className="text-gray-400 cursor-pointer hover:text-blue-600 transition-colors p-1"
+                              onClick={() =>
+                                setSelectedSubtask({
+                                  ...subtask,
+                                  parentTaskId: task.id,
+                                })
+                              }
+                              title="View/Edit subtask"
+                            >
+                              <svg
+                                className="w-3 h-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                />
+                              </svg>
+                            </button>
+                            <button
+                              className="text-gray-400 cursor-pointer hover:text-red-600 transition-colors p-1"
+                              onClick={() =>
+                                setShowDeleteSubtaskConfirmation({
+                                  taskId: task.id,
+                                  subtaskId: subtask.id,
+                                  subtaskTitle: subtask.title,
+                                })
+                              }
+                              title="Delete Sub-task"
+                            >
+                              <svg
+                                className="w-3 h-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </React.Fragment>
+              ))}
             </tbody>
           </table>
         </div>
@@ -1567,7 +1610,15 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               <h2 className="text-2xl font-bold text-white">
                 Create New Task
                 {selectedDateForTask &&
-                  ` for ${new Date(selectedDateForTask).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`}
+                  ` for ${new Date(selectedDateForTask).toLocaleDateString(
+                    "en-US",
+                    {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    },
+                  )}`}
               </h2>
               <button
                 onClick={() => setShowCreateTaskDrawer(false)}
@@ -1637,7 +1688,10 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
           task={showDeleteConfirmation.task}
           options={showDeleteConfirmation.options}
           onConfirm={(finalOptions) =>
-            executeTaskDeletion(showDeleteConfirmation.task.id, finalOptions)
+            executeTaskDeletion(
+              showDeleteConfirmation.task.id,
+              finalOptions,
+            )
           }
           onCancel={() => setShowDeleteConfirmation(null)}
           currentUser={currentUser}
@@ -1675,7 +1729,15 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               <h2 className="text-2xl font-bold text-white">
                 Create Approval Task
                 {selectedDateForTask &&
-                  ` for ${new Date(selectedDateForTask).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`}
+                  ` for ${new Date(selectedDateForTask).toLocaleDateString(
+                    "en-US",
+                    {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    },
+                  )}`}
               </h2>
               <button
                 onClick={() => setShowApprovalTaskModal(false)}
@@ -1761,7 +1823,15 @@ export default function AllTasks({ onCreateTask, onNavigateToTask }) {
               <h2 className="text-2xl font-bold text-white">
                 Create Milestone
                 {selectedDateForTask &&
-                  ` for ${new Date(selectedDateForTask).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}`}
+                  ` for ${new Date(selectedDateForTask).toLocaleDateString(
+                    "en-US",
+                    {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    },
+                  )}`}
               </h2>
               <button
                 onClick={() => setShowMilestoneModal(false)}

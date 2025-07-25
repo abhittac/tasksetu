@@ -5,15 +5,19 @@ import CreateTask from "./CreateTask";
 import AnnualSelfAppraisal from "./AnnualSelfAppraisal";
 import ApprovalTaskCreator from "./ApprovalTaskCreator";
 import NotificationCenter from "./NotificationCenter";
+import useTasksStore from "../stores/tasksStore";
 
 export default function Dashboard() {
+  const { tasks, notifications } = useTasksStore();
+  const [currentView, setCurrentView] = useState("dashboard");
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showNotificationCenter, setShowNotificationCenter] = useState(false);
+
+  const unreadNotificationCount = notifications.filter(n => !n.read).length;
   const [showCreateTask, setShowCreateTask] = useState(false);
   const [selectedTaskType, setSelectedTaskType] = useState("regular");
   const [showApprovalTaskModal, setShowApprovalTaskModal] = useState(false);
-  const [showNotifications, setShowNotifications] = React.useState(false);
-  const [showNotificationCenter, setShowNotificationCenter] =
-    React.useState(false);
-  const [notifications, setNotifications] = React.useState([
+  const [notifications_static, setNotifications] = React.useState([
     {
       id: 1,
       type: "assignment",
@@ -61,7 +65,7 @@ export default function Dashboard() {
     },
   ]);
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount = notifications_static.filter((n) => !n.read).length;
   const [showSelfAppraisal, setShowSelfAppraisal] = useState(false);
 
   const handleCreateTask = (taskType) => {
@@ -156,12 +160,12 @@ export default function Dashboard() {
   };
 
   const markAllAsRead = () => {
-    setNotifications(notifications.map((n) => ({ ...n, read: true })));
+    setNotifications(notifications_static.map((n) => ({ ...n, read: true })));
   };
 
   const markAsRead = (notificationId) => {
     setNotifications(
-      notifications.map((n) =>
+      notifications_static.map((n) =>
         n.id === notificationId ? { ...n, read: true } : n,
       ),
     );
@@ -205,21 +209,30 @@ export default function Dashboard() {
           </div>
           <div className="relative notification-dropdown">
             <button
-              className="p-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors relative"
               onClick={() => setShowNotifications(!showNotifications)}
+              className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              {/* Proper bell icon */}
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 17h5l-3.5-3.5a8.38 8.38 0 01-1.4-4.6C15.1 8.9 13.2 8 11 8c-2.2 0-4.1.9-4.1.9a8.38 8.38 0 00-1.4 4.6L2 17h5m7 0a3 3 0 11-6 0m6 0H9"
+                />
               </svg>
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  {unreadCount}
+              {unreadNotificationCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {unreadNotificationCount > 9 ? '9+' : unreadNotificationCount}
                 </span>
               )}
             </button>
 
-            
+
           </div>
         </div>
       </div>
@@ -553,8 +566,8 @@ export default function Dashboard() {
 
           {/* Notifications List - Scrollable */}
           <div className="flex-1 overflow-y-auto">
-            {notifications.length > 0 ? (
-              notifications.slice(0, 10).map((notification) => (
+            {notifications_static.length > 0 ? (
+              notifications_static.slice(0, 10).map((notification) => (
                 <div
                   key={notification.id}
                   className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${
@@ -612,7 +625,7 @@ export default function Dashboard() {
           </div>
 
           {/* Footer - Fixed */}
-          {notifications.length > 0 && (
+          {notifications_static.length > 0 && (
             <div className="p-3 border-t border-gray-200 bg-gray-50 rounded-b-lg flex-shrink-0">
               <button
                 onClick={() => {

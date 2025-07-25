@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from "react";
+import useTasksStore from "../stores/tasksStore";
 
 export default function NotificationCenter() {
-  const [notifications, setNotifications] = useState([
+  const { 
+    notifications, 
+    notificationSettings,
+    markNotificationRead,
+    markAllNotificationsRead,
+    deleteNotification,
+    updateNotificationSettings,
+    checkReminders 
+  } = useTasksStore();
+
+  const [staticNotifications] = useState([
     {
       id: 1,
       type: "assignment",
@@ -64,36 +75,21 @@ export default function NotificationCenter() {
     },
   ]);
 
-  const [settings, setSettings] = useState({
-    emailNotifications: true,
-    pushNotifications: true,
-    dueDateReminders: {
-      enabled: true,
-      daysBeforeDue: [3, 1],
-      time: "09:00",
-    },
-    overdueReminders: {
-      enabled: true,
-      frequency: "daily", // daily, every3days, weekly
-    },
-    assignmentNotifications: true,
-    mentionNotifications: true,
-    statusChangeNotifications: true,
-    snoozeWakeupNotifications: true,
-    quietHours: {
-      enabled: false,
-      start: "22:00",
-      end: "08:00",
-    },
-    weekendNotifications: false,
-  });
-
   const [filter, setFilter] = useState("all");
   const [showSettings, setShowSettings] = useState(false);
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  // Combine dynamic notifications from store with static ones for demo
+  const allNotifications = [...notifications, ...staticNotifications];
+  const unreadCount = allNotifications.filter((n) => !n.read).length;
 
-  const filteredNotifications = notifications.filter((notification) => {
+  // Check for reminders periodically
+  useEffect(() => {
+    checkReminders();
+    const interval = setInterval(checkReminders, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, [checkReminders]);
+
+  const filteredNotifications = allNotifications.filter((notification) => {
     if (filter === "all") return true;
     if (filter === "unread") return !notification.read;
     return notification.type === filter;
@@ -139,30 +135,25 @@ export default function NotificationCenter() {
   };
 
   const markAsRead = (notificationId) => {
-    setNotifications(
-      notifications.map((n) =>
-        n.id === notificationId ? { ...n, read: true } : n,
-      ),
-    );
+    markNotificationRead(notificationId);
   };
 
   const markAllAsRead = () => {
-    setNotifications(notifications.map((n) => ({ ...n, read: true })));
+    markAllNotificationsRead();
   };
 
-  const deleteNotification = (notificationId) => {
-    setNotifications(notifications.filter((n) => n.id !== notificationId));
+  const handleDeleteNotification = (notificationId) => {
+    deleteNotification(notificationId);
   };
 
   const handleSettingChange = (path, value) => {
     const keys = path.split(".");
     if (keys.length === 1) {
-      setSettings({ ...settings, [keys[0]]: value });
+      updateNotificationSettings({ [keys[0]]: value });
     } else if (keys.length === 2) {
-      setSettings({
-        ...settings,
+      updateNotificationSettings({
         [keys[0]]: {
-          ...settings[keys[0]],
+          ...notificationSettings[keys[0]],
           [keys[1]]: value,
         },
       });
@@ -211,8 +202,8 @@ export default function NotificationCenter() {
   if (showSettings) {
     return (
       <NotificationSettings
-        settings={settings}
-        onSettingsChange={setSettings}
+        settings={notificationSettings}
+        onSettingsChange={updateNotificationSettings}
         onBack={() => setShowSettings(false)}
       />
     );
@@ -302,7 +293,7 @@ export default function NotificationCenter() {
                     className="text-gray-400 hover:text-gray-600 ml-4"
                     onClick={(e) => {
                       e.stopPropagation();
-                      deleteNotification(notification.id);
+                      handleDeleteNotification(notification.id);
                     }}
                   >
                     <svg
