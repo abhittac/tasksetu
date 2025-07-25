@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Calendar from "./Calendar";
 
@@ -491,16 +492,16 @@ function RecurringTaskForm({ onClose }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {/* Basic Task Information */}
       <div className="card">
-        <h3 className="text-lg font-semibold text-gray-900 mb-3">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">
           Task Details
         </h3>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Task Title *
             </label>
             <input
@@ -515,7 +516,7 @@ function RecurringTaskForm({ onClose }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Description
             </label>
             <textarea
@@ -524,13 +525,13 @@ function RecurringTaskForm({ onClose }) {
               onChange={handleChange}
               className="form-textarea"
               placeholder="Describe the task..."
-              rows={2}
+              rows={3}
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Assign to
               </label>
               <select
@@ -548,7 +549,7 @@ function RecurringTaskForm({ onClose }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Priority
               </label>
               <select
@@ -565,7 +566,7 @@ function RecurringTaskForm({ onClose }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category
               </label>
               <select
@@ -585,7 +586,7 @@ function RecurringTaskForm({ onClose }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Tags
             </label>
             <input
@@ -602,7 +603,7 @@ function RecurringTaskForm({ onClose }) {
 
       {/* Make this a recurring task */}
       <div className="card">
-        <div className="flex items-center space-x-3 mb-3">
+        <div className="flex items-center space-x-3 mb-6">
           <input
             type="checkbox"
             id="repeatTask"
@@ -616,11 +617,11 @@ function RecurringTaskForm({ onClose }) {
         </div>
 
         {isRecurring && (
-          <div className="space-y-3 pl-4 border-l-4 border-blue-200">
+          <div className="space-y-6 pl-8 border-l-4 border-blue-200">
             {/* Recurrence Options */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Frequency *
                 </label>
                 <select
@@ -638,7 +639,7 @@ function RecurringTaskForm({ onClose }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Repeat Every
                 </label>
                 <div className="flex items-center space-x-2">
@@ -647,11 +648,11 @@ function RecurringTaskForm({ onClose }) {
                     name="repeatEvery"
                     value={formData.repeatEvery}
                     onChange={handleChange}
-                    className="form-input w-20"
+                    className="form-input"
                     min="1"
                     max="365"
                   />
-                  <span className="text-xs text-gray-500">
+                  <span className="text-sm text-gray-500">
                     {formData.frequency === "daily" && "day(s)"}
                     {formData.frequency === "weekly" && "week(s)"}
                     {formData.frequency === "monthly" && "month(s)"}
@@ -664,15 +665,15 @@ function RecurringTaskForm({ onClose }) {
             {/* Repeat On Days (for weekly) */}
             {formData.frequency === "weekly" && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
                   Repeat On Days *
                 </label>
-                <div className="grid grid-cols-7 gap-1">
+                <div className="grid grid-cols-7 gap-2">
                   {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
                     <button
                       key={day}
                       type="button"
-                      className={`px-2 py-1 text-xs rounded border transition-colors ${
+                      className={`px-3 py-2 text-sm rounded-md border transition-colors ${
                         formData.repeatOnDays.includes(day)
                           ? "bg-blue-600 text-white border-blue-600"
                           : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
@@ -686,9 +687,9 @@ function RecurringTaskForm({ onClose }) {
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Start Date *
                 </label>
                 <input
@@ -699,11 +700,14 @@ function RecurringTaskForm({ onClose }) {
                   className="form-input"
                   required
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Defaults to today
+                </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Time of Creation
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Time of Creation (Optional)
                 </label>
                 <input
                   type="time"
@@ -712,15 +716,18 @@ function RecurringTaskForm({ onClose }) {
                   onChange={handleChange}
                   className="form-input"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  System will auto-create task at this time
+                </p>
               </div>
             </div>
 
             {/* End Condition */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
                 End Condition *
               </label>
-              <div className="space-y-1.5">
+              <div className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <input
                     type="radio"
@@ -750,17 +757,17 @@ function RecurringTaskForm({ onClose }) {
                     Ends after
                   </label>
                   {formData.endConditionType === "after" && (
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center space-x-2">
                       <input
                         type="number"
                         name="endValue"
                         value={formData.endValue}
                         onChange={handleChange}
-                        className="form-input w-16 text-sm py-1"
+                        className="form-input w-20"
                         placeholder="10"
                         min="1"
                       />
-                      <span className="text-xs text-gray-500">times</span>
+                      <span className="text-sm text-gray-500">occurrences</span>
                     </div>
                   )}
                 </div>
@@ -776,7 +783,7 @@ function RecurringTaskForm({ onClose }) {
                     className="form-radio"
                   />
                   <label htmlFor="endDate" className="text-sm text-gray-700">
-                    Ends by date
+                    Ends by specific date
                   </label>
                   {formData.endConditionType === "endDate" && (
                     <input
@@ -784,7 +791,7 @@ function RecurringTaskForm({ onClose }) {
                       name="endValue"
                       value={formData.endValue}
                       onChange={handleChange}
-                      className="form-input text-sm py-1"
+                      className="form-input"
                     />
                   )}
                 </div>
@@ -795,7 +802,7 @@ function RecurringTaskForm({ onClose }) {
       </div>
 
       {/* Form Actions */}
-      <div className="flex flex-col sm:flex-row gap-2 sm:justify-between pt-2">
+      <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
         <button type="button" className="btn btn-secondary" onClick={onClose}>
           Cancel
         </button>
