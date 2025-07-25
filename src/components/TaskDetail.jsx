@@ -4522,7 +4522,42 @@ function RiskModal({ task, onSubmit, onClose }) {
   );
 }
 
-ndleSubmit = (e) => {
+function TaskEditModal({ task, onSave, onClose, permissions }) {
+  const [formData, setFormData] = useState({
+    title: task.title || "",
+    description: task.description || "",
+    status: task.status || "OPEN",
+    priority: task.priority || "medium",
+    assignee: task.assignee || "",
+    assigneeId: task.assigneeId || 1,
+    dueDate: task.dueDate || "",
+    startDate: task.startDate || "",
+    timeEstimate: task.timeEstimate || "",
+    category: task.category || "",
+    taskType: task.taskType || "normal",
+    isRisky: task.isRisky || false,
+    riskNote: task.riskNote || "",
+  });
+
+  const [tagInput, setTagInput] = useState(
+    task.tags ? task.tags.join(", ") : ""
+  );
+
+  const teamMembers = [
+    { id: 1, name: "John Smith", avatar: "JS" },
+    { id: 2, name: "Sarah Wilson", avatar: "SW" },
+    { id: 3, name: "Mike Johnson", avatar: "MJ" },
+    { id: 4, name: "Emily Davis", avatar: "ED" },
+  ];
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     // Process tags
