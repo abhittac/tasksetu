@@ -351,163 +351,104 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-scroll">
-      {/* Enhanced Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center">
-            <div className="flex items-center w-full justify-between gap-4">
-              <button
-                onClick={onBack}
-                className="flex items-center gap-2 px-4 py-2 bg-white/90 hover:bg-gray-50 border border-gray-200 rounded-xl font-medium text-gray-700 hover:text-gray-900 transition-all duration-300 shadow-sm hover:shadow-md"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                  />
-                </svg>
-                Back to Notifications
-              </button>
-
-              <div className="flex items-center  gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <span className="text-2xl">⚙️</span>
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    Notification Settings
-                  </h1>
-                  <p className="text-gray-600">
-                    Customize how and when you receive notifications
-                  </p>
-                </div>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gray-50 p-4">
+      {/* Compact Header */}
+      <div className="bg-white rounded-lg shadow-sm border p-4 mb-4">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back
+          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-lg">⚙️</span>
+            <h1 className="text-xl font-bold text-gray-900">Notification Settings</h1>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Enhanced Sidebar Navigation */}
-          <div className="lg:col-span-1">
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/50 shadow-xl p-6 sticky top-24">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Settings Categories
-              </h3>
-              <nav className="space-y-2">
-                {sections.map((section) => (
-                  <button
-                    key={section.id}
-                    onClick={() => setActiveSection(section.id)}
-                    className={`w-full text-left px-4 py-3 rounded-xl font-medium transition-all duration-300 flex items-center justify-between group ${
-                      activeSection === section.id
-                        ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg"
-                        : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg">{section.icon}</span>
-                      <span>{section.label}</span>
-                    </div>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        activeSection === section.id
-                          ? "bg-white/20 text-white"
-                          : "bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600"
-                      }`}
-                    >
-                      {section.count}
-                    </span>
-                  </button>
-                ))}
-              </nav>
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        {/* Compact Sidebar */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <nav className="space-y-1">
+              {sections.map((section) => (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-between ${
+                    activeSection === section.id
+                      ? "bg-blue-500 text-white"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span>{section.icon}</span>
+                    <span>{section.label}</span>
+                  </div>
+                  <span className={`text-xs px-1.5 py-0.5 rounded ${
+                    activeSection === section.id ? "bg-white/20" : "bg-gray-200"
+                  }`}>
+                    {section.count}
+                  </span>
+                </button>
+              ))}
+            </nav>
           </div>
+        </div>
 
-          {/* Enhanced Content Area */}
-          <div className="lg:col-span-3">
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/50 shadow-xl overflow-hidden">
+        {/* Compact Content */}
+        <div className="lg:col-span-3">
+          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
               {/* Delivery Preferences */}
               {activeSection === "delivery" && (
-                <div className="p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center">
-                      <span className="text-xl">📨</span>
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900">
-                        Delivery Preferences
-                      </h2>
-                      <p className="text-gray-600">
-                        Choose how you want to receive notifications
-                      </p>
-                    </div>
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-lg">📨</span>
+                    <h2 className="text-lg font-bold text-gray-900">Delivery Preferences</h2>
                   </div>
 
-                  <div className="space-y-6">
-                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl p-6 border border-emerald-100">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="text-lg">📧</span>
-                            <h3 className="text-lg font-semibold text-gray-900">
-                              Email notifications
-                            </h3>
-                          </div>
-                          <p className="text-gray-600">
-                            Receive notifications via email
-                          </p>
-                          <div className="mt-3 text-sm text-gray-500">
-                            ✓ Task assignments, updates, and deadlines
-                          </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <span>📧</span>
+                        <div>
+                          <h3 className="font-medium text-gray-900">Email notifications</h3>
+                          <p className="text-sm text-gray-600">Task assignments, updates, deadlines</p>
                         </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={settings.emailNotifications}
-                            onChange={() => handleToggle("emailNotifications")}
-                            className="sr-only peer"
-                          />
-                          <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-indigo-600"></div>
-                        </label>
                       </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.emailNotifications}
+                          onChange={() => handleToggle("emailNotifications")}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                      </label>
                     </div>
 
-                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="text-lg">🔔</span>
-                            <h3 className="text-lg font-semibold text-gray-900">
-                              Push notifications
-                            </h3>
-                          </div>
-                          <p className="text-gray-600">
-                            Receive browser push notifications
-                          </p>
-                          <div className="mt-3 text-sm text-gray-500">
-                            ✓ Real-time alerts and instant updates
-                          </div>
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <span>🔔</span>
+                        <div>
+                          <h3 className="font-medium text-gray-900">Push notifications</h3>
+                          <p className="text-sm text-gray-600">Real-time browser alerts</p>
                         </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={settings.pushNotifications}
-                            onChange={() => handleToggle("pushNotifications")}
-                            className="sr-only peer"
-                          />
-                          <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-indigo-600"></div>
-                        </label>
                       </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.pushNotifications}
+                          onChange={() => handleToggle("pushNotifications")}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                      </label>
                     </div>
                   </div>
                 </div>
@@ -515,34 +456,18 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
 
               {/* Due Date Reminders */}
               {activeSection === "reminders" && (
-                <div className="p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center">
-                      <span className="text-xl">⏰</span>
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900">
-                        Due Date Reminders
-                      </h2>
-                      <p className="text-gray-600">
-                        Get reminded before tasks are due
-                      </p>
-                    </div>
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-lg">⏰</span>
+                    <h2 className="text-lg font-bold text-gray-900">Due Date Reminders</h2>
                   </div>
 
-                  <div className="space-y-6">
-                    <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6 border border-orange-100">
-                      <div className="flex items-center justify-between mb-6">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="text-lg">📅</span>
-                            <h3 className="text-lg font-semibold text-gray-900">
-                              Enable due date reminders
-                            </h3>
-                          </div>
-                          <p className="text-gray-600">
-                            Receive reminders before tasks are due
-                          </p>
+                  <div className="space-y-4">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span>📅</span>
+                          <h3 className="font-medium text-gray-900">Enable due date reminders</h3>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
@@ -551,41 +476,24 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                             onChange={() => handleToggle("dueDateReminders")}
                             className="sr-only peer"
                           />
-                          <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-6 peer-checked:after:border-white after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-orange-500 peer-checked:to-red-600"></div>
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
                         </label>
                       </div>
 
                       {settings.dueDateReminders && (
-                        <div className="space-y-6 pt-6 border-t border-orange-200">
+                        <div className="space-y-3 pt-3 border-t border-gray-200">
                           <div>
-                            <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                              <span>⏱️</span>
-                              Remind me:
-                            </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <h4 className="text-sm font-medium text-gray-900 mb-2">Remind me:</h4>
+                            <div className="space-y-2">
                               {[
-                                {
-                                  days: 7,
-                                  label: "7 days before",
-                                  desc: "Week ahead",
-                                },
-                                {
-                                  days: 3,
-                                  label: "3 days before",
-                                  desc: "Few days",
-                                },
-                                {
-                                  days: 1,
-                                  label: "1 day before",
-                                  desc: "Last minute",
-                                },
-                              ].map(({ days, label, desc }) => (
-                                <label key={days} className="relative">
+                                { days: 7, label: "7 days before" },
+                                { days: 3, label: "3 days before" },
+                                { days: 1, label: "1 day before" },
+                              ].map(({ days, label }) => (
+                                <label key={days} className="flex items-center gap-2 cursor-pointer">
                                   <input
                                     type="checkbox"
-                                    checked={(settings.dueDateReminders?.daysBeforeDue || []).includes(
-                                      days,
-                                    )}
+                                    checked={(settings.dueDateReminders?.daysBeforeDue || []).includes(days)}
                                     onChange={(e) => {
                                       if (e.target.checked) {
                                         const currentDays = settings.dueDateReminders?.daysBeforeDue || [];
@@ -609,63 +517,30 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
                                         });
                                       }
                                     }}
-                                    className="sr-only peer"
+                                    className="w-4 h-4 text-orange-600 rounded"
                                   />
-                                  <div className="bg-white border-2 border-gray-200 rounded-xl p-4 cursor-pointer transition-all duration-300 peer-checked:border-orange-500 peer-checked:bg-orange-50 hover:border-orange-300">
-                                    <div className="flex items-center justify-between">
-                                      <div>
-                                        <div className="font-medium text-gray-900">
-                                          {label}
-                                        </div>
-                                        <div className="text-sm text-gray-600">
-                                          {desc}
-                                        </div>
-                                      </div>
-                                      <div className="w-5 h-5 border-2 border-gray-300 rounded peer-checked:border-orange-500 peer-checked:bg-orange-500 flex items-center justify-center">
-                                        {(settings.dueDateReminders?.daysBeforeDue || []).includes(
-                                          days,
-                                        ) && (
-                                          <svg
-                                            className="w-3 h-3 text-white"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                          >
-                                            <path
-                                              fillRule="evenodd"
-                                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                              clipRule="evenodd"
-                                            />
-                                          </svg>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
+                                  <span className="text-sm text-gray-700">{label}</span>
                                 </label>
                               ))}
                             </div>
                           </div>
 
                           <div>
-                            <h4 className="text-sm font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                              <span>🕘</span>
-                              Reminder time:
-                            </h4>
-                            <div className="bg-white rounded-xl border-2 border-gray-200 p-4 max-w-xs">
-                              <input
-                                type="time"
-                                value={settings.dueDateReminders.time}
-                                onChange={(e) =>
-                                  onSettingsChange({
-                                    ...settings,
-                                    dueDateReminders: {
-                                      ...settings.dueDateReminders,
-                                      time: e.target.value,
-                                    },
-                                  })
-                                }
-                                className="w-full text-lg font-medium text-gray-900 bg-transparent border-none outline-none"
-                              />
-                            </div>
+                            <h4 className="text-sm font-medium text-gray-900 mb-2">Reminder time:</h4>
+                            <input
+                              type="time"
+                              value={settings.dueDateReminders?.time || "09:00"}
+                              onChange={(e) =>
+                                onSettingsChange({
+                                  ...settings,
+                                  dueDateReminders: {
+                                    ...settings.dueDateReminders,
+                                    time: e.target.value,
+                                  },
+                                })
+                              }
+                              className="w-32 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                            />
                           </div>
                         </div>
                       )}
@@ -676,127 +551,66 @@ function NotificationSettings({ settings, onSettingsChange, onBack }) {
 
               {/* Advanced Settings */}
               {activeSection === "advanced" && (
-                <div className="p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-xl flex items-center justify-center">
-                      <span className="text-xl">⚙️</span>
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900">
-                        Advanced Settings
-                      </h2>
-                      <p className="text-gray-600">
-                        Fine-tune your notification preferences
-                      </p>
-                    </div>
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-lg">⚙️</span>
+                    <h2 className="text-lg font-bold text-gray-900">Advanced Settings</h2>
                   </div>
 
-                  <div className="space-y-6">
-                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-100">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="space-y-4">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
                         <span>🔕</span>
                         Quiet Hours
                       </h3>
-                      <p className="text-gray-600 mb-4">
-                        Set times when you don't want to receive notifications
-                      </p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Start time
-                          </label>
-                          <input
-                            type="time"
-                            defaultValue="22:00"
-                            className="form-input w-full"
-                          />
+                          <label className="block text-sm text-gray-700 mb-1">Start</label>
+                          <input type="time" defaultValue="22:00" className="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            End time
-                          </label>
-                          <input
-                            type="time"
-                            defaultValue="08:00"
-                            className="form-input w-full"
-                          />
+                          <label className="block text-sm text-gray-700 mb-1">End</label>
+                          <input type="time" defaultValue="08:00" className="w-full px-2 py-1 border border-gray-300 rounded text-sm" />
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
                         <span>📊</span>
                         Digest Settings
                       </h3>
-                      <p className="text-gray-600 mb-4">
-                        Receive summary notifications instead of individual ones
-                      </p>
-                      <div className="space-y-3">
-                        <label className="flex items-center gap-3 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="digest"
-                            value="none"
-                            defaultChecked
-                            className="w-4 h-4 text-green-600"
-                          />
-                          <span className="text-gray-700">
-                            Send notifications immediately
-                          </span>
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="digest" value="none" defaultChecked className="w-4 h-4 text-green-600" />
+                          <span className="text-sm text-gray-700">Send immediately</span>
                         </label>
-                        <label className="flex items-center gap-3 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="digest"
-                            value="hourly"
-                            className="w-4 h-4 text-green-600"
-                          />
-                          <span className="text-gray-700">Hourly digest</span>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="digest" value="hourly" className="w-4 h-4 text-green-600" />
+                          <span className="text-sm text-gray-700">Hourly digest</span>
                         </label>
-                        <label className="flex items-center gap-3 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="digest"
-                            value="daily"
-                            className="w-4 h-4 text-green-600"
-                          />
-                          <span className="text-gray-700">Daily digest</span>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="digest" value="daily" className="w-4 h-4 text-green-600" />
+                          <span className="text-sm text-gray-700">Daily digest</span>
                         </label>
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-6 border border-red-100">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
                         <span>🚨</span>
                         Priority Filter
                       </h3>
-                      <p className="text-gray-600 mb-4">
-                        Only receive notifications for specific priority levels
-                      </p>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="grid grid-cols-2 gap-2">
                         {[
-                          { level: "low", color: "green", label: "Low" },
-                          { level: "medium", color: "yellow", label: "Medium" },
-                          { level: "high", color: "orange", label: "High" },
-                          {
-                            level: "critical",
-                            color: "red",
-                            label: "Critical",
-                          },
-                        ].map(({ level, color, label }) => (
-                          <label
-                            key={level}
-                            className="flex items-center gap-2 cursor-pointer"
-                          >
-                            <input
-                              type="checkbox"
-                              defaultChecked
-                              className={`w-4 h-4 text-${color}-600`}
-                            />
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium bg-${color}-100 text-${color}-800`}
-                            >
+                          { level: "low", label: "Low", color: "bg-green-100 text-green-800" },
+                          { level: "medium", label: "Medium", color: "bg-yellow-100 text-yellow-800" },
+                          { level: "high", label: "High", color: "bg-orange-100 text-orange-800" },
+                          { level: "critical", label: "Critical", color: "bg-red-100 text-red-800" },
+                        ].map(({ level, label, color }) => (
+                          <label key={level} className="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" defaultChecked className="w-4 h-4" />
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${color}`}>
                               {label}
                             </span>
                           </label>
