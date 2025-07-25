@@ -52,6 +52,17 @@ export default function ApprovalTaskCreator({
     });
   };
 
+  const handleCollaboratorToggle = (collaboratorId) => {
+    const newCollaborators = formData.collaborators.includes(collaboratorId)
+      ? formData.collaborators.filter((id) => id !== collaboratorId)
+      : [...formData.collaborators, collaboratorId];
+
+    setFormData({
+      ...formData,
+      collaborators: newCollaborators,
+    });
+  };
+
   const handleFileUpload = (files) => {
     const newAttachments = Array.from(files).map((file) => ({
       id: Date.now() + Math.random(),
@@ -270,6 +281,58 @@ export default function ApprovalTaskCreator({
                 </div>
                 <p className="text-xs text-gray-500 mt-3">
                   Click to select multiple approvers
+                </p>
+              </div>
+            </div>
+
+            {/* Collaborators Selection */}
+            <div className="space-y-3">
+              <label className="block text-sm font-semibold text-gray-700">
+                Collaborators{" "}
+                <span className="text-xs text-gray-500 font-normal">
+                  ({formData.collaborators.length} selected)
+                </span>
+              </label>
+              <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                <div className="grid grid-cols-3 sm:grid-cols-2 gap-3">
+                  {availableApprovers.map((collaborator) => (
+                    <div
+                      key={collaborator.id}
+                      className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                        formData.collaborators.includes(collaborator.id)
+                          ? "border-green-500 bg-green-50"
+                          : "border-gray-200 bg-white hover:border-gray-300"
+                      }`}
+                      onClick={() => handleCollaboratorToggle(collaborator.id)}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0">
+                          <span className="text-lg">{collaborator.avatar}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              checked={formData.collaborators.includes(
+                                collaborator.id,
+                              )}
+                              onChange={() => handleCollaboratorToggle(collaborator.id)}
+                              className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                            />
+                            <span className="text-sm font-medium text-gray-900 truncate">
+                              {collaborator.name}
+                            </span>
+                          </div>
+                          <span className="text-xs text-gray-500 capitalize">
+                            {collaborator.role.replace("_", " ")}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  Collaborators receive notifications but cannot approve/reject
                 </p>
               </div>
             </div>
