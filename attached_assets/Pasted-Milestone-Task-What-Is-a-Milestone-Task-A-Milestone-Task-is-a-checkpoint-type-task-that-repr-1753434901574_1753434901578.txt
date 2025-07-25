@@ -1,0 +1,41 @@
+Milestone Task
+
+🧩 What Is a Milestone Task?
+A Milestone Task is a checkpoint-type task that represents a significant goal or event in a process. It can either:
+•	Exist as a standalone task.
+•	Or be logically linked to one or more other tasks/subtasks (dependencies).
+🔧 Creation Flow & Fields
+Field Name	Type	Default / Behavior
+Task Name	Short text	Mandatory
+Milestone Toggle	Checkbox/Toggle	Mandatory toggle to mark task as Milestone
+Milestone Type	Dropdown	Standalone or Linked to Tasks
+Link to Tasks	Multi-select	Visible only if Linked is selected — choose tasks/subtasks to monitor
+Due Date	Date	Mandatory
+Assigned To	Dropdown	Mandatory, Default creator
+Description	Long Text	Optional (for background, criteria, purpose)
+Visibility	Private/Public	Default: Private
+Priority	Dropdown	Default: Medium
+Collaborators	Dropdown	Optional (for updates & comments visibility)
+
+🎯 Behavior and Logic
+Scenario	Behavior
+Milestone is linked to task(s)	It monitors progress of those dependencies.
+When all linked tasks/subtasks are completed	Milestone status icon changes color, e.g., turns blue/green
+When immediate upper task (e.g., parent) is done	Visual cue (e.g., flashing dot, status tag changes) to prompt action
+User must manually confirm Milestone is “Achieved”	With a “Mark Milestone Achieved” action
+Milestone not marked after all dependencies complete	System can optionally notify the owner after configurable time window
+
+🎨 UI/UX Enhancements
+•	Milestones in list view show a star icon (⭐) or flag.
+•	Timeline/Dashboard views show them as checkpoints or vertical markers.
+•	In Task View, linked tasks appear under a "Dependency" tab.
+________________________________________
+📋 Use Cases
+•	“Product Beta Launch Complete”
+•	“Vendor Onboarded & Verified”
+•	“Training Cycle Finished”
+•	“Phase 1 Closure Milestone”
+
+🛡️ Permissions
+•	Only assigned user or Admin can mark milestone as completed.
+•	Editing milestone dependencies is restricted to task creator or admin.
