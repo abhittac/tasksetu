@@ -587,214 +587,381 @@ export default function TaskDetail({ taskId, onClose }) {
 
 function CoreInfoPanel({ task, onUpdate, permissions }) {
   return (
-    <div className="core-info-panel p-1">
-      <div className="info-grid grid grid-cols-1 lg:grid-cols-4 gap-1">
-        {/* Reminders and Description - Ultra Compact */}
-        <div className="info-section lg:col-span-4">
-          {task.reminders.length > 0 && (
-            <div className="bg-yellow-100 px-1 py-0.5 rounded text-xs">
-              <span className="font-medium">⏰ Reminder:</span>
-              <span className="ml-1">
-                {task.reminders[0].message} ({task.reminders[0].date})
-              </span>
+    <div className="core-info-panel p-4">
+      <div className="space-y-6">
+        {/* Task Overview */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+              <span className="text-blue-600 text-lg">{task.taskType === 'milestone' ? '🎯' : task.taskType === 'approval' ? '✅' : '📋'}</span>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Task Overview</h3>
+              <p className="text-sm text-gray-600">Complete task information and details</p>
+            </div>
+          </div>
+
+          {/* Reminders */}
+          {task.reminders && task.reminders.length > 0 && (
+            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-yellow-600">⏰</span>
+                <span className="font-medium text-yellow-800">Active Reminders:</span>
+              </div>
+              {task.reminders.map((reminder, index) => (
+                <div key={index} className="mt-2 text-sm text-yellow-700">
+                  {reminder.message} - {reminder.date}
+                </div>
+              ))}
             </div>
           )}
-          <h3 className="text-xs font-medium">Description</h3>
-          <EditableTextArea
-            value={task.description}
-            onSave={(newDesc) => onUpdate({ ...task, description: newDesc })}
-            canEdit={permissions.canEdit}
-            placeholder="Add task description..."
-          />
+
+          {/* Description */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <EditableTextArea
+              value={task.description}
+              onSave={(newDesc) => onUpdate({ ...task, description: newDesc })}
+              canEdit={permissions.canEdit}
+              placeholder="Add task description..."
+            />
+          </div>
         </div>
 
-        {/* Timeline - Compact - Reduced Width */}
-        <div
-          className="info-section bg-gray-50 p-1 rounded lg:col-span-1"
-          style={{ paddingTop: "2rem" }}
-        >
-          <h4
-            className="text-xs font-medium mb-0.5"
-            style={{ paddingLeft: "1rem" }}
-          >
-            Timeline
-          </h4>
-          <div className="space-y-0.5 p-4">
-            <div className="info-field flex justify-between text-xs">
-              <label className="font-medium">Start:</label>
-              <EditableDateField
-                value={task.startDate}
-                onSave={(newDate) => onUpdate({ ...task, startDate: newDate })}
-                canEdit={permissions.canEdit}
-              />
+        {/* Basic Information Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Task Details Card */}
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <span className="text-blue-500">📝</span>
+              Task Details
+            </h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">ID:</label>
+                <span className="text-sm text-gray-900">#{task.id}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Type:</label>
+                <span className="text-sm text-gray-900 capitalize">{task.taskType || 'Normal'}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Category:</label>
+                <span className="text-sm text-gray-900">{task.category || 'None'}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Visibility:</label>
+                <span className="text-sm text-gray-900 capitalize">{task.visibility || 'Private'}</span>
+              </div>
             </div>
-            <div className="info-field flex justify-between text-xs">
-              <label className="font-medium">Due:</label>
-              <EditableDateField
-                value={task.dueDate}
-                onSave={(newDate) => onUpdate({ ...task, dueDate: newDate })}
-                canEdit={permissions.canEdit}
-              />
+          </div>
+
+          {/* Timeline Card */}
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <span className="text-green-500">📅</span>
+              Timeline
+            </h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Start Date:</label>
+                <EditableDateField
+                  value={task.startDate}
+                  onSave={(newDate) => onUpdate({ ...task, startDate: newDate })}
+                  canEdit={permissions.canEdit}
+                />
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Due Date:</label>
+                <EditableDateField
+                  value={task.dueDate}
+                  onSave={(newDate) => onUpdate({ ...task, dueDate: newDate })}
+                  canEdit={permissions.canEdit}
+                />
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Time Estimate:</label>
+                <EditableTextField
+                  value={task.timeEstimate}
+                  onSave={(newEstimate) => onUpdate({ ...task, timeEstimate: newEstimate })}
+                  canEdit={permissions.canEdit}
+                />
+              </div>
             </div>
-            <div className="info-field flex justify-between text-xs">
-              <label className="font-medium">Estimate:</label>
-              <EditableTextField
-                value={task.timeEstimate}
-                onSave={(newEstimate) =>
-                  onUpdate({ ...task, timeEstimate: newEstimate })
-                }
-                canEdit={permissions.canEdit}
-              />
+          </div>
+
+          {/* Creation Info Card */}
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <span className="text-purple-500">👤</span>
+              Creation Info
+            </h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Created By:</label>
+                <span className="text-sm text-gray-900">{task.createdBy}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Created:</label>
+                <span className="text-sm text-gray-900">{new Date(task.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Last Updated:</label>
+                <span className="text-sm text-gray-900">{new Date(task.updatedAt).toLocaleDateString()}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Creator ID:</label>
+                <span className="text-sm text-gray-900">#{task.creatorId}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Creation Info - Compact - Increased Width */}
-        <div
-          className="info-section bg-gray-50 p-1 rounded lg:col-span-2"
-          style={{ paddingTop: "2rem" }}
-        >
-          <h4
-            className="text-xs font-medium mb-0.5"
-            style={{ paddingLeft: "1rem" }}
-          >
-            Details
-          </h4>
-          <div className="space-y-0.5 text-xs p-4">
-            <div className="info-field flex justify-between">
-              <label className="font-medium">Created By:</label>
-              <span className="truncate">{task.createdBy}</span>
-            </div>
-            <div className="info-field flex justify-between">
-              <label className="font-medium">Created:</label>
-              <span className="truncate">{task.createdAt}</span>
-            </div>
-            <div className="info-field flex justify-between">
-              <label className="font-medium">Updated:</label>
-              <span className="truncate">{task.updatedAt}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Relationships - Compact */}
-        <div
-          className="info-section bg-gray-50  rounded"
-          style={{ paddingTop: "2rem" }}
-        >
-          <h4
-            className="text-xs font-medium mb-0.5 p-4"
-            style={{ paddingLeft: "1rem" }}
-          >
-            Relationships
-          </h4>
-          <div className="space-y-0.5 text-xs p-4">
-            {task.parentTaskId && (
-              <div className="info-field">
-                <label className="font-medium">Parent:</label>
-                <span className="linked-task text-blue-600">
-                  #{task.parentTaskId}
+        {/* Assignment & Status Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Assignment Card */}
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <span className="text-orange-500">👥</span>
+              Assignment & Status
+            </h4>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Assignee:</label>
+                <span className="text-sm text-gray-900">{task.assignee}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Assignee ID:</label>
+                <span className="text-sm text-gray-900">#{task.assigneeId}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Current Status:</label>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  task.status === 'DONE' ? 'bg-green-100 text-green-800' :
+                  task.status === 'INPROGRESS' ? 'bg-blue-100 text-blue-800' :
+                  task.status === 'ONHOLD' ? 'bg-yellow-100 text-yellow-800' :
+                  task.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {getStatusLabel(task.status)}
                 </span>
               </div>
-            )}
-            {task.isRecurring && task.recurringFromTaskId && (
-              <div className="info-field">
-                <label className="font-medium">Recurring:</label>
-                <button
-                  className="linked-task text-blue-600 hover:underline"
-                  onClick={() =>
-                    console.log(`Open master task ${task.recurringFromTaskId}`)
-                  }
-                  title="View master recurring task"
-                >
-                  #{task.recurringFromTaskId} 🔁
-                </button>
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-600">Priority:</label>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  task.priority === 'critical' ? 'bg-red-100 text-red-800' :
+                  task.priority === 'high' ? 'bg-orange-100 text-orange-800' :
+                  task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-green-100 text-green-800'
+                }`}>
+                  {task.priority?.charAt(0).toUpperCase() + task.priority?.slice(1)}
+                </span>
               </div>
-            )}
-            <div className="info-field">
-              <label className="font-medium block mb-1">Collaborators:</label>
-              <div className="collaborators-list flex flex-wrap gap-1">
-                {task.collaborators.map((collab) => (
-                  <span
-                    key={collab}
-                    className="collaborator-badge bg-blue-100 text-blue-800 px-1 py-0.5 rounded text-xs"
-                  >
-                    {collab}
-                  </span>
-                ))}
+            </div>
+          </div>
+
+          {/* Collaborators & Tags Card */}
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <span className="text-indigo-500">🏷️</span>
+              Collaborators & Tags
+            </h4>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium text-gray-600 block mb-2">Collaborators:</label>
+                <div className="flex flex-wrap gap-1">
+                  {task.collaborators && task.collaborators.length > 0 ? task.collaborators.map((collab, index) => (
+                    <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                      {collab}
+                    </span>
+                  )) : (
+                    <span className="text-sm text-gray-500">No collaborators</span>
+                  )}
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 block mb-2">Tags:</label>
+                <div className="flex flex-wrap gap-1">
+                  {task.tags && task.tags.length > 0 ? task.tags.map((tag, index) => (
+                    <span key={index} className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">
+                      #{tag}
+                    </span>
+                  )) : (
+                    <span className="text-sm text-gray-500">No tags</span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Milestone Progress - Compact */}
-        {task.taskType === "milestone" && task.milestones.length > 0 && (
-          <div className="info-section lg:col-span-2 bg-purple-50 p-1 rounded">
-            <h4 className="text-xs font-medium mb-0.5">🎯 Milestones</h4>
-            <div className="milestone-list space-y-0.5">
-              {task.milestones.map((milestone) => (
-                <div
-                  key={milestone.id}
-                  className="milestone-item flex items-center gap-1 text-xs"
-                >
-                  <span className={`milestone-icon ${milestone.status}`}>
-                    {milestone.status === "completed"
-                      ? "✅"
-                      : milestone.status === "in-progress"
-                        ? "🔄"
-                        : "⭐"}
-                  </span>
-                  <div className="milestone-info flex-1">
-                    <span className="milestone-title font-medium">
-                      {milestone.title}
-                    </span>
-                    <span className="milestone-date text-gray-500 ml-1">
-                      ({milestone.date})
-                    </span>
+        {/* Relationships & Hierarchy */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <span className="text-cyan-500">🔗</span>
+            Relationships & Hierarchy
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-600">Parent Task:</label>
+              {task.parentTaskId ? (
+                <button className="text-blue-600 hover:underline text-sm" onClick={() => console.log(`Open parent task ${task.parentTaskId}`)}>
+                  #{task.parentTaskId}
+                </button>
+              ) : (
+                <span className="text-sm text-gray-500">None</span>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-600">Sub-tasks Count:</label>
+              <span className="text-sm text-gray-900">{task.subtasks?.length || 0}</span>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-600">Linked Items:</label>
+              <span className="text-sm text-gray-900">{task.linkedItems?.length || 0}</span>
+            </div>
+          </div>
+          {task.isRecurring && task.recurringFromTaskId && (
+            <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-600">🔁</span>
+                <span className="text-sm font-medium text-blue-800">Recurring Task</span>
+              </div>
+              <button 
+                className="text-blue-600 hover:underline text-sm mt-1"
+                onClick={() => console.log(`Open master task ${task.recurringFromTaskId}`)}
+              >
+                Master Task: #{task.recurringFromTaskId}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Special Properties */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Risk Information */}
+          {task.isRisky && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+              <h4 className="text-md font-semibold text-red-900 mb-3 flex items-center gap-2">
+                <span className="text-red-600">⚠️</span>
+                Risk Information
+              </h4>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">At Risk</span>
+                </div>
+                {task.riskNote && (
+                  <div>
+                    <label className="text-sm font-medium text-red-700">Risk Note:</label>
+                    <p className="text-sm text-red-600 mt-1">{task.riskNote}</p>
                   </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Snooze Information */}
+          {task.snoozedUntil && (
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+              <h4 className="text-md font-semibold text-orange-900 mb-3 flex items-center gap-2">
+                <span className="text-orange-600">😴</span>
+                Snooze Information
+              </h4>
+              <div className="space-y-2">
+                <div>
+                  <label className="text-sm font-medium text-orange-700">Snoozed Until:</label>
+                  <p className="text-sm text-orange-600">{new Date(task.snoozedUntil).toLocaleString()}</p>
+                </div>
+                {task.snoozeNote && (
+                  <div>
+                    <label className="text-sm font-medium text-orange-700">Snooze Note:</label>
+                    <p className="text-sm text-orange-600">{task.snoozeNote}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Milestone Progress */}
+        {task.taskType === "milestone" && task.milestones?.length > 0 && (
+          <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+            <h4 className="text-md font-semibold text-purple-900 mb-3 flex items-center gap-2">
+              <span className="text-purple-600">🎯</span>
+              Milestone Progress
+            </h4>
+            <div className="space-y-3">
+              {task.milestones.map((milestone) => (
+                <div key={milestone.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-purple-100">
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">
+                      {milestone.status === "completed" ? "✅" : milestone.status === "in-progress" ? "🔄" : "⭐"}
+                    </span>
+                    <div>
+                      <p className="font-medium text-gray-900">{milestone.title}</p>
+                      <p className="text-sm text-gray-600">{milestone.date}</p>
+                    </div>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    milestone.status === 'completed' ? 'bg-green-100 text-green-800' :
+                    milestone.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {milestone.status.replace('-', ' ')}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Approval Status - Compact */}
+        {/* Approval Status */}
         {task.taskType === "approval" && (
-          <div className="info-section lg:col-span-2 bg-green-50 p-1 rounded">
-            <h4 className="text-xs font-medium mb-0.5">✅ Approval</h4>
-            <div className="approval-info">
-              <span
-                className={`approval-badge px-2 py-1 rounded text-xs font-medium ${task.approvalStatus || "pending"}`}
-              >
-                {task.approvalStatus || "Pending Approval"}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Risk Information - Compact */}
-        {task.isRisky && (
-          <div className="info-section lg:col-span-2 bg-red-50 p-1 rounded">
-            <h4 className="text-xs font-medium mb-0.5">⚠️ Risk</h4>
-            <div className="risk-details">
-              <p className="text-xs">{task.riskNote}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Snooze Information - Compact */}
-        {task.snoozedUntil && (
-          <div className="info-section lg:col-span-2 bg-orange-50 p-1 rounded">
-            <h4 className="text-xs font-medium mb-0.5">😴 Snoozed</h4>
-            <div className="snooze-details space-y-0.5 text-xs">
-              <div className="snooze-field">
-                <strong>Until:</strong>{" "}
-                {new Date(task.snoozedUntil).toLocaleString()}
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+            <h4 className="text-md font-semibold text-green-900 mb-3 flex items-center gap-2">
+              <span className="text-green-600">✅</span>
+              Approval Status
+            </h4>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  task.approvalStatus === 'approved' ? 'bg-green-100 text-green-800' :
+                  task.approvalStatus === 'rejected' ? 'bg-red-100 text-red-800' :
+                  'bg-yellow-100 text-yellow-800'
+                }`}>
+                  {task.approvalStatus || "Pending Approval"}
+                </span>
               </div>
-              {task.snoozeNote && (
-                <div className="snooze-field">
-                  <strong>Note:</strong> {task.snoozeNote}
-                </div>
+              {task.isApprovalTask && (
+                <p className="text-sm text-green-600">This task requires approval to proceed</p>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Forms Information */}
+        {task.forms && task.forms.length > 0 && (
+          <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
+            <h4 className="text-md font-semibold text-indigo-900 mb-3 flex items-center gap-2">
+              <span className="text-indigo-600">📄</span>
+              Attached Forms ({task.forms.length})
+            </h4>
+            <div className="space-y-2">
+              {task.forms.map((form) => (
+                <div key={form.id} className="flex items-center justify-between p-2 bg-white rounded border border-indigo-100">
+                  <div>
+                    <p className="font-medium text-gray-900">{form.title}</p>
+                    <p className="text-sm text-gray-600">{form.type}</p>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    form.status === 'completed' ? 'bg-green-100 text-green-800' :
+                    form.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {form.status.replace('-', ' ')}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}
