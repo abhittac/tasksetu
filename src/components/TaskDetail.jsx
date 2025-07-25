@@ -884,7 +884,7 @@ function CoreInfoPanel({ task, onUpdate, permissions }) {
           {/* Relationships & Hierarchy */}
           <div className="bg-white rounded-xl border border-gray-200 p-4">
             <h4 className="text-md font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <span className="text-cyan-500">🔗</span>
+              <span className="text-cyan-500">📊</span>
               Relationships & Hierarchy
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
@@ -3396,9 +3396,9 @@ function LinkedItemsPanel({ linkedItems }) {
       task: "📋",
       document: "📄",
       form: "📝",
-      link: "🔗",
+      link: "📎",
     };
-    return icons[type] || "🔗";
+    return icons[type] || "📎";
   };
 
   const getItemTypeColor = (type) => {
@@ -3427,7 +3427,7 @@ function LinkedItemsPanel({ linkedItems }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
-            <span className="text-white text-lg">🔗</span>
+            <span className="text-white text-lg">📎</span>
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-900">
@@ -3532,7 +3532,7 @@ function LinkedItemsPanel({ linkedItems }) {
       ) : (
         <div className="text-center py-12">
           <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">🔗</span>
+            <span className="text-3xl">📎</span>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             No linked items
