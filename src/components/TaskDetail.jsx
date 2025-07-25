@@ -164,7 +164,7 @@ export default function TaskDetail({ taskId, onClose }) {
   const snoozedUntil = task.snoozedUntil ? new Date(task.snoozedUntil) : null;
   const isSnoozed = snoozedUntil && snoozedUntil > now;
 
-  // Permission checks
+  // Enhanced permission checks based on specification
   const permissions = {
     canView: true, // All roles can view
     canEdit:
@@ -173,8 +173,15 @@ export default function TaskDetail({ taskId, onClose }) {
       currentUser.role === "admin",
     canReassign:
       task.creatorId === currentUser.id || currentUser.role === "admin",
-    canDelete:
-      task.creatorId === currentUser.id || currentUser.role === "admin",
+    canDelete: (() => {
+      // Company Admin can delete any task
+      if (currentUser.role === "admin") return true;
+      
+      // Individual/Team users can delete:
+      // 1. Tasks they created
+      // 2. Tasks assigned to them
+      return task.creatorId === currentUser.id || task.assigneeId === currentUser.id;
+    })(),
     canComment: true, // All roles can comment
     canAddFiles: true, // All roles can add files
     canChangeStatus:
@@ -252,11 +259,43 @@ export default function TaskDetail({ taskId, onClose }) {
   };
 
   const handleDeleteTask = (deleteOptions) => {
-    // Log the deletion
+    const taskType = task.parentTaskId ? 'sub-task' : 'task';
+    
+    // Log the deletion with comprehensive details
     console.log(
-      `Task "${task.title}" deleted by ${currentUser.name}`,
-      deleteOptions,
+      `${taskType.charAt(0).toUpperCase() + taskType.slice(1)} "${task.title}" deleted by ${currentUser.name}`,
+      {
+        taskId: task.id,
+        deletedBy: currentUser.name,
+        deletedAt: new Date().toISOString(),
+        options: deleteOptions,
+        hadSubtasks: task.subtasks?.length || 0,
+        hadAttachments: task.attachments?.length || 0,
+        hadLinkedItems: task.linkedItems?.length || 0,
+        wasCreatedBy: task.createdBy
+      }
     );
+
+    // Show success toast notification
+    const toastMessage = `${taskType.charAt(0).toUpperCase() + taskType.slice(1)} "${task.title}" deleted successfully`;
+    
+    // Create and show toast (you can customize this based on your toast implementation)
+    const showToast = (message, type = 'success') => {
+      // Simple toast implementation - you can replace with your preferred toast library
+      const toast = document.createElement('div');
+      toast.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white transition-all duration-300 ${
+        type === 'success' ? 'bg-green-600' : 'bg-red-600'
+      }`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => document.body.removeChild(toast), 300);
+      }, 3000);
+    };
+    
+    showToast(toastMessage, 'success');
 
     // Close the modal and task detail
     setShowDeleteModal(false);
