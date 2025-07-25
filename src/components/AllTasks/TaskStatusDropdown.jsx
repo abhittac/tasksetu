@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 
 export default function TaskStatusDropdown({
@@ -119,7 +118,7 @@ export default function TaskStatusDropdown({
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-full left-0 mt-1 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+          <div className="absolute top-full left-0 mt-1 w-70 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
             {/* Current Status */}
             <div className="px-3 py-2 bg-gray-50 border-b border-gray-200">
               <div className="flex items-center gap-2 text-xs text-gray-600">

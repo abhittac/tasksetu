@@ -1,0 +1,138 @@
+Task Status Management
+
+✅ TASK STATUS MANAGEMENT
+________________________________________
+🧩 Core Idea
+•	Every task and sub-task in Tasksetu must have a Status at all times.
+•	Status defines the current state of work on the task (e.g., "Open", "In Progress", "Completed").
+•	Each company can define its own statuses and the sequence/logic between them.
+
+🔁 DEFAULT STATUS FLOW (System Default for All Companies)
+These will apply only until the company defines their own.
+Status Code	Label	Description
+OPEN	Open	Task is created but not yet started
+INPROGRESS	In Progress	Task is being worked on
+ONHOLD	On Hold	Task is paused
+DONE	Completed	Task has been completed
+CANCELLED	Cancelled	Task was terminated intentionally
+________________________________________
+🏢 COMPANY-LEVEL CONFIGURABLE STATUSES
+Each company admin can:
+•	Define their own statuses, label them, order them.
+•	Choose which ones are “active” vs “final” statuses.
+•	Map status change rules (e.g., "On Hold" can go back only to "Open" or "In Progress").
+•	Set default status for newly created tasks/sub-tasks.
+UI for Admin (Company Settings > Task Settings > Status Configuration):
+•	Add New Status (Text, Color Picker, Description)
+•	Drag-drop to reorder
+•	Mark as “Default” or “Final Status”
+•	Option to “Hide system statuses” (if fully custom)
+
+**** The same kind of logic shall be applicable for priority settings as well ****
+
+🧱 1. System-Defined Statuses (Tasksetu Core Layer)
+These are required to support core application logic, analytics, and consistency across features.
+Example system statuses:
+•	Not Started
+•	In Progress
+•	On Hold
+•	Completed
+•	Cancelled
+System status codes (e.g. SYS_NOT_STARTED) will never change, and must be used internally.
+________________________________________
+🏢 2. Company-Defined Statuses (Custom Layer)
+Companies can configure their own statuses via Admin Panel.
+Examples: The company defined status will be mapped with the system status codes only. The Admin must do this mapping in the settings.
+•	Pending → mapped to Not Started
+•	Working On → mapped to In Progress
+•	Blocked → mapped to On Hold
+•	Closed, Done → both mapped to Completed
+🧩 Rules:
+•	One system status can have multiple company statuses.
+•	Each company status must be mapped to a valid system status.
+•	Mapping is mandatory at the time of status creation or update.
+•	Company can edit names, colors, order, but not delete a system status mapping.
+
+⚙️ 3. Admin Status Configuration Flow
+Step-by-step:
+1.	Admin goes to Company Settings → Status Management
+2.	Sees existing company-defined statuses (editable inline)
+3.	Can click “+ Add New Status”
+o	Enters Status Name
+o	Selects Color
+o	Must map to a system status from dropdown
+4.	On Save, system checks:
+o	All system statuses have at least one mapping
+o	No duplication of status names
+o	System prompts: “Changing a status will affect existing tasks”
+
+🔄 4. What Happens to Existing Tasks?
+If a company renames or remaps a status:
+•	Existing tasks remain unchanged in database (linked to system code)
+•	UI dynamically renders using updated company-defined label
+•	Activity feed records:
+"Task status updated display from ‘Pending’ to ‘New Pending’"
+🛑 If a company tries to delete a status, system prevents it if it’s being used — or offers a merge option (move tasks to a different company status mapped to same system status).
+
+
+🌐 6. UI Considerations
+•	Status shown in dropdowns (e.g., task cards, Kanban board) will show company-defined statuses with color tags
+•	Admin view will have table:
+Company Status	Color	System Mapping	Tasks Using
+Working On	Blue	In Progress	452
+
+⚙️ BEHAVIOR IN TASK VIEW / UPDATE
+WHERE & HOW USER SEES / UPDATES STATUS:
+•	In Task List View:
+o	Small status pill/badge
+o	Hover → shows quick dropdown (editable for assigned users)
+•	In Task Detail Modal:
+o	Inline dropdown for status (editable, modern style)
+o	Change triggers confirmation pop-up for “final” statuses like "Completed" or "Cancelled"
+o	Activity log records status changes (Status changed from OPEN to INPROGRESS by Priya)
+
+🧠 RULES & LOGIC
+Default Assignment:
+•	New task → Gets company-defined default status (else "Open")
+Edit Permissions:
+•	Only:
+o	Task assignee
+o	Collaborators (if allowed)
+o	Admins
+Bulk Update:
+•	Multiple tasks can have status changed in Task List (bulk-select)
+Status Logic for Sub-Tasks:
+•	Parent task can’t be marked “Completed” until all sub-tasks are either:
+o	Done
+o	Cancelled (optional setting)
+
+🔄 HANDLING STATUS CHANGES (Retroactive)
+When a company changes its status list (adds, renames, removes):
+Scenario	Behavior
+A status is renamed	All tasks with old label auto-update display label (no data change)
+A status is deleted	System prompts admin to map old status to a new one
+A new default is set	All future tasks use the new default. Existing tasks are unaffected.
+Data Integrity:
+•	All statuses (even retired ones) are preserved in task history (activity logs).
+•	System keeps a hidden mapping table for legacy status values to prevent breaking reports.
+
+🌈 USER FRIENDLINESS
+•	Status Pill Colors: Color-coded status labels (configurable per status)
+•	Quick Status Change: Dropdown shows only valid next statuses.
+•	Autosave: Inline changes auto-save when user clicks outside.
+•	Tooltips: Hover over status explains what it means (for clarity)
+
+🔧 BACKEND DESIGN OVERVIEW (High-Level)
+•	Table: status_master
+o	status_id, label, description, color, is_final, is_default, company_id (null for global), active_flag
+•	Table: task_status_history
+o	task_id, previous_status_id, new_status_id, changed_by, changed_at
+________________________________________
+✅ SUMMARY
+Feature	Supported	Configurable
+Default System Statuses	✅	✅
+Company-Defined Statuses	✅	✅
+Status Edit from Task List & Detail	✅	-
+Retroactive Handling of Deleted Status	✅	-
+Activity Feed Logging	✅	-
+Sub-task Blocking Final Status	✅	✅ (optional)

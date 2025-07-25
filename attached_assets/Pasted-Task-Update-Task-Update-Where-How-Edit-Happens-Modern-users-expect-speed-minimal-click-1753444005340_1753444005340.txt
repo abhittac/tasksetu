@@ -1,0 +1,42 @@
+Task Update -
+
+🔄 Task Update – Where & How Edit Happens
+Modern users expect speed, minimal clicks, and in-context editing. So, instead of sending users to a separate "Edit Page," Tasksetu will support contextual editing from wherever the user is interacting with tasks:
+Task Update is not task life cycle, it is updating/editing the task details.
+Task Status Update – in every view
+ 1. Task List View (Table/Grid or Kanban)
+Trigger	Action
+Click on Task Name or ID	Opens Task Detail Modal (Modal Coming in from Right) for full edit
+Hover on editable fields (e.g. Assignee, Due Date, Priority)	Shows pencil/edit icon → click to inline-edit in place
+Bulk Edit Option (Future Enhancement)	Checkbox-select multiple rows → shows “Bulk Edit” toolbar
+✅ Why? Fastest way for users working with multiple tasks
+🧠 Design Tip: Show minimal indicators unless user hovers or selects
+
+2. Task Detail Modal (Default Edit Container)
+Where	Action
+Fields like Task Name, Priority, Due Date, Assignee, Description, etc.	Editable directly from this modal. “Save” button
+“More” Section	Opens a second modal (drawer or popover) for advanced settings like custom form, dependencies, related process
+Collaborators	Added via searchable multi-select inside this modal
+✅ Why? Familiar interaction, full field visibility, fewer distractions
+🧠 Design Tip: Split into collapsible sections for better readability
+
+3. Kanban / Calendar / My Day View (Mini Update)
+Trigger	Action
+Click on Task Card	Opens Task Quick View drawer from right side, showing key info (assignee, due date, status, description)
+Click “Edit” or icon inside	Converts into inline editing controls or opens full Task Modal
+Drag-drop in calendar / Kanban – (Future Enhancement)	Updates date or status directly, without opening anything
+✅ Why? Great for quick updates without breaking workflow
+🧠 Design Tip: Use soft transitions, auto-save where possible
+
+
+Notification or Activity Feed (Jump-to-Edit) – (Future Enhancement)
+Trigger	Action
+User clicks on task reference in notification or feed	Opens Task Detail Modal in editable mode, directly focusing on the field they were notified about (e.g., overdue date)
+✅ Why? Brings the user exactly to where they need to act
+🧠 Design Tip: Highlight the affected field for 2-3 seconds to draw attention.
+
+🧭 Final Flow (User-Friendly Summary)
+1.	User clicks anywhere they see the task (board, list, calendar, search result)
+2.	Task Detail Modal opens with editable fields.
+3.	Inline fields like Task Name, Assignee, and Due Date become editable on click.
+4.	Advanced settings accessed via “More” → opens a layered modal.
