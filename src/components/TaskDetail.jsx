@@ -2901,63 +2901,63 @@ function SubtaskSlideUpPanel({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overlay-animate">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 overlay-animate">
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
       <div
-        className="relative bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl w-full max-w-4xl max-h-[700px] overflow-hidden modal-animate-slide-right"
+        className="relative bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden modal-animate-slide-right"
         style={{
           boxShadow: "0 25px 50px rgba(0,0,0,0.25)",
           border: "1px solid rgba(255,255,255,0.2)",
         }}
       >
-        {/* Enhanced Header */}
-        <div className="relative p-6 border-b border-gray-200/50 bg-gradient-to-r from-blue-50 to-indigo-50 overflow-hidden">
+        {/* Compact Header */}
+        <div className="relative p-3 border-b border-gray-200/50 bg-gradient-to-r from-blue-50 to-indigo-50 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-600/10"></div>
           <div className="relative flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-sm">
+                <span className="text-sm">
                   {getStatusIcon(subtask.status)}
                 </span>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-1">
+                <h3 className="text-sm font-bold text-gray-900">
                   Sub-task Details
                 </h3>
-                <p className="text-sm text-gray-600 flex items-center gap-2">
-                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                  Part of parent task #{subtask.parentTaskId}
+                <p className="text-xs text-gray-600 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                  Parent: #{subtask.parentTaskId}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {canEdit && (
                 <button
-                  className="px-4 py-2 bg-white/80 backdrop-blur-sm text-blue-600 border border-blue-200 rounded-xl font-semibold hover:bg-blue-50 transition-all duration-300 shadow-sm"
+                  className="px-2 py-1 bg-white/80 backdrop-blur-sm text-blue-600 border border-blue-200 rounded-lg text-xs font-medium hover:bg-blue-50 transition-all duration-300 shadow-sm"
                   onClick={() => setIsEditing(!isEditing)}
                 >
                   {isEditing ? (
                     <>
-                      <span className="mr-2">✕</span>
-                      Cancel Edit
+                      <span className="mr-1">✕</span>
+                      Cancel
                     </>
                   ) : (
                     <>
-                      <span className="mr-2">✏️</span>
+                      <span className="mr-1">✏️</span>
                       Edit
                     </>
                   )}
                 </button>
               )}
               <button
-                className="w-10 h-10 bg-white/80 backdrop-blur-sm text-gray-500 hover:text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-300 flex items-center justify-center shadow-sm"
+                className="w-6 h-6 bg-white/80 backdrop-blur-sm text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-300 flex items-center justify-center shadow-sm"
                 onClick={onClose}
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-3 h-3"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -2974,19 +2974,19 @@ function SubtaskSlideUpPanel({
           </div>
         </div>
 
-        {/* Enhanced Content */}
+        {/* Compact Content */}
         <div
-          className="p-6 overflow-y-auto"
-          style={{ maxHeight: "calc(90vh - 200px)" }}
+          className="p-3 overflow-y-auto"
+          style={{ maxHeight: "calc(85vh - 140px)" }}
         >
-          <div className="space-y-8">
+          <div className="space-y-3">
             {/* Title Section */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <span className="text-blue-600 text-sm font-bold">T</span>
+            <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-5 h-5 bg-blue-100 rounded flex items-center justify-center">
+                  <span className="text-blue-600 text-xs font-bold">T</span>
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900">
+                <h4 className="text-sm font-medium text-gray-900">
                   Task Title
                 </h4>
               </div>
@@ -2996,13 +2996,13 @@ function SubtaskSlideUpPanel({
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                  className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
                   maxLength={100}
                   placeholder="Enter task title..."
                 />
               ) : (
-                <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-4 rounded-xl border border-gray-200">
-                  <p className="text-gray-900 font-semibold text-lg">
+                <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-2 rounded-lg border border-gray-200">
+                  <p className="text-gray-900 font-medium text-sm">
                     {subtask.title}
                   </p>
                 </div>
@@ -3010,14 +3010,14 @@ function SubtaskSlideUpPanel({
             </div>
 
             {/* Status & Priority Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-3">
               {/* Status Card */}
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-                    <span className="text-emerald-600 text-sm">🎯</span>
+              <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-5 h-5 bg-emerald-100 rounded flex items-center justify-center">
+                    <span className="text-emerald-600 text-xs">🎯</span>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900">
+                  <h4 className="text-sm font-medium text-gray-900">
                     Status
                   </h4>
                 </div>
@@ -3026,7 +3026,7 @@ function SubtaskSlideUpPanel({
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                    className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
                   >
                     <option value="to-do">To Do</option>
                     <option value="in-progress">In Progress</option>
@@ -3034,9 +3034,9 @@ function SubtaskSlideUpPanel({
                   </select>
                 ) : (
                   <div
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-semibold ${getStatusColor(subtask.status)}`}
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-xs font-medium ${getStatusColor(subtask.status)}`}
                   >
-                    <span className="text-lg">
+                    <span className="text-sm">
                       {getStatusIcon(subtask.status)}
                     </span>
                     <span className="capitalize">
@@ -3047,12 +3047,12 @@ function SubtaskSlideUpPanel({
               </div>
 
               {/* Priority Card */}
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <span className="text-orange-600 text-sm">⚡</span>
+              <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-5 h-5 bg-orange-100 rounded flex items-center justify-center">
+                    <span className="text-orange-600 text-xs">⚡</span>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900">
+                  <h4 className="text-sm font-medium text-gray-900">
                     Priority
                   </h4>
                 </div>
@@ -3061,7 +3061,7 @@ function SubtaskSlideUpPanel({
                     name="priority"
                     value={formData.priority}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                    className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -3070,7 +3070,7 @@ function SubtaskSlideUpPanel({
                   </select>
                 ) : (
                   <div
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-semibold ${getPriorityColor(subtask.priority)}`}
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-xs font-medium ${getPriorityColor(subtask.priority)}`}
                   >
                     <span className="capitalize">{subtask.priority}</span>
                   </div>
@@ -3079,14 +3079,14 @@ function SubtaskSlideUpPanel({
             </div>
 
             {/* Assignee & Due Date Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-3">
               {/* Assignee Card */}
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <span className="text-purple-600 text-sm">👤</span>
+              <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-5 h-5 bg-purple-100 rounded flex items-center justify-center">
+                    <span className="text-purple-600 text-xs">👤</span>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900">
+                  <h4 className="text-sm font-medium text-gray-900">
                     Assignee
                   </h4>
                 </div>
@@ -3095,7 +3095,7 @@ function SubtaskSlideUpPanel({
                     name="assignee"
                     value={formData.assignee}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                    className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
                   >
                     <option value="John Smith">John Smith</option>
                     <option value="Sarah Wilson">Sarah Wilson</option>
@@ -3103,29 +3103,29 @@ function SubtaskSlideUpPanel({
                     <option value="Emily Davis">Emily Davis</option>
                   </select>
                 ) : (
-                  <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-gray-50 to-purple-50 rounded-xl border border-gray-200">
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm">
-                      <span className="text-white font-bold text-sm">
+                  <div className="flex items-center gap-2 p-1.5 bg-gradient-to-r from-gray-50 to-purple-50 rounded-lg border border-gray-200">
+                    <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm">
+                      <span className="text-white font-bold text-xs">
                         {subtask.assignee?.charAt(0) || "U"}
                       </span>
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-medium text-gray-900 text-xs">
                         {subtask.assignee}
                       </p>
-                      <p className="text-sm text-gray-500">Task Assignee</p>
+                      <p className="text-xs text-gray-500">Assignee</p>
                     </div>
                   </div>
                 )}
               </div>
 
               {/* Due Date Card */}
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                    <span className="text-red-600 text-sm">📅</span>
+              <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-5 h-5 bg-red-100 rounded flex items-center justify-center">
+                    <span className="text-red-600 text-xs">📅</span>
                   </div>
-                  <h4 className="text-lg font-semibold text-gray-900">
+                  <h4 className="text-sm font-medium text-gray-900">
                     Due Date
                   </h4>
                 </div>
@@ -3135,26 +3135,26 @@ function SubtaskSlideUpPanel({
                     name="dueDate"
                     value={formData.dueDate}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
+                    className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
                   />
                 ) : (
-                  <div className="p-3 bg-gradient-to-r from-gray-50 to-red-50 rounded-xl border border-gray-200">
-                    <p className="font-semibold text-gray-900">
+                  <div className="p-1.5 bg-gradient-to-r from-gray-50 to-red-50 rounded-lg border border-gray-200">
+                    <p className="font-medium text-gray-900 text-xs">
                       {subtask.dueDate}
                     </p>
-                    <p className="text-sm text-gray-500">Target completion</p>
+                    <p className="text-xs text-gray-500">Target</p>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Description Section */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                  <span className="text-indigo-600 text-sm">📝</span>
+            <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-5 h-5 bg-indigo-100 rounded flex items-center justify-center">
+                  <span className="text-indigo-600 text-xs">📝</span>
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900">
+                <h4 className="text-sm font-medium text-gray-900">
                   Description
                 </h4>
               </div>
@@ -3163,18 +3163,18 @@ function SubtaskSlideUpPanel({
                   name="description"
                   value={formData.description || ""}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 resize-none"
-                  rows="4"
+                  className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300 resize-none"
+                  rows="3"
                   placeholder="Add a detailed description of this sub-task..."
                 />
               ) : (
-                <div className="bg-gradient-to-br from-gray-50 to-indigo-50 p-4 rounded-xl border border-gray-200 min-h-[120px]">
+                <div className="bg-gradient-to-br from-gray-50 to-indigo-50 p-2 rounded-lg border border-gray-200 min-h-[60px]">
                   {subtask.description ? (
-                    <p className="text-gray-900 leading-relaxed">
+                    <p className="text-gray-900 leading-relaxed text-xs">
                       {subtask.description}
                     </p>
                   ) : (
-                    <p className="text-gray-500 italic">
+                    <p className="text-gray-500 italic text-xs">
                       No description provided for this sub-task.
                     </p>
                   )}
@@ -3183,49 +3183,49 @@ function SubtaskSlideUpPanel({
             </div>
 
             {/* Metadata Section */}
-            <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-slate-200 rounded-lg flex items-center justify-center">
-                  <span className="text-slate-600 text-sm">ℹ️</span>
+            <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-lg p-3 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-5 h-5 bg-slate-200 rounded flex items-center justify-center">
+                  <span className="text-slate-600 text-xs">ℹ️</span>
                 </div>
-                <h4 className="text-lg font-semibold text-gray-900">
+                <h4 className="text-sm font-medium text-gray-900">
                   Task Information
                 </h4>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-white/50">
-                  <span className="text-gray-500 text-sm font-medium">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="bg-white/60 backdrop-blur-sm p-2 rounded-lg border border-white/50">
+                  <span className="text-gray-500 text-xs font-medium">
                     Created by:
                   </span>
-                  <p className="text-gray-900 font-semibold">
+                  <p className="text-gray-900 font-medium text-xs">
                     {subtask.createdBy}
                   </p>
                 </div>
-                <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-white/50">
-                  <span className="text-gray-500 text-sm font-medium">
+                <div className="bg-white/60 backdrop-blur-sm p-2 rounded-lg border border-white/50">
+                  <span className="text-gray-500 text-xs font-medium">
                     Created on:
                   </span>
-                  <p className="text-gray-900 font-semibold">
+                  <p className="text-gray-900 font-medium text-xs">
                     {new Date(subtask.createdAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
+                      month: "short",
                       day: "numeric",
+                      year: "numeric",
                     })}
                   </p>
                 </div>
-                <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-white/50">
-                  <span className="text-gray-500 text-sm font-medium">
+                <div className="bg-white/60 backdrop-blur-sm p-2 rounded-lg border border-white/50">
+                  <span className="text-gray-500 text-xs font-medium">
                     Visibility:
                   </span>
-                  <p className="text-gray-900 font-semibold">
+                  <p className="text-gray-900 font-medium text-xs">
                     {subtask.visibility || "Private"}
                   </p>
                 </div>
-                <div className="bg-white/60 backdrop-blur-sm p-3 rounded-xl border border-white/50">
-                  <span className="text-gray-500 text-sm font-medium">
-                    Parent Task ID:
+                <div className="bg-white/60 backdrop-blur-sm p-2 rounded-lg border border-white/50">
+                  <span className="text-gray-500 text-xs font-medium">
+                    Parent ID:
                   </span>
-                  <p className="text-gray-900 font-semibold">
+                  <p className="text-gray-900 font-medium text-xs">
                     #{subtask.parentTaskId}
                   </p>
                 </div>
@@ -3234,23 +3234,23 @@ function SubtaskSlideUpPanel({
           </div>
         </div>
 
-        {/* Enhanced Action Buttons */}
+        {/* Compact Action Buttons */}
         {isEditing && (
-          <div className="p-6 border-t border-gray-200/50 bg-gradient-to-r from-gray-50 to-blue-50">
-            <div className="flex justify-end gap-4">
+          <div className="p-3 border-t border-gray-200/50 bg-gradient-to-r from-gray-50 to-blue-50">
+            <div className="flex justify-end gap-2">
               <button
-                className="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 shadow-sm"
+                className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 shadow-sm"
                 onClick={handleCancel}
               >
-                <span className="mr-2">↩️</span>
-                Cancel Changes
+                <span className="mr-1">↩️</span>
+                Cancel
               </button>
               <button
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-lg"
+                className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg text-xs font-medium hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-lg"
                 onClick={handleSave}
               >
-                <span className="mr-2">💾</span>
-                Save Changes
+                <span className="mr-1">💾</span>
+                Save
               </button>
             </div>
           </div>
