@@ -286,7 +286,7 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
         onChange={(e) => handleInputChange(field, e.target.value)}
         className={`form-textarea ${validationErrors[field] ? "border-red-500" : ""}`}
         placeholder={placeholder}
-        rows={4}
+        rows={3}
         disabled={formStatus === "submitted"}
       />
       {validationErrors[field] && (
@@ -296,66 +296,52 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
   );
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[95vh]  overflow-hidden">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-2 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[98vh] overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold mb-2">Annual Self-Appraisal</h1>
-              <p className="text-blue-100">
-                Review Period: {formData.reviewPeriod}
-              </p>
-            </div>
             <div className="flex items-center gap-4">
+              <div>
+                <h1 className="text-xl font-bold">Annual Self-Appraisal</h1>
+                <p className="text-blue-100 text-sm">Review Period: {formData.reviewPeriod}</p>
+              </div>
               {getStatusBadge()}
+            </div>
+            <div className="flex items-center gap-3">
+              {lastSaved && <p className="text-xs text-blue-100">Last saved: {lastSaved.toLocaleTimeString()}</p>}
+              {formStatus === "draft" && (
+                <p className="flex items-center gap-2 text-xs text-blue-100">
+                  <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
+                  Auto-saving
+                </p>
+              )}
               <button
                 onClick={onClose}
-                className="text-white hover:text-blue-200 transition-colors p-2 rounded-full hover:bg-white/10"
+                className="text-white hover:text-blue-200 transition-colors p-1.5 rounded-full hover:bg-white/10"
                 disabled={isSubmitting}
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-          </div>
-
-          {/* Status Info */}
-          <div className="mt-4 text-sm text-blue-100">
-            {lastSaved && <p>Last saved: {lastSaved.toLocaleString()}</p>}
-            {formStatus === "draft" && (
-              <p className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
-                Auto-saving enabled
-              </p>
-            )}
           </div>
         </div>
 
         {/* Form Content */}
         <div
           className="overflow-y-auto"
-          style={{ maxHeight: "calc(95vh - 200px)" }}
+          style={{ maxHeight: "calc(98vh - 140px)" }}
         >
-          <div className="p-6 space-y-8">
+          <div className="p-4 space-y-6">
             {/* Personal Information (Read-Only) */}
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <div className="bg-gray-50 rounded-xl p-4">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <span className="text-blue-600">👤</span>
                 Personal Information
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 <div className="info-item">
                   <label className="text-sm font-medium text-gray-500">
                     Employee ID
@@ -408,12 +394,12 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
             </div>
 
             {/* Achievements Section */}
-            <div className="bg-white border border-gray-200 rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <div className="bg-white border border-gray-200 rounded-xl p-4">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <span className="text-green-600">🏆</span>
                 Achievements & Accomplishments
               </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {renderTextArea(
                   "keyAccomplishments",
                   "Key Accomplishments",
@@ -440,12 +426,12 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
             </div>
 
             {/* Challenges Section */}
-            <div className="bg-white border border-gray-200 rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <div className="bg-white border border-gray-200 rounded-xl p-4">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <span className="text-orange-600">⚡</span>
                 Challenges & Growth
               </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {renderTextArea(
                   "challengesFaced",
                   "Challenges Faced",
@@ -472,12 +458,12 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
             </div>
 
             {/* Goals Section */}
-            <div className="bg-white border border-gray-200 rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <div className="bg-white border border-gray-200 rounded-xl p-4">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <span className="text-purple-600">🎯</span>
                 Goals & Aspirations
               </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {renderTextArea(
                   "shortTermGoals",
                   "Short-term Goals (Next 6-12 months)",
@@ -504,12 +490,12 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
             </div>
 
             {/* Self-Rating Section */}
-            <div className="bg-white border border-gray-200 rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <div className="bg-white border border-gray-200 rounded-xl p-4">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <span className="text-indigo-600">⭐</span>
                 Self-Assessment Ratings
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {renderRatingField("performanceRating", "Overall Performance")}
                 {renderRatingField(
                   "communicationRating",
@@ -528,7 +514,7 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
                   "Reliability & Accountability",
                 )}
               </div>
-              <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+              <div className="mt-3 p-3 bg-blue-50 rounded-lg">
                 <h4 className="font-medium text-blue-900 mb-2">
                   Rating Scale:
                 </h4>
@@ -558,12 +544,12 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
             </div>
 
             {/* Manager Feedback Section (Optional) */}
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <span className="text-teal-600">💬</span>
                 Manager Feedback (Optional)
               </h2>
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {renderTextArea(
                   "managerComments",
                   "Manager Comments",
@@ -591,8 +577,8 @@ export default function AnnualSelfAppraisal({ onClose, employeeData = null }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="bg-gray-50 w-full px-6 py-4 overflow-visible border-t border-gray-200 ">
-          <div className="flex flex-col sm:flex-row gap-3 justify-between">
+        <div className="bg-gray-50 w-full px-4 py-3 overflow-visible border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row gap-2 justify-between">
             <div className="flex flex-col sm:flex-row gap-3 ">
               <button
                 onClick={handleReset}
